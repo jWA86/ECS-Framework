@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 require("mocha");
 var chai_1 = require("chai");
-var ComponentFactory_1 = require("../src/ComponentFactory");
+var ComponentFactory_1 = require("../../src/AOS/ComponentFactory");
 describe("Component Factory", function () {
     var concreteComponent = (function () {
         function concreteComponent(id) {
