@@ -44,8 +44,6 @@ var ComponentFactory = (function () {
             return false;
         }
     };
-    ComponentFactory.prototype.clearPool = function () {
-    };
     ComponentFactory.prototype.removeAll = function () {
         this.pool = [];
     };

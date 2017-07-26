@@ -52,12 +52,8 @@ class ComponentFactory<T extends IComponent> {
             return false;
         }
     }
-
-    clearPool(){
-        
-    }
-
-    removeAll(){
+    
+    removeAll() {
         this.pool = [];
     }
 
