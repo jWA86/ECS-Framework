@@ -1,7 +1,6 @@
 //Components is a struct/object 
 //Entities hold component
 // AOS (Array of structure) 
-// >> should use Structure of Array instead for perf
 interface IComponent {
     id: string;
 }
@@ -52,6 +51,14 @@ class ComponentFactory<T extends IComponent> {
         else {
             return false;
         }
+    }
+
+    clearPool(){
+        
+    }
+
+    removeAll(){
+        this.pool = [];
     }
 
     protected insertComponent(component: T, index = -1): number {

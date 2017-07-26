@@ -86,4 +86,13 @@ describe("Component Factory", () => {
         simpleFactory.removeComponent(t3.id);
         expect(simpleFactory.pool.length).to.equal(0);
     });
+    it("should be able to remove all components from the pool", ()=>{
+        //remove ref from the pool
+        let t = simpleFactory.createComponent(concreteComponent);
+        let t2 = simpleFactory.createComponent(concreteComponent);
+        let t3 = simpleFactory.createComponent(concreteComponent);
+        expect(simpleFactory.pool.length).to.equal(3);
+        simpleFactory.removeAll();
+        expect(simpleFactory.pool.length).to.equal(0);
+    })
 });

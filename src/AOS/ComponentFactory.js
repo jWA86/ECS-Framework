@@ -44,6 +44,11 @@ var ComponentFactory = (function () {
             return false;
         }
     };
+    ComponentFactory.prototype.clearPool = function () {
+    };
+    ComponentFactory.prototype.removeAll = function () {
+        this.pool = [];
+    };
     ComponentFactory.prototype.insertComponent = function (component, index) {
         if (index === void 0) { index = -1; }
         if (index < 0 || index >= this.pool.length) {

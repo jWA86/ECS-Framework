@@ -80,4 +80,13 @@ describe("Component Factory", function () {
         simpleFactory.removeComponent(t3.id);
         chai_1.expect(simpleFactory.pool.length).to.equal(0);
     });
+    it("should be able to remove all components from the pool", function () {
+        //remove ref from the pool
+        var t = simpleFactory.createComponent(concreteComponent);
+        var t2 = simpleFactory.createComponent(concreteComponent);
+        var t3 = simpleFactory.createComponent(concreteComponent);
+        chai_1.expect(simpleFactory.pool.length).to.equal(3);
+        simpleFactory.removeAll();
+        chai_1.expect(simpleFactory.pool.length).to.equal(0);
+    });
 });
