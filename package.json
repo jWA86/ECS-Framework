@@ -1,0 +1,24 @@
+{
+  "name": "componententitysystem",
+  "version": "1.0.0",
+  "description": "Simple Component Entity System",
+  "main": "src/main.js",
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://admin@192.168.0.20/volume1/Mes Documents/Documents Jord/git/ComponentEntitySystem"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/chai": "^4.0.1",
+    "@types/mocha": "^2.2.41",
+    "chai": "^4.0.2",
+    "mocha": "^3.4.2",
+    "nyc": "^11.0.3",
+    "ts-node": "^3.1.0",
+    "typescript": "^2.4.1"
+  }
+}
