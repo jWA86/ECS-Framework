@@ -41,7 +41,7 @@ describe("Component Factory", function () {
         chai_1.expect(simpleFactory.pool[0].id).to.equal(t.id);
         chai_1.expect(simpleFactory.pool[1].id).to.equal(t2.id);
         chai_1.expect(simpleFactory.pool[2].id).to.equal(t3.id);
-        //insert t4 should after t2
+        //inserted t4 should be after t2
         var t4 = simpleFactory.createComponentAfter(concreteComponent, t2.id);
         chai_1.expect(simpleFactory.pool[0].id).to.equal(t.id);
         chai_1.expect(simpleFactory.pool[1].id).to.equal(t2.id);

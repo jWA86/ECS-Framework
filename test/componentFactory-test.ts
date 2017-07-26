@@ -41,7 +41,7 @@ describe("Component Factory", () => {
         expect(simpleFactory.pool[1].id).to.equal(t2.id);
         expect(simpleFactory.pool[2].id).to.equal(t3.id);
 
-        //insert t4 should after t2
+        //inserted t4 should be after t2
         let t4 = simpleFactory.createComponentAfter(concreteComponent, t2.id);
         expect(simpleFactory.pool[0].id).to.equal(t.id);
         expect(simpleFactory.pool[1].id).to.equal(t2.id);
