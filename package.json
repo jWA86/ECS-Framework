@@ -6,10 +6,6 @@
   "scripts": {
     "test": "mocha test/"
   },
-  "repository": {
-    "type": "git",
-    "url": "ssh://admin@192.168.0.20/volume1/Mes Documents/Documents Jord/git/ComponentEntitySystem"
-  },
   "author": "",
   "license": "ISC",
   "devDependencies": {
