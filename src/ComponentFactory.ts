@@ -1,8 +1,9 @@
-
+//Components is a struct/object 
+//Entities hold component
+// AOS (Array of structure) 
+// >> should use Structure of Array instead for perf
 interface IComponent {
     id: string;
-    // new (id:string);
-
 }
 
 class ComponentFactory<T extends IComponent> {

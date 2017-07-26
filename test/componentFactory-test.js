@@ -14,11 +14,13 @@ describe("Component Factory", function () {
     beforeEach(function () {
         simpleFactory = new ComponentFactory_1.ComponentFactory();
     });
-    it("should return the id of the comopnent it creates", function () {
-        var id = simpleFactory.createComponent(concreteComponent);
-        chai_1.expect(id).to.not.be.null;
-        var id2 = simpleFactory.createComponent(concreteComponent);
-        chai_1.expect(id2).to.not.equal(id);
+    it("should generate an id of the component it creates", function () {
+        var c = simpleFactory.createComponent(concreteComponent);
+        chai_1.expect(c.id).to.not.be.null;
+        chai_1.expect(simpleFactory.pool[0].id).to.equal(c.id);
+        var c2 = simpleFactory.createComponent(concreteComponent);
+        chai_1.expect(c2.id).to.not.equal(c.id);
+        chai_1.expect(simpleFactory.pool[1].id).to.equal(c2.id);
     });
     it("should hold components it instanciates in a pool", function () {
         for (var i = 0; i < 5; ++i) {
@@ -53,7 +55,7 @@ describe("Component Factory", function () {
         chai_1.expect(simpleFactory.pool[0].id).to.equal(t.id);
         chai_1.expect(simpleFactory.pool[1].id).to.equal(t2.id);
         chai_1.expect(simpleFactory.pool[2].id).to.equal(t3.id);
-        //insert t4 should before t2
+        //inserted t4 should be before t2
         var t4 = simpleFactory.createComponentAt(concreteComponent, t2.id);
         chai_1.expect(simpleFactory.pool[0].id).to.equal(t.id);
         chai_1.expect(simpleFactory.pool[1].id).to.equal(t4.id);

@@ -7,15 +7,17 @@ describe("Component Factory", () => {
     class concreteComponent implements IComponent {
         constructor(public id: string) {}
     }
-     let simpleFactory = new ComponentFactory<IComponent>();
+    let simpleFactory = new ComponentFactory<IComponent>();
     beforeEach(() => {
         simpleFactory = new ComponentFactory<IComponent>();
     });
-    it("should return the id of the comopnent it creates", () => {
-        let id = simpleFactory.createComponent(concreteComponent);
-        expect(id).to.not.be.null;
-        let id2 = simpleFactory.createComponent(concreteComponent);
-        expect(id2).to.not.equal(id);
+    it("should generate an id of the component it creates", () => {
+        let c = simpleFactory.createComponent(concreteComponent);
+        expect(c.id).to.not.be.null;
+        expect(simpleFactory.pool[0].id).to.equal(c.id);
+        let c2 = simpleFactory.createComponent(concreteComponent);
+        expect(c2.id).to.not.equal(c.id);
+        expect(simpleFactory.pool[1].id).to.equal(c2.id);
     });
     it("should hold components it instanciates in a pool", () => {
         for (let i = 0; i < 5; ++i) {
@@ -55,7 +57,7 @@ describe("Component Factory", () => {
         expect(simpleFactory.pool[1].id).to.equal(t2.id);
         expect(simpleFactory.pool[2].id).to.equal(t3.id);
 
-        //insert t4 should before t2
+        //inserted t4 should be before t2
         let t4 = simpleFactory.createComponentAt(concreteComponent, t2.id);
         expect(simpleFactory.pool[0].id).to.equal(t.id);
         expect(simpleFactory.pool[1].id).to.equal(t4.id);
