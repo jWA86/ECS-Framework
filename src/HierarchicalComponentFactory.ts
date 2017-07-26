@@ -1,3 +1,4 @@
+
 import {IComponent, ComponentFactory} from "./ComponentFactory";
 interface IHierarchicalComponent extends IComponent {
     children: string[];
@@ -36,5 +37,4 @@ class HierarchicalComponentFactory<T extends IHierarchicalComponent> extends Com
         return false;
     }
 }
-
 export  {HierarchicalComponentFactory, IHierarchicalComponent}

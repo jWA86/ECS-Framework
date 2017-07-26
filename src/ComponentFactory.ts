@@ -78,5 +78,4 @@ class ComponentFactory<T extends IComponent> {
         });
     }
 }
-
 export { IComponent, ComponentFactory }
