@@ -34,7 +34,6 @@ describe("Hierarchical Component Factory ", function () {
     });
     it("should be able to remove a parent and all its children in the factory pool", function () {
         var t = HierarchicalFactory.createComponent(HierarchicalComponent);
-        // let system = new TimelineSystem();
         var child1 = HierarchicalFactory.createChildComponent(HierarchicalComponent, t.id);
         var child2 = HierarchicalFactory.createChildComponent(HierarchicalComponent, t.id);
         var t2 = HierarchicalFactory.createComponent(HierarchicalComponent);
@@ -45,7 +44,6 @@ describe("Hierarchical Component Factory ", function () {
     });
     it("should be able to remove the whole branch of a hierachy recursively", function () {
         var t = HierarchicalFactory.createComponent(HierarchicalComponent);
-        // let system = new TimelineSystem();
         var child1 = HierarchicalFactory.createChildComponent(HierarchicalComponent, t.id);
         var child2 = HierarchicalFactory.createChildComponent(HierarchicalComponent, t.id);
         var child1OfChild2 = HierarchicalFactory.createChildComponent(HierarchicalComponent, child2.id);
@@ -66,7 +64,6 @@ describe("Hierarchical Component Factory ", function () {
     });
     it("should be able to remove a parent but not its children in the factory pool", function () {
         var t = HierarchicalFactory.createComponent(HierarchicalComponent);
-        // let system = new TimelineSystem();
         var child1 = HierarchicalFactory.createChildComponent(HierarchicalComponent, t.id);
         var child2 = HierarchicalFactory.createChildComponent(HierarchicalComponent, t.id);
         var t2 = HierarchicalFactory.createComponent(HierarchicalComponent);
