@@ -53,8 +53,6 @@ function variance(ar, m) {
     return v / (l - 1);
 }
 exports.variance = variance;
-function createWebWork() {
-}
 var printRes = function (res) {
     console.log(res.nb + " components, " + res.easingMethod + " easing");
     console.log("mean : " + res.mean.toFixed(6) + "ms");
