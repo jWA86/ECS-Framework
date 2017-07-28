@@ -65,6 +65,7 @@ var InterpolateSystem = (function () {
     InterpolateSystem.prototype.process = function (components, progress) {
         var l = components.length;
         for (var i = 0; i < l; ++i) {
+            var c = components[i];
             var length_1 = components[i].endValue - components[i].startValue;
             var normProgress = progress / length_1;
             components[i].currentValue = this.easingFunctions[easingMethod[components[i].easing]](normProgress);

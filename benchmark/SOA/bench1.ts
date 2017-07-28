@@ -1,31 +1,30 @@
-import { ComponentFactory, IComponent } from "../../src/AOS/ComponentFactory";
+import { ComponentFactory, IComponent } from "../../src/SOA/ComponentFactory";
 import {easingMethod,  IInterpolableComponent, InterpolableComponent, InterpolateSystem} from "./SimpleSystem";
 import * as b from "../benchLib";
 
 
 const main = {
     progress: 0,
-    init: function (nb: number, easing: easingMethod) {
+    init: function (nb: number, easing?: easingMethod) { 
         this.factory = new ComponentFactory<IInterpolableComponent>();
         this.system = new InterpolateSystem();
         this.createComponents(nb, easing);
-    },
+    }, 
     next: function () {
         this.progress += 1;
         let start = process.hrtime();
         this.system.process(this.factory.pool, this.progress);
         return process.hrtime(start);
     },
-    createComponents: function (nb: number, easing: easingMethod) {
+    createComponents: function (nb: number, easing?: easingMethod) {
         for (let i = 0; i < nb; ++i) {
             let c = this.factory.createComponent(InterpolableComponent);
             c.endValue = Math.random() * 10 * i;
             if (easing === undefined) {
-                c.easing = easingMethod[Math.floor(Math.random() * 12)];
+                c.easing = Math.floor(Math.random() * Object.keys(easingMethod).length / 2);
                 
             } else {
                 c.easing = easing;
-                
             }
         }
     },
@@ -37,14 +36,14 @@ const main = {
 }
 
 
-const bench = function (nb, easing) {
+const bench = function (nb, easing?) {
     main.init(nb, easing);
     let m = [];
     for (let i = 0; i < 100; ++i) {
         m.push(main.next());
     }
     let e = easingMethod[easing];
-    if(!e){
+    if(e===undefined){
         e = "random";
     }
     let moy = b.mean(m);
@@ -55,7 +54,8 @@ const bench = function (nb, easing) {
     "min":b.min(m).value / b.NS_PER_MS,
     "SD":Math.sqrt(b.variance(m, moy)) / b.NS_PER_MS,
     "first":(m[0][0] * b.NS_PER_SEC + m[0][1]) / b.NS_PER_MS,
-    "raw":m
+    "raw":m,
+    "unit":"ms"
     }
     main.clear();
     return res;
@@ -153,6 +153,14 @@ r.push(bench(1000, easingMethod.easeInOutQuint));
 r.push(bench(10000, easingMethod.easeInOutQuint));
 r.push(bench(100000, easingMethod.easeInOutQuint));
 console.timeEnd("easeInOutQuint");
+console.time("random");
+r.push(bench(10));
+r.push(bench(100));
+r.push(bench(1000));
+r.push(bench(10000));
+r.push(bench(100000));
+console.timeEnd("random");
+
 
 function writeRes(res){
     

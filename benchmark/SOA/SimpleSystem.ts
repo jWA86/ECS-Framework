@@ -1,6 +1,6 @@
-import { ComponentFactory, IComponent } from "../../src/AOS/ComponentFactory";
-import { IHierarchicalComponent, HierarchicalComponentFactory } from "../../src/AOS/HierarchicalComponentFactory";
-import { ISystem } from "../../src/AOS/System";
+import { ComponentFactory, IComponent } from "../../src/SOA/ComponentFactory";
+import { IHierarchicalComponent, HierarchicalComponentFactory } from "../../src/SOA/HierarchicalComponentFactory";
+import { ISystem } from "../../src/SOA/System";
 
 enum easingMethod {
     "linear",
@@ -38,6 +38,7 @@ class InterpolateSystem implements ISystem {
     process(components: IInterpolableComponent[], progress: number) {
         let l = components.length;
         for (let i = 0; i < l; ++i) {
+            let c = components[i];
             let length = components[i].endValue - components[i].startValue;
             let normProgress = progress / length;
             components[i].currentValue = this.easingFunctions[easingMethod[components[i].easing]](normProgress);

@@ -53,12 +53,3 @@ function variance(ar, m) {
     return v / (l - 1);
 }
 exports.variance = variance;
-var printRes = function (res) {
-    console.log(res.nb + " components, " + res.easingMethod + " easing");
-    console.log("mean : " + res.mean.toFixed(6) + "ms");
-    console.log("max : " + res.max.toFixed(6) + "ms");
-    console.log("min : " + res.min.toFixed(6) + "ms");
-    console.log("standard deviation : " + res.SD.toFixed(6) + "ms");
-    console.log("first : " + res.first.toFixed(6) + "ms");
-};
-exports.printRes = printRes;

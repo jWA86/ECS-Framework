@@ -1,6 +1,3 @@
-//Components is a struct/object 
-//Entities hold component
-// AOS (Array of structure) 
 interface IComponent {
     id: string;
 }

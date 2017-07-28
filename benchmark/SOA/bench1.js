@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var ComponentFactory_1 = require("../../src/AOS/ComponentFactory");
+var ComponentFactory_1 = require("../../src/SOA/ComponentFactory");
 var SimpleSystem_1 = require("./SimpleSystem");
 var b = require("../benchLib");
 var main = {
@@ -21,7 +21,7 @@ var main = {
             var c = this.factory.createComponent(SimpleSystem_1.InterpolableComponent);
             c.endValue = Math.random() * 10 * i;
             if (easing === undefined) {
-                c.easing = SimpleSystem_1.easingMethod[Math.floor(Math.random() * 12)];
+                c.easing = Math.floor(Math.random() * Object.keys(SimpleSystem_1.easingMethod).length / 2);
             }
             else {
                 c.easing = easing;
@@ -41,7 +41,7 @@ var bench = function (nb, easing) {
         m.push(main.next());
     }
     var e = SimpleSystem_1.easingMethod[easing];
-    if (!e) {
+    if (e === undefined) {
         e = "random";
     }
     var moy = b.mean(m);
@@ -52,7 +52,8 @@ var bench = function (nb, easing) {
         "min": b.min(m).value / b.NS_PER_MS,
         "SD": Math.sqrt(b.variance(m, moy)) / b.NS_PER_MS,
         "first": (m[0][0] * b.NS_PER_SEC + m[0][1]) / b.NS_PER_MS,
-        "raw": m
+        "raw": m,
+        "unit": "ms"
     };
     main.clear();
     return res;
@@ -149,5 +150,12 @@ r.push(bench(1000, SimpleSystem_1.easingMethod.easeInOutQuint));
 r.push(bench(10000, SimpleSystem_1.easingMethod.easeInOutQuint));
 r.push(bench(100000, SimpleSystem_1.easingMethod.easeInOutQuint));
 console.timeEnd("easeInOutQuint");
+console.time("random");
+r.push(bench(10));
+r.push(bench(100));
+r.push(bench(1000));
+r.push(bench(10000));
+r.push(bench(100000));
+console.timeEnd("random");
 function writeRes(res) {
 }

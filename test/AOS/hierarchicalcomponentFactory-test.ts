@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import { IHierarchicalComponent,  HierarchicalComponentFactory }
-    from "../../src/AOS/HierarchicalComponentFactory";
+    from "../../src/SOA/HierarchicalComponentFactory";
 
 describe("Hierarchical Component Factory ", () => {
 

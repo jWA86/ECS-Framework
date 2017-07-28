@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { ComponentFactory, IComponent } from "../../src/AOS/ComponentFactory";
+import { ComponentFactory, IComponent } from "../../src/SOA/ComponentFactory";
 
 describe("Component Factory", () => {
 

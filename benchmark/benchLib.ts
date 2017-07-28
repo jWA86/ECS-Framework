@@ -1,8 +1,8 @@
-
 const NS_PER_SEC = 1e9;
 const NS_PER_MS = 1e6;
 
 interface IResult {
+    unit:number;
     mean: number;
     max: number;
     min: number;
@@ -57,13 +57,13 @@ function variance(ar, m) {
     return v / (l - 1);
 }
 
-const printRes = function (res) {
-    console.log(res.nb + " components, " + res.easingMethod + " easing");
-    console.log("mean : " + res.mean.toFixed(6) + "ms");
-    console.log("max : " + res.max.toFixed(6) + "ms");
-    console.log("min : " + res.min.toFixed(6) + "ms");
-    console.log("standard deviation : " + res.SD.toFixed(6) + "ms");
-    console.log("first : " + res.first.toFixed(6) + "ms");
-}
+// const printRes = function (res:IResult) {
+//     console.log(res.nb + " components, " + res.easingMethod + " easing");
+//     console.log("mean : " + res.mean.toFixed(6) + res.unit);
+//     console.log("max : " + res.max.toFixed(6) + res.unit);
+//     console.log("min : " + res.min.toFixed(6) + res.unit);
+//     console.log("standard deviation : " + res.SD.toFixed(6) + res.unit);
+//     console.log("first : " + res.first.toFixed(6) + res.unit);
+// }
 
-export { NS_PER_SEC, NS_PER_MS, IResult, hrToNanoSec, mean, max, min, variance, printRes }
+export { NS_PER_SEC, NS_PER_MS, IResult, hrToNanoSec, mean, max, min, variance }
