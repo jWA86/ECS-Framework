@@ -1,5 +1,3 @@
-var fs = require('fs');
-
 const NS_PER_SEC = 1e9;
 const NS_PER_MS = 1e6;
 
@@ -59,29 +57,13 @@ function variance(ar, m) {
     return v / (l - 1);
 }
 
-// const printRes = function (res:IResult) {
-//     console.log(res.nb + " components, " + res.easingMethod + " easing");
-//     console.log("mean : " + res.mean.toFixed(6) + res.unit);
-//     console.log("max : " + res.max.toFixed(6) + res.unit);
-//     console.log("min : " + res.min.toFixed(6) + res.unit);
-//     console.log("standard deviation : " + res.SD.toFixed(6) + res.unit);
-//     console.log("first : " + res.first.toFixed(6) + res.unit);
-// }
-
 function writeRes(res, path) {
     let p = path + "/" + Date.now() + ".json";
     let buffer = new Buffer(JSON.stringify(res));
-
-    // fs.open(p, 'w', function (err, fd) {
-    //     if (err) {
-    //         throw 'error opening file: ' + err;
-    //     }
-
         fs.writeFile(p, buffer, 0, buffer.length, null, function (err) {
             if (err) throw 'error writing file: ' + err;
             else{console.log("results written in /res")}
         });
-    //});
 }
 
 
