@@ -1,167 +1,230 @@
 import { ComponentFactory, IComponent } from "../../src/SOA/ComponentFactory";
-import {easingMethod,  IInterpolableComponent, InterpolableComponent, InterpolateSystem} from "./SimpleSystem";
+import { easingMethod, IInterpolableComponent, InterpolableComponent, InterpolateSystem, easingSystem } from "./SimpleSystem";
 import * as b from "../benchLib";
 
 
 const main = {
     progress: 0,
-    init: function (nb: number, easing?: easingMethod) { 
-        this.factory = new ComponentFactory<IInterpolableComponent>();
-        this.system = new InterpolateSystem();
-        this.createComponents(nb, easing);
-    }, 
+    factories: [],
+    createFactories: function () {
+        //create a component factory for each type of components
+        let nbFact = Object.keys(easingMethod).length / 2;
+        for (let i = 0; i < nbFact; ++i) {
+            this.factories.push(new ComponentFactory<IInterpolableComponent>());
+        }
+    },
+    init: function (nb: number) {
+        this.createFactories();
+        this.system = easingSystem;
+        this.createComponents(nb); 
+    },
     next: function () {
         this.progress += 1;
         let start = process.hrtime();
-        this.system.process(this.factory.pool, this.progress);
+        this.system.process(this.factories, this.progress);
         return process.hrtime(start);
     },
-    createComponents: function (nb: number, easing?: easingMethod) {
-        for (let i = 0; i < nb; ++i) {
-            let c = this.factory.createComponent(InterpolableComponent);
-            c.endValue = Math.random() * 10 * i;
-            if (easing === undefined) {
-                c.easing = Math.floor(Math.random() * Object.keys(easingMethod).length / 2);
-                
-            } else {
-                c.easing = easing;
+    createComponents: function (nb: number) {
+        for (let f = 0; f < this.factories.length; ++f) {
+            for (let i = 0; i < nb; ++i) {
+                let c = this.factories[f].createComponent(InterpolableComponent);
+                c.endValue = Math.random() * 10 * i;
             }
         }
     },
     clear: function () {
-        this.factory.removeAll();
-        this.factory = null;
+        this.factories.forEach((f) => {
+            f.removeAll();
+        });
+        this.factories = [];
         this.system = null;
     }
 }
 
 
-const bench = function (nb, easing?) {
-    main.init(nb, easing);
+const bench = function (nbLoop, nbComp) {
     let m = [];
-    for (let i = 0; i < 100; ++i) {
+    for (let i = 0; i < nbLoop; ++i) {
         m.push(main.next());
     }
-    let e = easingMethod[easing];
-    if(e===undefined){
-        e = "random";
-    }
     let moy = b.mean(m);
-    let res = {"nb":nb,
-    "easingMethod":e,
-    "mean":moy / b.NS_PER_MS,
-    "max":b.max(m).value / b.NS_PER_MS,
-    "min":b.min(m).value / b.NS_PER_MS,
-    "SD":Math.sqrt(b.variance(m, moy)) / b.NS_PER_MS,
-    "first":(m[0][0] * b.NS_PER_SEC + m[0][1]) / b.NS_PER_MS,
-    "raw":m,
-    "unit":"ms"
+    let res = {
+        "nb": nbComp,
+        "easingMethod": "all sys one by one",
+        "nbIteration": nbLoop,
+        "mean": moy / b.NS_PER_MS,
+        "max": b.max(m).value / b.NS_PER_MS,
+        "min": b.min(m).value / b.NS_PER_MS,
+        "SD": Math.sqrt(b.variance(m, moy)) / b.NS_PER_MS,
+        "first": (m[0][0] * b.NS_PER_SEC + m[0][1]) / b.NS_PER_MS,
+        "raw": m,
+        "unit": "ms"
     }
-    main.clear();
     return res;
 }
 
+//init loop
+main.init(100);
+bench(10, 100);
+main.clear();
+
+
+// test with x (10, 100, 1000 ,10000 ,100000) components for each type of component (13 easing system)
+// sample over y iterations (1, 2, 3, 10, 100) 
 let r = [];
-console.time("linear");
-r.push(bench(10, easingMethod.linear));
-r.push(bench(100, easingMethod.linear));
-r.push(bench(1000, easingMethod.linear));
-r.push(bench(10000, easingMethod.linear));
-r.push(bench(100000, easingMethod.linear));
-console.timeEnd("linear");
-console.time("easeInQuad");
-r.push(bench(10, easingMethod.easeInQuad));
-r.push(bench(100, easingMethod.easeInQuad));
-r.push(bench(1000, easingMethod.easeInQuad));
-r.push(bench(10000, easingMethod.easeInQuad));
-r.push(bench(100000, easingMethod.easeInQuad));
-console.timeEnd("easeInQuad");
-console.time("easeOutQuad");
-r.push(bench(10, easingMethod.easeOutQuad));
-r.push(bench(100, easingMethod.easeOutQuad));
-r.push(bench(1000, easingMethod.easeOutQuad));
-r.push(bench(10000, easingMethod.easeOutQuad));
-r.push(bench(100000, easingMethod.easeOutQuad));
-console.timeEnd("easeOutQuad");
-console.time("easeInOutQuad");
-r.push(bench(10, easingMethod.easeInOutQuad));
-r.push(bench(100, easingMethod.easeInOutQuad));
-r.push(bench(1000, easingMethod.easeInOutQuad));
-r.push(bench(10000, easingMethod.easeInOutQuad));
-r.push(bench(100000, easingMethod.easeInOutQuad));
-console.timeEnd("easeInOutQuad");
-console.time("easeInCubic");
-r.push(bench(10, easingMethod.easeInCubic));
-r.push(bench(100, easingMethod.easeInCubic));
-r.push(bench(1000, easingMethod.easeInCubic));
-r.push(bench(10000, easingMethod.easeInCubic));
-r.push(bench(100000, easingMethod.easeInCubic));
-console.timeEnd("easeInCubic");
-console.time("easeOutCubic");
-r.push(bench(10, easingMethod. easeOutCubic));
-r.push(bench(100, easingMethod. easeOutCubic));
-r.push(bench(1000, easingMethod. easeOutCubic));
-r.push(bench(10000, easingMethod. easeOutCubic));
-r.push(bench(100000, easingMethod. easeOutCubic));
-console.timeEnd("easeOutCubic");
-console.time("easeInOutCubic");
-r.push(bench(10, easingMethod.easeInOutCubic));
-r.push(bench(100, easingMethod.easeInOutCubic));
-r.push(bench(1000, easingMethod.easeInOutCubic));
-r.push(bench(10000, easingMethod.easeInOutCubic));
-r.push(bench(100000, easingMethod.easeInOutCubic));
-console.timeEnd("easeInOutCubic");
-console.time("easeInQuart");
-r.push(bench(10, easingMethod.easeInQuart));
-r.push(bench(100, easingMethod.easeInQuart));
-r.push(bench(1000, easingMethod.easeInQuart));
-r.push(bench(10000, easingMethod.easeInQuart));
-r.push(bench(100000, easingMethod.easeInQuart));
-console.timeEnd("easeInQuart");
-console.time("easeOutQuart");
-r.push(bench(10, easingMethod.easeOutQuart));
-r.push(bench(100, easingMethod.easeOutQuart));
-r.push(bench(1000, easingMethod.easeOutQuart));
-r.push(bench(10000, easingMethod.easeOutQuart));
-r.push(bench(100000, easingMethod.easeOutQuart));
-console.timeEnd("easeOutQuart");
-console.time("easeInOutQuart");
-r.push(bench(10, easingMethod.easeInOutQuart));
-r.push(bench(100, easingMethod.easeInOutQuart));
-r.push(bench(1000, easingMethod.easeInOutQuart));
-r.push(bench(10000, easingMethod.easeInOutQuart));
-r.push(bench(100000, easingMethod.easeInOutQuart));
-console.timeEnd("easeInOutQuart");
-console.time("easeInQuint");
-r.push(bench(10, easingMethod.easeInQuint));
-r.push(bench(100, easingMethod.easeInQuint));
-r.push(bench(1000, easingMethod.easeInQuint));
-r.push(bench(10000, easingMethod.easeInQuint));
-r.push(bench(100000, easingMethod.easeInQuint));
-console.timeEnd("easeInQuint");
-console.time("easeOutQuint");
-r.push(bench(10, easingMethod.easeOutQuint));
-r.push(bench(100, easingMethod.easeOutQuint));
-r.push(bench(1000, easingMethod.easeOutQuint));
-r.push(bench(10000, easingMethod.easeOutQuint));
-r.push(bench(100000, easingMethod.easeOutQuint));
-console.timeEnd("easeOutQuint");
-console.time("easeInOutQuint");
-r.push(bench(10, easingMethod.easeInOutQuint));
-r.push(bench(100, easingMethod.easeInOutQuint));
-r.push(bench(1000, easingMethod.easeInOutQuint));
-r.push(bench(10000, easingMethod.easeInOutQuint));
-r.push(bench(100000, easingMethod.easeInOutQuint));
-console.timeEnd("easeInOutQuint");
-console.time("random");
-r.push(bench(10));
-r.push(bench(100));
-r.push(bench(1000));
-r.push(bench(10000));
-r.push(bench(100000));
-console.timeEnd("random");
+//1 iteration
+main.init(10);
+console.time("10c * 1 / sys");
+r.push(bench(1, 10));
+console.timeEnd("10c * 1 / sys");
+main.clear();
 
+main.init(100);
+console.time("100c * 1 / sys");
+r.push(bench(1, 100));
+console.timeEnd("100c * 1 / sys");
+main.clear();
 
-function writeRes(res){
-    
-}
+main.init(1000);
+console.time("1000c * 1 / sys");
+r.push(bench(1, 1000));
+console.timeEnd("1000c * 1 / sys");
+main.clear();
+
+main.init(10000);
+console.time("10000c * 1 / sys");
+r.push(bench(1, 10000));
+console.timeEnd("10000c * 1 / sys");
+main.clear();
+
+main.init(100000);
+console.time("100000c * 1 / sys");
+r.push(bench(1, 100000));
+console.timeEnd("100000c * 1 / sys");
+main.clear();
+
+// 2 iterations
+main.init(10);
+console.time("10c * 2 / sys");
+r.push(bench(2, 10));
+console.timeEnd("10c * 2 / sys");
+main.clear();
+
+main.init(100);
+console.time("100c * 2 / sys");
+r.push(bench(2, 100));
+console.timeEnd("100c * 2 / sys");
+main.clear();
+
+main.init(1000);
+console.time("1000c * 2 / sys");
+r.push(bench(2, 1000));
+console.timeEnd("1000c * 2 / sys");
+main.clear();
+
+main.init(10000);
+console.time("10000c * 2 / sys");
+r.push(bench(2, 10000));
+console.timeEnd("10000c * 2 / sys");
+main.clear();
+
+main.init(100000);
+console.time("100000c * 2 / sys");
+r.push(bench(2, 100000));
+console.timeEnd("100000c * 2 / sys");
+main.clear();
+
+// 3 iterations
+main.init(10);
+console.time("10c * 3 / sys");
+r.push(bench(3, 10));
+console.timeEnd("10c * 3 / sys");
+main.clear();
+
+main.init(100);
+console.time("100c * 3 / sys");
+r.push(bench(3, 100));
+console.timeEnd("100c * 3 / sys");
+main.clear();
+
+main.init(1000);
+console.time("1000c * 3 / sys");
+r.push(bench(3, 1000));
+console.timeEnd("1000c * 3 / sys");
+main.clear();
+
+main.init(10000);
+console.time("10000c * 3 / sys");
+r.push(bench(3, 10000));
+console.timeEnd("10000c * 3 / sys");
+main.clear();
+
+main.init(100000);
+console.time("100000c * 3 / sys");
+r.push(bench(3, 100000));
+console.timeEnd("100000c * 3 / sys");
+main.clear();
+
+// 10 iterations
+main.init(10);
+console.time("10c * 10 / sys");
+r.push(bench(10, 10));
+console.timeEnd("10c * 10 / sys");
+main.clear();
+
+main.init(100);
+console.time("100c * 10 / sys");
+r.push(bench(10, 100));
+console.timeEnd("100c * 10 / sys");
+main.clear();
+
+main.init(1000);
+console.time("1000c * 10 / sys");
+r.push(bench(10, 1000));
+console.timeEnd("1000c * 10 / sys");
+main.clear();
+
+main.init(10000);
+console.time("10000c * 10 / sys");
+r.push(bench(10, 10000));
+console.timeEnd("10000c * 10 / sys");
+main.clear();
+
+main.init(100000);
+console.time("100000c * 10 / sys");
+r.push(bench(10, 100000));
+console.timeEnd("100000c * 10 / sys");
+main.clear();
+
+// 100 iterations
+main.init(10);
+console.time("10c * 100 / sys");
+r.push(bench(100, 10));
+console.timeEnd("10c * 100 / sys");
+main.clear();
+
+main.init(100);
+console.time("100c * 100 / sys");
+r.push(bench(100, 100));
+console.timeEnd("100c * 100 / sys");
+main.clear();
+
+main.init(1000);
+console.time("1000c * 100 / sys");
+r.push(bench(100, 1000));
+console.timeEnd("1000c * 100 / sys");
+main.clear();
+
+main.init(10000);
+console.time("10000c * 100 / sys");
+r.push(bench(100, 10000));
+console.timeEnd("10000c * 100 / sys");
+main.clear();
+
+main.init(100000);
+console.time("100000c * 100 / sys");
+r.push(bench(100, 100000));
+console.timeEnd("100000c * 100 / sys");
+main.clear();
+
+b.writeRes(r, "./benchmark/SOA/res");

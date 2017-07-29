@@ -1,8 +1,10 @@
+var fs = require('fs');
+
 const NS_PER_SEC = 1e9;
 const NS_PER_MS = 1e6;
 
 interface IResult {
-    unit:number;
+    unit: number;
     mean: number;
     max: number;
     min: number;
@@ -66,4 +68,21 @@ function variance(ar, m) {
 //     console.log("first : " + res.first.toFixed(6) + res.unit);
 // }
 
-export { NS_PER_SEC, NS_PER_MS, IResult, hrToNanoSec, mean, max, min, variance }
+function writeRes(res, path) {
+    let p = path + "/" + Date.now() + ".json";
+    let buffer = new Buffer(JSON.stringify(res));
+
+    // fs.open(p, 'w', function (err, fd) {
+    //     if (err) {
+    //         throw 'error opening file: ' + err;
+    //     }
+
+        fs.writeFile(p, buffer, 0, buffer.length, null, function (err) {
+            if (err) throw 'error writing file: ' + err;
+            else{console.log("results written in /res")}
+        });
+    //});
+}
+
+
+export { NS_PER_SEC, NS_PER_MS, IResult, hrToNanoSec, mean, max, min, variance, writeRes }

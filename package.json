@@ -6,8 +6,8 @@
   "scripts": {
     "test": "mocha test/"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "jWA86",
+  "license": "MIT",
   "devDependencies": {
     "@types/chai": "^4.0.1",
     "@types/mocha": "^2.2.41",

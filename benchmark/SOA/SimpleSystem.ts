@@ -19,7 +19,6 @@ enum easingMethod {
 }
 
 interface IInterpolableComponent extends IComponent {
-    easing: easingMethod;
     currentValue: number;
     startValue: number;
     endValue: number;
@@ -32,7 +31,7 @@ class InterpolableComponent implements IInterpolableComponent {
     }
 }
 
-class InterpolateSystem implements ISystem {
+abstract class InterpolateSystem implements ISystem {
     constructor() {
     }
     process(components: IInterpolableComponent[], progress: number) {
@@ -40,39 +39,197 @@ class InterpolateSystem implements ISystem {
         for (let i = 0; i < l; ++i) {
             let c = components[i];
             let length = components[i].endValue - components[i].startValue;
-            let normProgress = progress / length;
-            components[i].currentValue = this.easingFunctions[easingMethod[components[i].easing]](normProgress);
+            let nt = progress / length;
+            components[i].currentValue = this.interpolate(nt);
         };
     }
-
-    public easingFunctions = {
-        // no easing, no acceleration
-        linear: function (t) { return t },
-        // accelerating from zero velocity
-        easeInQuad: function (t) { return t * t },
-        // decelerating to zero velocity
-        easeOutQuad: function (t) { return t * (2 - t) },
-        // acceleration until halfway, then deceleration
-        easeInOutQuad: function (t) { return t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t },
-        // accelerating from zero velocity 
-        easeInCubic: function (t) { return t * t * t },
-        // decelerating to zero velocity 
-        easeOutCubic: function (t) { return (--t) * t * t + 1 },
-        // acceleration until halfway, then deceleration 
-        easeInOutCubic: function (t) { return t < .5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1 },
-        // accelerating from zero velocity 
-        easeInQuart: function (t) { return t * t * t * t },
-        // decelerating to zero velocity 
-        easeOutQuart: function (t) { return 1 - (--t) * t * t * t },
-        // acceleration until halfway, then deceleration
-        easeInOutQuart: function (t) { return t < .5 ? 8 * t * t * t * t : 1 - 8 * (--t) * t * t * t },
-        // accelerating from zero velocity
-        easeInQuint: function (t) { return t * t * t * t * t },
-        // decelerating to zero velocity
-        easeOutQuint: function (t) { return 1 + (--t) * t * t * t * t },
-        // acceleration until halfway, then deceleration 
-        easeInOutQuint: function (t) { return t < .5 ? 16 * t * t * t * t * t : 1 + 16 * (--t) * t * t * t * t }
-    };
+    protected abstract interpolate(t: number): number
 }
 
-export {easingMethod,  IInterpolableComponent, InterpolableComponent, InterpolateSystem}
+class LinearSystemSys extends InterpolateSystem {
+    constructor() {
+        super();
+    }
+    process(components: IInterpolableComponent[], progress: number) {
+        super.process(components, progress);
+    }
+    protected interpolate(t: number) {
+        return t;
+    }
+}
+
+class easeInQuadSys extends InterpolateSystem {
+    constructor() {
+        super();
+    }
+    process(components: IInterpolableComponent[], progress: number) {
+        super.process(components, progress);
+    }
+    protected interpolate(t: number) {
+        return t * t;
+    }
+}
+
+class easeOutQuadSys extends InterpolateSystem {
+    constructor() {
+        super();
+    }
+    process(components: IInterpolableComponent[], progress: number) {
+        super.process(components, progress);
+    }
+    protected interpolate(t: number) {
+        return t * (2 - t);
+    }
+}
+
+class easeInOutQuadSys extends InterpolateSystem {
+    constructor() {
+        super();
+    }
+    process(components: IInterpolableComponent[], progress: number) {
+        super.process(components, progress);
+    }
+    protected interpolate(t: number) {
+        return t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    }
+}
+
+class easeInCubicSys extends InterpolateSystem {
+    constructor() {
+        super();
+    }
+    process(components: IInterpolableComponent[], progress: number) {
+        super.process(components, progress);
+    }
+    protected interpolate(t: number) {
+        return t * t * t;
+    }
+}
+
+class easeOutCubicSys extends InterpolateSystem {
+    constructor() {
+        super();
+    }
+    process(components: IInterpolableComponent[], progress: number) {
+        super.process(components, progress);
+    }
+    protected interpolate(t: number) {
+        return (--t) * t * t + 1;;
+    }
+}
+
+class easeInOutCubicSys extends InterpolateSystem {
+    constructor() {
+        super();
+    }
+    process(components: IInterpolableComponent[], progress: number) {
+        super.process(components, progress);
+    }
+    protected interpolate(t: number) {
+        return t < .5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1
+    }
+}
+
+class easeInQuartSys extends InterpolateSystem {
+    constructor() {
+        super();
+    }
+    process(components: IInterpolableComponent[], progress: number) {
+        super.process(components, progress);
+    }
+    protected interpolate(t: number) {
+        return t * t * t * t;
+    }
+}
+
+
+class easeInOutQuartSys extends InterpolateSystem {
+    constructor() {
+        super();
+    }
+    process(components: IInterpolableComponent[], progress: number) {
+        super.process(components, progress);
+    }
+    protected interpolate(t: number) {
+        return t < .5 ? 8 * t * t * t * t : 1 - 8 * (--t) * t * t * t;
+    }
+}
+
+class easeOutQuartSys extends InterpolateSystem {
+    constructor() {
+        super();
+    }
+    process(components: IInterpolableComponent[], progress: number) {
+        super.process(components, progress);
+    }
+    protected interpolate(t: number) {
+        return 1 - (--t) * t * t * t;
+    }
+}
+
+class easeInQuintSys extends InterpolateSystem {
+    constructor() {
+        super();
+    }
+    process(components: IInterpolableComponent[], progress: number) {
+        super.process(components, progress);
+    }
+    protected interpolate(t: number) {
+        return t * t * t * t * t;
+    }
+}
+
+class easeOutQuintSys extends InterpolateSystem {
+    constructor() {
+        super();
+    }
+    process(components: IInterpolableComponent[], progress: number) {
+        super.process(components, progress);
+    }
+    protected interpolate(t: number) {
+        return 1 + (--t) * t * t * t * t;
+    }
+}
+
+class easeInOutQuintSys extends InterpolateSystem {
+    constructor() {
+        super();
+    }
+    process(components: IInterpolableComponent[], progress: number) {
+        super.process(components, progress);
+    }
+    protected interpolate(t: number) {
+        return t < .5 ? 16 * t * t * t * t * t : 1 + 16 * (--t) * t * t * t * t;
+    }
+}
+
+const easingSystem = {
+    systems: [new LinearSystemSys(),
+    new easeInQuadSys(),
+    new easeOutQuadSys(),
+    new easeInOutQuadSys(),
+    new easeInCubicSys(),
+    new easeOutCubicSys(),
+    new easeInOutCubicSys(),
+    new easeInQuartSys(),
+    new easeOutQuartSys(),
+    new easeInOutQuartSys(),
+    new easeInQuintSys(),
+    new easeOutQuintSys(),
+    new easeInOutQuintSys()
+    ],
+    process: function (factories: ComponentFactory<IInterpolableComponent>[], progress: number) {
+        let l = factories.length;
+        //iterate over all factories, supposed its in the same order as instanciated in the easingSystem
+        for (let i = 0; i < l; ++i) {
+            let pool = factories[i].pool;
+            let poolL = pool.length;
+            for (let p = 0; p < poolL; ++p) {
+                this.systems[i].process(pool[p], progress);
+            }
+        }
+    }
+}
+
+
+export { easingMethod, IInterpolableComponent, InterpolableComponent, InterpolateSystem, easingSystem }
