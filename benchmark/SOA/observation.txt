@@ -1,0 +1,5 @@
+// map is slower than array for iteration
+// perf difference are bigger with very hight numbers of components
+// also it seems array iteration benefit from optimization with hight number of loop.
+// map should be faster for fetching component by id
+// need to write a benchmark with a system that combine multiple components

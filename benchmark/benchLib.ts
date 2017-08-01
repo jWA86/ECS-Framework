@@ -74,5 +74,4 @@ function writeRes(res, path) {
         });
 }
 
-
 export { NS_PER_SEC, NS_PER_MS, IResult, hrToNanoSec, mean, max, min, variance, writeRes }
