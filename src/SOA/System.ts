@@ -1,4 +1,4 @@
-import {IComponent} from "./ComponentFactory";
+import {IComponent} from "./interfaces";
 
 interface ISystem {
     process(component: IComponent[], ...args: any[]);

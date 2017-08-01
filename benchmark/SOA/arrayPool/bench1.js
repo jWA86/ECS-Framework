@@ -1,6 +1,7 @@
 "use strict";
+//simple benchmark testing multiple components number processed by 13 differents systems x time
 Object.defineProperty(exports, "__esModule", { value: true });
-var ComponentFactory_1 = require("../../../src/SOA/ComponentFactory");
+var ComponentFactory_1 = require("../../../src/SOA/arrayPool/ComponentFactory");
 var SimpleSystem_1 = require("./SimpleSystem");
 var b = require("../../benchLib");
 var main = {

@@ -1,6 +1,4 @@
-interface IComponent {
-    id: string;
-}
+import { IComponent } from "../interfaces";
 
 class ComponentFactory<T extends IComponent> {
     pool: T[] = [];
@@ -49,7 +47,7 @@ class ComponentFactory<T extends IComponent> {
             return false;
         }
     }
-    
+
     removeAll() {
         this.pool = [];
     }

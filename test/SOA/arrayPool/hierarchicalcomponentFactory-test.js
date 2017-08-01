@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 require("mocha");
 var chai_1 = require("chai");
-var HierarchicalComponentFactory_1 = require("../../src/SOA/HierarchicalComponentFactory");
+var HierarchicalComponentFactory_1 = require("../../../src/SOA/arrayPool/HierarchicalComponentFactory");
 describe("Hierarchical Component Factory ", function () {
     var HierarchicalComponent = (function () {
         function HierarchicalComponent(id) {

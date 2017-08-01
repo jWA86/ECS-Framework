@@ -1,5 +1,5 @@
-import { ComponentFactory, IComponent } from "../../../src/SOA/ComponentFactory";
-import { IHierarchicalComponent, HierarchicalComponentFactory } from "../../../src/SOA/HierarchicalComponentFactory";
+import {IComponent } from "../../../src/SOA/interfaces";
+import { ComponentFactory} from "../../../src/SOA/arrayPool/ComponentFactory";
 import { ISystem } from "../../../src/SOA/System";
 
 enum easingMethod {
