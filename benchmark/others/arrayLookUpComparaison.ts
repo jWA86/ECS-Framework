@@ -1,4 +1,9 @@
 //simple benchmark for comparing collection lookup and iteration
+import * as b from "../benchLib";
+
+//size of collections
+//fetch random same number of elements in fetch benchmark
+const l = 10000;
 
 const generateUniqueId = function () {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -7,139 +12,146 @@ const generateUniqueId = function () {
     });
 }
 
-let l = 10000;
-let myArray = [];
+let sArray = [];
 for (let i = 0; i < l; ++i) {
-    myArray.push({ "id": generateUniqueId(), "index": i, "prop": 0 });
+    sArray.push({ "id": generateUniqueId(), "index": i, "prop": 0 });
 }
 
-let myArray2 = [];
+let objArray = [];
 for (let i = 0; i < l; ++i) {
-    let id = myArray[i].id;
+    let id = sArray[i].id;
     let o = { "index": i, "prop": 0 };
-    myArray2[id] = o;
+    objArray[id] = o;
 }
 
 let myMap = new Map();
 for (let i = 0; i < l; ++i) {
-    let id = myArray[i].id;
+    let id = sArray[i].id;
     let o = { "index": i, "prop": 0 };
     myMap.set(id, o);
 }
 
 let idToLookUp1 = [];
 for (let i = 0; i < l; ++i) {
-    idToLookUp1.push(myArray[Math.floor(Math.random() * l)].id);
+    idToLookUp1.push(sArray[Math.floor(Math.random() * l)].id);
 }
 
-let lgth1 = idToLookUp1.length;
-function benchFind() {
-    console.time("find");
-    for (let i = 0; i < lgth1; ++i) {
-        myArray.find((e) => {
+function benchFind() {    
+    let start = process.hrtime();
+    for (let i = 0; i < l; ++i) {
+        sArray.find((e) => {
             return e.id === idToLookUp1[i];
         }).prop += 1;
     }
-    console.timeEnd("find");
+    return process.hrtime(start);
 }
 
 function benchById() {
-    console.time("byId");
-    for (let i = 0; i < lgth1; ++i) {
-        myArray2[idToLookUp1[i]].prop += 1;
+    let start = process.hrtime();
+    for (let i = 0; i < l; ++i) {
+        objArray[idToLookUp1[i]].prop += 1;
     }
-    console.timeEnd("byId");
+    return process.hrtime(start);
 }
 
 function benchMap() {
-    console.time("map");
-    for (let i = 0; i < lgth1; ++i) {
+   let start = process.hrtime();
+    for (let i = 0; i < l; ++i) {
         myMap.get(idToLookUp1[i]).prop += 1;
     }
-    console.timeEnd("map");
+    return process.hrtime(start);
 }
 
-function benchIterateOject() {
-    console.time("iterateObject");
-    for (var property in myArray2) {
-        if (myArray2.hasOwnProperty(property)) {
-            myArray2[property].prop += 1;
+function IterateOject() {
+    let start = process.hrtime();
+    for (var property in objArray) {
+        if (objArray.hasOwnProperty(property)) {
+            objArray[property].prop += 1;
         }
-
     }
-    console.timeEnd("iterateObject");
+    return process.hrtime(start);
 }
 
-function benchIterateObject2() {
-    console.time("iterateObject2");
-    Object.keys(myArray2).forEach(function (key, index) {
-        myArray2[key].prop += 1;
+function IterateObject2() {
+    let start = process.hrtime();
+    Object.keys(objArray).forEach(function (key, index) {
+        objArray[key].prop += 1;
     });
-    console.timeEnd("iterateObject2");
+    return process.hrtime(start);
 }
 
 function iterateArray() {
-    console.time("iterateArray");
+    let start = process.hrtime();
     for (let i = 0; i < l; ++i) {
-        myArray[i].prop += 1;
+        sArray[i].prop += 1;
     }
-    console.timeEnd("iterateArray");
+    return process.hrtime(start);
 }
 
- function iterateMapForEach() {
-
-     console.time("iterateMapForEach");
+function iterateMapForEach() {
+    let start = process.hrtime();
     myMap.forEach((v, k)=>{
         v.prop +=1;
     });
-     console.timeEnd("iterateMapForEach");
- }
-
+    return process.hrtime(start);
+}
 
 function iterateMapIterator(){
-    console.time("iterateMapIterator");
+    let start = process.hrtime();
     let it = myMap.entries();
     for(let i=0;i<l;++i){
         it.next().value.prop+=1;
     }
-    console.timeEnd("iterateMapIterator");
+    return process.hrtime(start);
 }
 
 //warm up
-for (let i = 0; i < lgth1; ++i) {
-    myArray[i];
+for (let i = 0; i < l; ++i) {
+    sArray[i];
 }
 
-console.log("fetch");
-benchById();
-benchFind();
-benchMap();
-benchFind();
-benchMap();
-benchById();
+let fbyId = [];
+let ffind =[];
+let fmap = [];
+console.log("fetch "+l+" elements");
+for (let i=0;i<10;++i){
+    fbyId.push(benchById());
+    ffind.push(benchFind());
+    fmap.push(benchMap());
+}
+console.log("mean fetch with Id : "+(b.mean(fbyId)/b.NS_PER_MS).toFixed(4)+"ms");
+console.log("mean fetch with find() : "+(b.mean(ffind)/b.NS_PER_MS).toFixed(4)+"ms");
+console.log("mean fetch with hashMap : "+(b.mean(fmap)/b.NS_PER_MS).toFixed(4)+"ms");
 
 //fastest : lookup byId (object)
-console.log("iteration0");
-iterateArray();
-benchIterateOject();
-iterateMapForEach();
-benchIterateObject2();
-iterateMapIterator();
 
+console.log("iteration over "+l+" elements");
+let rIArray = [];
+let rIMapIterator =[];
+let rIMapForEach = [];
+let rIObject = [];
+let rIObject2 = [];
 
-benchIterateOject();
-iterateMapForEach();
-iterateMapIterator();
-iterateArray();
-benchIterateObject2();
+for (let i = 0; i<10; ++i) {
+    rIArray.push(iterateArray());
+    rIMapIterator.push(iterateMapIterator());
+    rIMapForEach.push(iterateMapForEach());
+    rIObject.push(IterateObject2());
+    rIObject2.push(IterateOject());
+}
+
+console.log("mean iteration array : "+(b.mean(rIArray)/b.NS_PER_MS).toFixed(4)+"ms");
+console.log("mean iteration Map with iterator : "+(b.mean(rIMapIterator)/b.NS_PER_MS).toFixed(4)+"ms");
+console.log("mean iteration map with forEach : "+(b.mean(rIMapForEach)/b.NS_PER_MS).toFixed(4)+"ms");
+console.log("mean iteration object hasOwnProprety : "+(b.mean(rIObject)/b.NS_PER_MS).toFixed(4)+"ms");
+console.log("mean iteration object Object.keys() : "+(b.mean(rIObject2)/b.NS_PER_MS).toFixed(4)+"ms");
 
 //fastest : array iteration then iterate Map with ForEach
 
-//insert
-
+//insertion at a given positon (based on an element id)
 function benchInsertionMap() {
-    let id = myArray[Math.floor(Math.random()*myArray.length)].id;
-    console.time("insertMap");
+    let id = sArray[Math.floor(Math.random()*sArray.length)].id;
+    let start = process.hrtime();
     let nMap = new Map();
     myMap.forEach((v, k)=>{
         nMap.set(k, v);
@@ -147,10 +159,14 @@ function benchInsertionMap() {
             nMap.set("inserted", "inserted");
         }
     });
-    console.timeEnd("insertMap");
+    return process.hrtime(start);
 }
 
 console.log("insertion at position");
-benchInsertionMap();
+let rInsertionMap = [];
+for(let i = 0; i<100; ++i) {
+    rInsertionMap.push(benchInsertionMap());
+}
+console.log("mean insertion of 1 element in Map by forEach & new Map: "+(b.mean(rInsertionMap)/b.NS_PER_MS).toFixed(4)+"ms");
 
 //iteration after multi insert ?

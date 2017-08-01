@@ -1,5 +1,7 @@
 // map is slower than array for iteration
-// perf difference are bigger with very hight numbers of components
-// also it seems array iteration benefit from optimization with hight number of loop.
+// perf difference are bigger with very hight numbers of components : 
+// it seems array iteration benefit from optimization with hight number of loop, or it just highlight the spread of perf
+// for game usage, system iteration are done once per frame so it should not benefit from it
+// real use case for game would rarelly have to update more than 100 components per systems (exepts particles / voxel )
 // map should be faster for fetching component by id
 // need to write a benchmark with a system that combine multiple components
