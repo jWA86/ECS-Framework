@@ -34,14 +34,13 @@ class InterpolableComponent implements IInterpolableComponent {
 abstract class InterpolateSystem implements ISystem {
     constructor() {
     }
-    process(components: IInterpolableComponent[], progress: number) {
-        let l = components.length;
-        for (let i = 0; i < l; ++i) {
-            let c = components[i];
-            let length = components[i].endValue - components[i].startValue;
+    process(components: Map<IInterpolableComponent>, progress: number) {
+        let l = components.size;
+        components.forEach((v, k)=>{
+            let length = v.endValue - v.startValue;
             let nt = progress / length;
-            components[i].currentValue = this.interpolate(nt);
-        };
+            v.currentValue = this.interpolate(nt);
+        });
     }
     protected abstract interpolate(t: number): number
 }
@@ -50,7 +49,7 @@ class LinearSystemSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: IInterpolableComponent[], progress: number) {
+    process(components: Map<IInterpolableComponent>, progress: number) {
         super.process(components, progress);
     }
     protected interpolate(t: number) {
@@ -62,7 +61,7 @@ class easeInQuadSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: IInterpolableComponent[], progress: number) {
+    process(components: Map<IInterpolableComponent>, progress: number) {
         super.process(components, progress);
     }
     protected interpolate(t: number) {
@@ -74,7 +73,7 @@ class easeOutQuadSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: IInterpolableComponent[], progress: number) {
+    process(components: Map<IInterpolableComponent>, progress: number) {
         super.process(components, progress);
     }
     protected interpolate(t: number) {
@@ -86,7 +85,7 @@ class easeInOutQuadSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: IInterpolableComponent[], progress: number) {
+    process(components: Map<IInterpolableComponent>, progress: number) {
         super.process(components, progress);
     }
     protected interpolate(t: number) {
@@ -98,7 +97,7 @@ class easeInCubicSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: IInterpolableComponent[], progress: number) {
+    process(components: Map<IInterpolableComponent>, progress: number) {
         super.process(components, progress);
     }
     protected interpolate(t: number) {
@@ -110,7 +109,7 @@ class easeOutCubicSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: IInterpolableComponent[], progress: number) {
+    process(components: Map<IInterpolableComponent>, progress: number) {
         super.process(components, progress);
     }
     protected interpolate(t: number) {
@@ -122,7 +121,7 @@ class easeInOutCubicSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: IInterpolableComponent[], progress: number) {
+    process(components: Map<IInterpolableComponent>, progress: number) {
         super.process(components, progress);
     }
     protected interpolate(t: number) {
@@ -134,7 +133,7 @@ class easeInQuartSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: IInterpolableComponent[], progress: number) {
+    process(components: Map<IInterpolableComponent>, progress: number) {
         super.process(components, progress);
     }
     protected interpolate(t: number) {
@@ -147,7 +146,7 @@ class easeInOutQuartSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: IInterpolableComponent[], progress: number) {
+    process(components: Map<IInterpolableComponent>, progress: number) {
         super.process(components, progress);
     }
     protected interpolate(t: number) {
@@ -159,7 +158,7 @@ class easeOutQuartSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: IInterpolableComponent[], progress: number) {
+    process(components: Map<IInterpolableComponent>, progress: number) {
         super.process(components, progress);
     }
     protected interpolate(t: number) {
@@ -171,7 +170,7 @@ class easeInQuintSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: IInterpolableComponent[], progress: number) {
+    process(components: Map<IInterpolableComponent>, progress: number) {
         super.process(components, progress);
     }
     protected interpolate(t: number) {
@@ -183,7 +182,7 @@ class easeOutQuintSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: IInterpolableComponent[], progress: number) {
+    process(components: Map<IInterpolableComponent>, progress: number) {
         super.process(components, progress);
     }
     protected interpolate(t: number) {
@@ -195,7 +194,7 @@ class easeInOutQuintSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: IInterpolableComponent[], progress: number) {
+    process(components: Map<IInterpolableComponent>, progress: number) {
         super.process(components, progress);
     }
     protected interpolate(t: number) {
@@ -223,10 +222,7 @@ const easingSystem = {
         //iterate over all factories, supposed its in the same order as instanciated in the easingSystem
         for (let i = 0; i < l; ++i) {
             let pool = factories[i].pool;
-            let poolL = pool.length;
-            for (let p = 0; p < poolL; ++p) {
-                this.systems[i].process(pool[p], progress);
-            }
+            this.systems[i].process(pool, progress);
         }
     }
 }

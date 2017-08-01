@@ -1,3 +1,5 @@
+const fs = require('fs');  
+
 const NS_PER_SEC = 1e9;
 const NS_PER_MS = 1e6;
 
@@ -65,6 +67,5 @@ function writeRes(res, path) {
             else{console.log("results written in /res")}
         });
 }
-
 
 export { NS_PER_SEC, NS_PER_MS, IResult, hrToNanoSec, mean, max, min, variance, writeRes }

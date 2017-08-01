@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var fs = require('fs');
 var NS_PER_SEC = 1e9;
 exports.NS_PER_SEC = NS_PER_SEC;
 var NS_PER_MS = 1e6;

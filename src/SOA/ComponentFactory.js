@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var ComponentFactory = (function () {
     function ComponentFactory() {
-        this.pool = [];
+        this.pool = new Map();
     }
     ComponentFactory.prototype.createComponent = function (type) {
         var id = this.generateUniqueId();
@@ -11,54 +11,66 @@ var ComponentFactory = (function () {
         return t;
     };
     ComponentFactory.prototype.createComponentAfter = function (type, cId) {
-        var index = this.getComponentIndex(cId);
         var id = this.generateUniqueId();
         var t = new type(id);
-        this.insertComponent(t, index + 1);
+        this.insertComponent(t, cId, true);
         return t;
     };
-    ComponentFactory.prototype.createComponentAt = function (type, cId) {
-        var index = this.getComponentIndex(cId);
+    ComponentFactory.prototype.createComponentBefore = function (type, cId) {
         var id = this.generateUniqueId();
         var t = new type(id);
-        this.insertComponent(t, index);
+        this.insertComponent(t, cId);
         return t;
-    };
-    ComponentFactory.prototype.getComponentIndex = function (id) {
-        return this.pool.findIndex(function (c) {
-            return c.id === id;
-        });
     };
     ComponentFactory.prototype.getComponent = function (id) {
-        return this.pool.find(function (c) {
-            return c.id === id;
-        });
+        return this.pool.get(id);
     };
     ComponentFactory.prototype.removeComponent = function (id) {
-        var index = this.getComponentIndex(id);
-        if (index > -1) {
-            this.pool.splice(index, 1);
-            return true;
-        }
-        else {
-            return false;
-        }
+        return this.pool.delete(id);
     };
     ComponentFactory.prototype.removeAll = function () {
-        this.pool = [];
+        this.pool.clear();
     };
-    ComponentFactory.prototype.insertComponent = function (component, index) {
-        if (index === void 0) { index = -1; }
-        if (index < 0 || index >= this.pool.length) {
-            this.pool.push(component);
-            return this.pool.length;
+    Object.defineProperty(ComponentFactory.prototype, "size", {
+        get: function () {
+            return this.pool.size;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    ComponentFactory.prototype.insertComponent = function (component, idOfPositionToInsert, insertAfter) {
+        if (idOfPositionToInsert === void 0) { idOfPositionToInsert = "-1"; }
+        if (insertAfter === void 0) { insertAfter = false; }
+        if (idOfPositionToInsert === "-1") {
+            //if no id of the component to insert at position is provided, insert at the end
+            this.pool.set(component.id, component);
         }
         else {
-            this.pool.splice(index, 0, component);
-            return index;
+            if (this.pool.has(idOfPositionToInsert)) {
+                //create a new map
+                //slow
+                var nMap_1 = new Map();
+                this.pool.forEach(function (v, k) {
+                    //if key == id of the ref component for position insertion 
+                    if (k === idOfPositionToInsert) {
+                        if (insertAfter) {
+                            nMap_1.set(k, v);
+                            nMap_1.set(component.id, component);
+                        }
+                        else {
+                            nMap_1.set(component.id, component);
+                            nMap_1.set(k, v);
+                        }
+                    }
+                    else {
+                        nMap_1.set(k, v);
+                    }
+                });
+                this.pool.removeAll;
+                this.pool = nMap_1;
+            }
         }
     };
-    ;
     /*!
         Math.uuid.js (v1.4)
         http://www.broofa.com

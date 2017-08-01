@@ -3,7 +3,7 @@ interface IComponent {
 }
 
 class ComponentFactory<T extends IComponent> {
-    pool: T[] = [];
+    pool: Map<T> = new Map<T>();
     constructor() {
     }
     createComponent(type: { new(id: string): T }): T {
@@ -13,56 +13,64 @@ class ComponentFactory<T extends IComponent> {
         return t;
     }
     createComponentAfter(type: { new(id: string): T }, cId: string): T {
-        let index = this.getComponentIndex(cId);
         let id = this.generateUniqueId();
         let t = new type(id);
-        this.insertComponent(t, index + 1);
+        this.insertComponent(t, cId, true);
         return t;
     }
-    createComponentAt(type: { new(id: string): T }, cId: string): T {
-        let index = this.getComponentIndex(cId);
+    createComponentBefore(type: { new(id: string): T }, cId: string): T {
         let id = this.generateUniqueId();
         let t = new type(id);
-        this.insertComponent(t, index);
+        this.insertComponent(t, cId);
         return t;
-    }
-
-    getComponentIndex(id: string): number {
-        return this.pool.findIndex((c) => {
-            return c.id === id;
-        });
     }
 
     getComponent(id: string): T {
-        return this.pool.find((c) => {
-            return c.id === id;
-        });
+        return this.pool.get(id);
     }
 
     removeComponent(id: string): boolean {
-        let index = this.getComponentIndex(id);
-        if (index > -1) {
-            this.pool.splice(index, 1);
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    
-    removeAll() {
-        this.pool = [];
+        return this.pool.delete(id);
     }
 
-    protected insertComponent(component: T, index = -1): number {
-        if (index < 0 || index >= this.pool.length) {
-            this.pool.push(component);
-            return this.pool.length;
-        } else {
-            this.pool.splice(index, 0, component);
-            return index;
+    removeAll() {
+        this.pool.clear();
+    }
+
+    get size() {
+        return this.pool.size;
+    }
+
+    protected insertComponent(component: T, idOfPositionToInsert = "-1", insertAfter = false) {
+        if (idOfPositionToInsert === "-1") {
+            //if no id of the component to insert at position is provided, insert at the end
+            this.pool.set(component.id, component);
         }
-    };
+        else {
+            if (this.pool.has(idOfPositionToInsert)) {
+                //create a new map
+                //slow
+                let nMap = new Map();
+                this.pool.forEach((v, k) => {
+                    //if key == id of the ref component for position insertion 
+                    if (k === idOfPositionToInsert) {
+                        if (insertAfter) {
+                            nMap.set(k, v);
+                            nMap.set(component.id, component);
+                        } else {
+                            nMap.set(component.id, component);
+                            nMap.set(k, v);
+                        }
+                    } else {
+                        nMap.set(k, v);
+                    }
+
+                });
+                this.pool.removeAll;
+                this.pool = nMap;
+            }
+        }
+    }
 
     /*!
         Math.uuid.js (v1.4)
