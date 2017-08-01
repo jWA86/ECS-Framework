@@ -48,9 +48,9 @@ var InterpolateSystem = (function () {
         var l = components.length;
         for (var i = 0; i < l; ++i) {
             var c = components[i];
-            var length_1 = components[i].endValue - components[i].startValue;
+            var length_1 = c.endValue - c.startValue;
             var nt = progress / length_1;
-            components[i].currentValue = this.interpolate(nt);
+            c.currentValue = this.interpolate(nt);
         }
         ;
     };
@@ -247,10 +247,7 @@ var easingSystem = {
         //iterate over all factories, supposed its in the same order as instanciated in the easingSystem
         for (var i = 0; i < l; ++i) {
             var pool = factories[i].pool;
-            var poolL = pool.length;
-            for (var p = 0; p < poolL; ++p) {
-                this.systems[i].process(pool[p], progress);
-            }
+            this.systems[i].process(pool, progress);
         }
     }
 };

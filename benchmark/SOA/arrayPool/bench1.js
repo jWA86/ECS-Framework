@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var ComponentFactory_1 = require("../../src/SOA/ComponentFactory");
+var ComponentFactory_1 = require("../../../src/SOA/ComponentFactory");
 var SimpleSystem_1 = require("./SimpleSystem");
-var b = require("../benchLib");
+var b = require("../../benchLib");
 var main = {
     progress: 0,
     factories: [],
@@ -197,4 +197,4 @@ console.time("100000c * 100 / sys");
 r.push(bench(100, 100000));
 console.timeEnd("100000c * 100 / sys");
 main.clear();
-b.writeRes(r, "./benchmark/SOA/res");
+b.writeRes(r, "./benchmark/SOA/arrayPool/res/bench1");

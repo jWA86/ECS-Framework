@@ -1,6 +1,6 @@
-import { ComponentFactory, IComponent } from "../../src/SOA/ComponentFactory";
-import { IHierarchicalComponent, HierarchicalComponentFactory } from "../../src/SOA/HierarchicalComponentFactory";
-import { ISystem } from "../../src/SOA/System";
+import { ComponentFactory, IComponent } from "../../../src/SOA/ComponentFactory";
+import { IHierarchicalComponent, HierarchicalComponentFactory } from "../../../src/SOA/HierarchicalComponentFactory";
+import { ISystem } from "../../../src/SOA/System";
 
 enum easingMethod {
     "linear",
@@ -38,9 +38,9 @@ abstract class InterpolateSystem implements ISystem {
         let l = components.length;
         for (let i = 0; i < l; ++i) {
             let c = components[i];
-            let length = components[i].endValue - components[i].startValue;
+            let length = c.endValue - c.startValue;
             let nt = progress / length;
-            components[i].currentValue = this.interpolate(nt);
+            c.currentValue = this.interpolate(nt);
         };
     }
     protected abstract interpolate(t: number): number
@@ -223,10 +223,7 @@ const easingSystem = {
         //iterate over all factories, supposed its in the same order as instanciated in the easingSystem
         for (let i = 0; i < l; ++i) {
             let pool = factories[i].pool;
-            let poolL = pool.length;
-            for (let p = 0; p < poolL; ++p) {
-                this.systems[i].process(pool[p], progress);
-            }
+                this.systems[i].process(pool, progress);
         }
     }
 }

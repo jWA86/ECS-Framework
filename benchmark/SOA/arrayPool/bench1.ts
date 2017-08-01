@@ -1,7 +1,6 @@
-import { ComponentFactory, IComponent } from "../../src/SOA/ComponentFactory";
+import { ComponentFactory, IComponent } from "../../../src/SOA/ComponentFactory";
 import { easingMethod, IInterpolableComponent, InterpolableComponent, InterpolateSystem, easingSystem } from "./SimpleSystem";
-import * as b from "../benchLib";
-
+import * as b from "../../benchLib";
 
 const main = {
     progress: 0,
@@ -67,6 +66,7 @@ const bench = function (nbLoop, nbComp) {
 main.init(100);
 bench(10, 100);
 main.clear();
+
 
 
 // test with x (10, 100, 1000 ,10000 ,100000) components for each type of component (13 easing system)
@@ -227,4 +227,4 @@ r.push(bench(100, 100000));
 console.timeEnd("100000c * 100 / sys");
 main.clear();
 
-b.writeRes(r, "./benchmark/SOA/res");
+b.writeRes(r, "./benchmark/SOA/arrayPool/res/bench1");
