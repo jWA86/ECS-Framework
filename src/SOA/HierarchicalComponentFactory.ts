@@ -1,10 +1,10 @@
-import { IComponent } from "../interfaces";
-import { ComponentFactory } from "./ComponentFactory";
+import { IComponent } from "./interfaces";
+import { ComponentFactoryArray } from "./ComponentFactoryArray";
 interface IHierarchicalComponent extends IComponent {
     children: string[];
 }
 
-class HierarchicalComponentFactory<T extends IHierarchicalComponent> extends ComponentFactory<T> {
+class HierarchicalComponentFactory<T extends IHierarchicalComponent> extends ComponentFactoryArray<T> {
 
     createChildComponent(type: { new(id: string): T }, parentId: string): T {
         let index = this.getComponentIndex(parentId);
@@ -37,4 +37,5 @@ class HierarchicalComponentFactory<T extends IHierarchicalComponent> extends Com
         return false;
     }
 }
+
 export { HierarchicalComponentFactory, IHierarchicalComponent }

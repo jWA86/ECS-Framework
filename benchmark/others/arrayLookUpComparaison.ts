@@ -3,7 +3,7 @@ import * as b from "../benchLib";
 
 //size of collections
 //fetch random same number of elements in fetch benchmark
-const l = 10000;
+const l = 100;
 
 const generateUniqueId = function () {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -111,13 +111,14 @@ for (let i = 0; i < l; ++i) {
 }
 
 let fbyId = [];
-let ffind =[];
+let ffind = [];
 let fmap = [];
 console.log("fetch "+l+" elements");
 for (let i=0;i<10;++i){
-    fbyId.push(benchById());
+    
     ffind.push(benchFind());
     fmap.push(benchMap());
+    fbyId.push(benchById());
 }
 console.log("mean fetch with Id : "+(b.mean(fbyId)/b.NS_PER_MS).toFixed(4)+"ms");
 console.log("mean fetch with find() : "+(b.mean(ffind)/b.NS_PER_MS).toFixed(4)+"ms");
@@ -143,10 +144,11 @@ for (let i = 0; i<10; ++i) {
 console.log("mean iteration array : "+(b.mean(rIArray)/b.NS_PER_MS).toFixed(4)+"ms");
 console.log("mean iteration Map with iterator : "+(b.mean(rIMapIterator)/b.NS_PER_MS).toFixed(4)+"ms");
 console.log("mean iteration map with forEach : "+(b.mean(rIMapForEach)/b.NS_PER_MS).toFixed(4)+"ms");
-console.log("mean iteration object hasOwnProprety : "+(b.mean(rIObject)/b.NS_PER_MS).toFixed(4)+"ms");
+console.log("mean iteration object hasOwnProperty : "+(b.mean(rIObject)/b.NS_PER_MS).toFixed(4)+"ms");
 console.log("mean iteration object Object.keys() : "+(b.mean(rIObject2)/b.NS_PER_MS).toFixed(4)+"ms");
 
-//fastest : array iteration then iterate Map with ForEach
+//fastest for 100+: array iteration then iterate Map with ForEach 
+// fastest for < 50 c/system : array then object.keys() then iter by hasOwnProperty
 
 //insertion at a given positon (based on an element id)
 function benchInsertionMap() {
@@ -168,5 +170,4 @@ for(let i = 0; i<100; ++i) {
     rInsertionMap.push(benchInsertionMap());
 }
 console.log("mean insertion of 1 element in Map by forEach & new Map: "+(b.mean(rInsertionMap)/b.NS_PER_MS).toFixed(4)+"ms");
-
 //iteration after multi insert ?

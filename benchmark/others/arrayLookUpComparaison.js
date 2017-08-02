@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var b = require("../benchLib");
 //size of collections
 //fetch random same number of elements in fetch benchmark
-var l = 10000;
+var l = 100;
 var generateUniqueId = function () {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -104,9 +104,9 @@ var ffind = [];
 var fmap = [];
 console.log("fetch " + l + " elements");
 for (var i = 0; i < 10; ++i) {
-    fbyId.push(benchById());
     ffind.push(benchFind());
     fmap.push(benchMap());
+    fbyId.push(benchById());
 }
 console.log("mean fetch with Id : " + (b.mean(fbyId) / b.NS_PER_MS).toFixed(4) + "ms");
 console.log("mean fetch with find() : " + (b.mean(ffind) / b.NS_PER_MS).toFixed(4) + "ms");
@@ -128,9 +128,10 @@ for (var i = 0; i < 10; ++i) {
 console.log("mean iteration array : " + (b.mean(rIArray) / b.NS_PER_MS).toFixed(4) + "ms");
 console.log("mean iteration Map with iterator : " + (b.mean(rIMapIterator) / b.NS_PER_MS).toFixed(4) + "ms");
 console.log("mean iteration map with forEach : " + (b.mean(rIMapForEach) / b.NS_PER_MS).toFixed(4) + "ms");
-console.log("mean iteration object hasOwnProprety : " + (b.mean(rIObject) / b.NS_PER_MS).toFixed(4) + "ms");
+console.log("mean iteration object hasOwnProperty : " + (b.mean(rIObject) / b.NS_PER_MS).toFixed(4) + "ms");
 console.log("mean iteration object Object.keys() : " + (b.mean(rIObject2) / b.NS_PER_MS).toFixed(4) + "ms");
-//fastest : array iteration then iterate Map with ForEach
+//fastest for 100+: array iteration then iterate Map with ForEach 
+// fastest for < 50 c/system : array then object.keys() then iter by hasOwnProperty
 //insertion at a given positon (based on an element id)
 function benchInsertionMap() {
     var id = sArray[Math.floor(Math.random() * sArray.length)].id;

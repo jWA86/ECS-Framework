@@ -10,7 +10,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var ComponentFactory_1 = require("./ComponentFactory");
+var ComponentFactoryArray_1 = require("./ComponentFactoryArray");
 var HierarchicalComponentFactory = (function (_super) {
     __extends(HierarchicalComponentFactory, _super);
     function HierarchicalComponentFactory() {
@@ -47,5 +47,5 @@ var HierarchicalComponentFactory = (function (_super) {
         return false;
     };
     return HierarchicalComponentFactory;
-}(ComponentFactory_1.ComponentFactory));
+}(ComponentFactoryArray_1.ComponentFactoryArray));
 exports.HierarchicalComponentFactory = HierarchicalComponentFactory;

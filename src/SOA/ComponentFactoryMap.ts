@@ -1,21 +1,24 @@
-import { IComponent } from "../interfaces";
+import { IComponent, IComponentFactory } from "./interfaces";
 
-class ComponentFactory<T extends IComponent> {
+class ComponentFactoryMap<T extends IComponent> implements IComponentFactory {
     pool: Map<T> = new Map<T>();
     constructor() {
     }
+
     createComponent(type: { new(id: string): T }): T {
         let id = this.generateUniqueId();
         let t = new type(id);
         this.insertComponent(t);
         return t;
     }
+
     createComponentAfter(type: { new(id: string): T }, cId: string): T {
         let id = this.generateUniqueId();
         let t = new type(id);
         this.insertComponent(t, cId, true);
         return t;
     }
+
     createComponentBefore(type: { new(id: string): T }, cId: string): T {
         let id = this.generateUniqueId();
         let t = new type(id);
@@ -84,4 +87,5 @@ class ComponentFactory<T extends IComponent> {
         });
     }
 }
-export { IComponent, ComponentFactory }
+
+export { IComponent, ComponentFactoryMap }

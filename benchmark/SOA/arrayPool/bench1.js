@@ -1,7 +1,7 @@
 "use strict";
 //simple benchmark testing multiple components number processed by 13 differents systems x time
 Object.defineProperty(exports, "__esModule", { value: true });
-var ComponentFactory_1 = require("../../../src/SOA/arrayPool/ComponentFactory");
+var ComponentFactoryArray_1 = require("../../../src/SOA/ComponentFactoryArray");
 var SimpleSystem_1 = require("./SimpleSystem");
 var b = require("../../benchLib");
 var main = {
@@ -11,7 +11,7 @@ var main = {
         //create a component factory for each type of components
         var nbFact = Object.keys(SimpleSystem_1.easingMethod).length / 2;
         for (var i = 0; i < nbFact; ++i) {
-            this.factories.push(new ComponentFactory_1.ComponentFactory());
+            this.factories.push(new ComponentFactoryArray_1.ComponentFactoryArray());
         }
     },
     init: function (nb) {

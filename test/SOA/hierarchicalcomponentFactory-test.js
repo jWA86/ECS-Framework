@@ -2,7 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 require("mocha");
 var chai_1 = require("chai");
-var HierarchicalComponentFactory_1 = require("../../../src/SOA/arrayPool/HierarchicalComponentFactory");
+var HierarchicalComponentFactory_1 = require("../../src/SOA/HierarchicalComponentFactory");
+//TODO test with IComponentFactory interfaces
 describe("Hierarchical Component Factory ", function () {
     var HierarchicalComponent = (function () {
         function HierarchicalComponent(id) {
@@ -22,7 +23,7 @@ describe("Hierarchical Component Factory ", function () {
         chai_1.expect(HierarchicalFactory.pool[0].children.length).to.equal(1);
         chai_1.expect(HierarchicalFactory.pool[0].children[0]).to.equal(child1.id);
         // insert a new component at the top
-        var t2 = HierarchicalFactory.createComponentAt(HierarchicalComponent, t.id);
+        var t2 = HierarchicalFactory.createComponentBefore(HierarchicalComponent, t.id);
         var child2 = HierarchicalFactory.createChildComponent(HierarchicalComponent, t2.id);
         chai_1.expect(HierarchicalFactory.pool[0].id).to.equal(t2.id);
         chai_1.expect(HierarchicalFactory.pool[0].children[0]).to.equal(child2.id);

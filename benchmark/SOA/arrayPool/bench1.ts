@@ -1,7 +1,7 @@
 //simple benchmark testing multiple components number processed by 13 differents systems x time
 
 import {IComponent} from "../../../src/SOA/interfaces"
-import { ComponentFactory } from "../../../src/SOA/arrayPool/ComponentFactory";
+import { ComponentFactoryArray as ComponentFactory } from "../../../src/SOA/ComponentFactoryArray";
 import { easingMethod, IInterpolableComponent, InterpolableComponent, InterpolateSystem, easingSystem } from "./SimpleSystem";
 import * as b from "../../benchLib";
 

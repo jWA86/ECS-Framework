@@ -1,44 +1,44 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var ComponentFactory = (function () {
-    function ComponentFactory() {
+var ComponentFactoryMap = (function () {
+    function ComponentFactoryMap() {
         this.pool = new Map();
     }
-    ComponentFactory.prototype.createComponent = function (type) {
+    ComponentFactoryMap.prototype.createComponent = function (type) {
         var id = this.generateUniqueId();
         var t = new type(id);
         this.insertComponent(t);
         return t;
     };
-    ComponentFactory.prototype.createComponentAfter = function (type, cId) {
+    ComponentFactoryMap.prototype.createComponentAfter = function (type, cId) {
         var id = this.generateUniqueId();
         var t = new type(id);
         this.insertComponent(t, cId, true);
         return t;
     };
-    ComponentFactory.prototype.createComponentBefore = function (type, cId) {
+    ComponentFactoryMap.prototype.createComponentBefore = function (type, cId) {
         var id = this.generateUniqueId();
         var t = new type(id);
         this.insertComponent(t, cId);
         return t;
     };
-    ComponentFactory.prototype.getComponent = function (id) {
+    ComponentFactoryMap.prototype.getComponent = function (id) {
         return this.pool.get(id);
     };
-    ComponentFactory.prototype.removeComponent = function (id) {
+    ComponentFactoryMap.prototype.removeComponent = function (id) {
         return this.pool.delete(id);
     };
-    ComponentFactory.prototype.removeAll = function () {
+    ComponentFactoryMap.prototype.removeAll = function () {
         this.pool.clear();
     };
-    Object.defineProperty(ComponentFactory.prototype, "size", {
+    Object.defineProperty(ComponentFactoryMap.prototype, "size", {
         get: function () {
             return this.pool.size;
         },
         enumerable: true,
         configurable: true
     });
-    ComponentFactory.prototype.insertComponent = function (component, idOfPositionToInsert, insertAfter) {
+    ComponentFactoryMap.prototype.insertComponent = function (component, idOfPositionToInsert, insertAfter) {
         if (idOfPositionToInsert === void 0) { idOfPositionToInsert = "-1"; }
         if (insertAfter === void 0) { insertAfter = false; }
         if (idOfPositionToInsert === "-1") {
@@ -78,12 +78,12 @@ var ComponentFactory = (function () {
         Copyright (c) 2010 Robert Kieffer
         Dual licensed under the MIT and GPL licenses.
     */
-    ComponentFactory.prototype.generateUniqueId = function () {
+    ComponentFactoryMap.prototype.generateUniqueId = function () {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
             var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
     };
-    return ComponentFactory;
+    return ComponentFactoryMap;
 }());
-exports.ComponentFactory = ComponentFactory;
+exports.ComponentFactoryMap = ComponentFactoryMap;

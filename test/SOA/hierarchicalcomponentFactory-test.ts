@@ -1,8 +1,8 @@
 import "mocha";
 import { expect } from "chai";
-import { IHierarchicalComponent,  HierarchicalComponentFactory }
-    from "../../../src/SOA/arrayPool/HierarchicalComponentFactory";
+import { IHierarchicalComponent,  HierarchicalComponentFactory } from "../../src/SOA/HierarchicalComponentFactory";
 
+//TODO test with IComponentFactory interfaces
 describe("Hierarchical Component Factory ", () => {
 
     class HierarchicalComponent implements IHierarchicalComponent {
@@ -24,7 +24,7 @@ describe("Hierarchical Component Factory ", () => {
         expect(HierarchicalFactory.pool[0].children[0]).to.equal(child1.id);
 
         // insert a new component at the top
-        let t2 = HierarchicalFactory.createComponentAt(HierarchicalComponent, t.id);
+        let t2 = HierarchicalFactory.createComponentBefore(HierarchicalComponent, t.id);
         let child2 = HierarchicalFactory.createChildComponent(HierarchicalComponent, t2.id);
 
         expect(HierarchicalFactory.pool[0].id).to.equal(t2.id);

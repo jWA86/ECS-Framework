@@ -1,6 +1,6 @@
-import { IComponent } from "../interfaces";
+import { IComponent, IComponentFactory} from "./interfaces";
 
-class ComponentFactory<T extends IComponent> {
+class ComponentFactoryArray<T extends IComponent> implements IComponentFactory {
     pool: T[] = [];
     constructor() {
     }
@@ -10,6 +10,7 @@ class ComponentFactory<T extends IComponent> {
         this.insertComponent(t);
         return t;
     }
+
     createComponentAfter(type: { new(id: string): T }, cId: string): T {
         let index = this.getComponentIndex(cId);
         let id = this.generateUniqueId();
@@ -17,7 +18,8 @@ class ComponentFactory<T extends IComponent> {
         this.insertComponent(t, index + 1);
         return t;
     }
-    createComponentAt(type: { new(id: string): T }, cId: string): T {
+
+    createComponentBefore(type: { new(id: string): T }, cId: string): T {
         let index = this.getComponentIndex(cId);
         let id = this.generateUniqueId();
         let t = new type(id);
@@ -52,6 +54,10 @@ class ComponentFactory<T extends IComponent> {
         this.pool = [];
     }
 
+    get size() {
+        return this.pool.length;
+    }
+
     protected insertComponent(component: T, index = -1): number {
         if (index < 0 || index >= this.pool.length) {
             this.pool.push(component);
@@ -76,4 +82,5 @@ class ComponentFactory<T extends IComponent> {
         });
     }
 }
-export { IComponent, ComponentFactory }
+
+export { IComponent, ComponentFactoryArray }

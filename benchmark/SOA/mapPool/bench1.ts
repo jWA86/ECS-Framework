@@ -1,7 +1,7 @@
 //simple benchmark testing multiple components number processed by 13 differents systems x time
 
 import {IComponent} from "../../../src/SOA/interfaces"
-import { ComponentFactory } from "../../../src/SOA/mapPool/ComponentFactory";
+import { ComponentFactoryMap as ComponentFactory} from "../../../src/SOA/ComponentFactoryMap";
 import { easingMethod, IInterpolableComponent, InterpolableComponent, InterpolateSystem, easingSystem } from "./SimpleSystem";
 import * as b from "../../benchLib";
 
@@ -43,7 +43,6 @@ const main = {
     }
 }
 
-
 const bench = function (nbLoop, nbComp) {
     let m = [];
     for (let i = 0; i < nbLoop; ++i) {
@@ -69,8 +68,6 @@ const bench = function (nbLoop, nbComp) {
 main.init(100);
 bench(10, 100);
 main.clear();
-
-
 
 // test with x (10, 100, 1000 ,10000 ,100000) components for each type of component (13 easing system)
 // sample over y iterations (1, 2, 3, 10, 100) 
