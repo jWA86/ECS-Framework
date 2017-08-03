@@ -1,59 +1,38 @@
-import {IComponent } from "../../../src/SOA/interfaces";
-import { ComponentFactory} from "../../../src/SOA/arrayPool/ComponentFactory";
+import {IComponent, IComponentFactory } from "../../../src/SOA/interfaces";
+import { ComponentFactoryArray} from "../../../src/SOA/ComponentFactoryArray";
 import { ISystem } from "../../../src/SOA/System";
+import {IInterpolableComponent, InterpolableComponent, easingMethod, IInterpolableSystem, easingSystem} from "../easingComponent";
 
-enum easingMethod {
-    "linear",
-    "easeInQuad",
-    "easeOutQuad",
-    "easeInOutQuad",
-    "easeInCubic",
-    "easeOutCubic",
-    "easeInOutCubic",
-    "easeInQuart",
-    "easeOutQuart",
-    "easeInOutQuart",
-    "easeInQuint",
-    "easeOutQuint",
-    "easeInOutQuint"
-}
-
-interface IInterpolableComponent extends IComponent {
-    currentValue: number;
-    startValue: number;
-    endValue: number;
-}
-
-class InterpolableComponent implements IInterpolableComponent {
-    public currentValue: number;
-    constructor(public id: string, public easing = easingMethod.linear, public startValue = 0, public endValue = 1) {
-        this.currentValue = this.startValue;
-    }
-}
-
-abstract class InterpolateSystem implements ISystem {
+abstract class InterpolateSystem implements IInterpolableSystem {
     constructor() {
     }
-    process(components: IInterpolableComponent[], progress: number) {
-        let l = components.length;
+    process(factory:ComponentFactoryArray<IInterpolableComponent>, progress: number) {
+        let l = factory.size;
+       
         for (let i = 0; i < l; ++i) {
-            let c = components[i];
+            //since it's an array implementation, iterate directly via the pool instead of .get(id)
+            let c = factory.pool[i];
+            //doesn't check if it's equal 0
             let length = c.endValue - c.startValue;
-            let nt = progress / length;
-            c.currentValue = this.interpolate(nt);
+            if(progress <= length){
+                let nt = progress / length;
+                c.currentValue = this.interpolate(nt);
+            }
+            
         };
+
     }
-    protected abstract interpolate(t: number): number
+    abstract interpolate(t: number): number
 }
 
 class LinearSystemSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: Map<IInterpolableComponent>, progress: number) {
-        super.process(components, progress);
+    process(factory:ComponentFactoryArray<IInterpolableComponent>, progress: number) {
+        super.process(factory, progress);
     }
-    protected interpolate(t: number) {
+    interpolate(t: number) {
         return t;
     }
 }
@@ -62,10 +41,10 @@ class easeInQuadSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: Map<IInterpolableComponent>, progress: number) {
-        super.process(components, progress);
+    process(factory:ComponentFactoryArray<IInterpolableComponent>, progress: number) {
+        super.process(factory, progress);
     }
-    protected interpolate(t: number) {
+    interpolate(t: number) {
         return t * t;
     }
 }
@@ -74,10 +53,10 @@ class easeOutQuadSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: Map<IInterpolableComponent>, progress: number) {
-        super.process(components, progress);
+    process(factory:ComponentFactoryArray<IInterpolableComponent>, progress: number) {
+        super.process(factory, progress);
     }
-    protected interpolate(t: number) {
+interpolate(t: number) {
         return t * (2 - t);
     }
 }
@@ -86,10 +65,10 @@ class easeInOutQuadSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: Map<IInterpolableComponent>, progress: number) {
-        super.process(components, progress);
+    process(factory:ComponentFactoryArray<IInterpolableComponent>, progress: number) {
+        super.process(factory, progress);
     }
-    protected interpolate(t: number) {
+    interpolate(t: number) {
         return t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     }
 }
@@ -98,10 +77,10 @@ class easeInCubicSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: Map<IInterpolableComponent>, progress: number) {
-        super.process(components, progress);
+    process(factory:ComponentFactoryArray<IInterpolableComponent>, progress: number) {
+        super.process(factory, progress);
     }
-    protected interpolate(t: number) {
+    interpolate(t: number) {
         return t * t * t;
     }
 }
@@ -110,10 +89,10 @@ class easeOutCubicSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: Map<IInterpolableComponent>, progress: number) {
-        super.process(components, progress);
+    process(factory:ComponentFactoryArray<IInterpolableComponent>, progress: number) {
+        super.process(factory, progress);
     }
-    protected interpolate(t: number) {
+    interpolate(t: number) {
         return (--t) * t * t + 1;;
     }
 }
@@ -122,10 +101,10 @@ class easeInOutCubicSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: Map<IInterpolableComponent>, progress: number) {
-        super.process(components, progress);
+    process(factory:ComponentFactoryArray<IInterpolableComponent>, progress: number) {
+        super.process(factory, progress);
     }
-    protected interpolate(t: number) {
+    interpolate(t: number) {
         return t < .5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1
     }
 }
@@ -134,10 +113,10 @@ class easeInQuartSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: Map<IInterpolableComponent>, progress: number) {
-        super.process(components, progress);
+    process(factory:ComponentFactoryArray<IInterpolableComponent>, progress: number) {
+        super.process(factory, progress);
     }
-    protected interpolate(t: number) {
+    interpolate(t: number) {
         return t * t * t * t;
     }
 }
@@ -147,10 +126,10 @@ class easeInOutQuartSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: Map<IInterpolableComponent>, progress: number) {
-        super.process(components, progress);
+    process(factory:ComponentFactoryArray<IInterpolableComponent>, progress: number) {
+        super.process(factory, progress);
     }
-    protected interpolate(t: number) {
+    interpolate(t: number) {
         return t < .5 ? 8 * t * t * t * t : 1 - 8 * (--t) * t * t * t;
     }
 }
@@ -159,10 +138,10 @@ class easeOutQuartSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: Map<IInterpolableComponent>, progress: number) {
-        super.process(components, progress);
+    process(factory:ComponentFactoryArray<IInterpolableComponent>, progress: number) {
+        super.process(factory, progress);
     }
-    protected interpolate(t: number) {
+    interpolate(t: number) {
         return 1 - (--t) * t * t * t;
     }
 }
@@ -171,10 +150,10 @@ class easeInQuintSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: Map<IInterpolableComponent>, progress: number) {
-        super.process(components, progress);
+    process(factory:ComponentFactoryArray<IInterpolableComponent>, progress: number) {
+        super.process(factory, progress);
     }
-    protected interpolate(t: number) {
+    interpolate(t: number) {
         return t * t * t * t * t;
     }
 }
@@ -183,10 +162,10 @@ class easeOutQuintSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: Map<IInterpolableComponent>, progress: number) {
-        super.process(components, progress);
+    process(factory:ComponentFactoryArray<IInterpolableComponent>, progress: number) {
+        super.process(factory, progress);
     }
-    protected interpolate(t: number) {
+    interpolate(t: number) {
         return 1 + (--t) * t * t * t * t;
     }
 }
@@ -195,16 +174,15 @@ class easeInOutQuintSys extends InterpolateSystem {
     constructor() {
         super();
     }
-    process(components: Map<IInterpolableComponent>, progress: number) {
-        super.process(components, progress);
+    process(factory:ComponentFactoryArray<IInterpolableComponent>, progress: number) {
+        super.process(factory, progress);
     }
-    protected interpolate(t: number) {
+    interpolate(t: number) {
         return t < .5 ? 16 * t * t * t * t * t : 1 + 16 * (--t) * t * t * t * t;
     }
 }
 
-const easingSystem = {
-    systems: [new LinearSystemSys(),
+let systems = [new LinearSystemSys(),
     new easeInQuadSys(),
     new easeOutQuadSys(),
     new easeInOutQuadSys(),
@@ -217,16 +195,8 @@ const easingSystem = {
     new easeInQuintSys(),
     new easeOutQuintSys(),
     new easeInOutQuintSys()
-    ],
-    process: function (factories: ComponentFactory<IInterpolableComponent>[], progress: number) {
-        let l = factories.length;
-        //iterate over all factories, supposed its in the same order as instanciated in the easingSystem
-        for (let i = 0; i < l; ++i) {
-            let pool = factories[i].pool;
-                this.systems[i].process(pool, progress);
-        }
-    }
-}
+    ];
+const System = new easingSystem(systems);
 
 
-export { easingMethod, IInterpolableComponent, InterpolableComponent, InterpolateSystem, easingSystem }
+export { easingMethod, IInterpolableComponent, InterpolableComponent, InterpolateSystem, System }
