@@ -1,6 +1,6 @@
-import {IComponent} from "./interfaces";
+import {IComponent, IComponentFactory} from "./interfaces";
 
 interface ISystem {
-    process(component: IComponent[], ...args: any[]);
+    process(factory:IComponentFactory, ...args: any[]);
 }
 export {ISystem}

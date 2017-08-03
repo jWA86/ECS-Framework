@@ -9,7 +9,7 @@ poolImpl.forEach((p) => {
     describe("Component Factory with " + p.name, () => {
         //for checking content of the pool whether it is a hashMap or array -> convert it to an array
         //ie: for checking order of elements in the map
-        function poolToArray(factory: IComponentFactory) {
+        function poolToArray(factory: IComponentFactory<IComponent>) {
             let a = [];
             factory.pool.forEach((v) => {
                 a.push(v);
@@ -19,7 +19,7 @@ poolImpl.forEach((p) => {
         class concreteComponent implements IComponent {
             constructor(public id: string) { }
         }
-        let simpleFactory: IComponentFactory = new p.impl<IComponent>();
+        let simpleFactory: IComponentFactory<IComponent> = new p.impl<IComponent>();
         beforeEach(() => {
             simpleFactory = new p.impl<IComponent>();
         });

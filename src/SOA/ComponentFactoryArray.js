@@ -5,22 +5,34 @@ var ComponentFactoryArray = (function () {
         this.pool = [];
     }
     ComponentFactoryArray.prototype.createComponent = function (type) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
         var id = this.generateUniqueId();
-        var t = new type(id);
+        var t = new type(id, args);
         this.insertComponent(t);
         return t;
     };
     ComponentFactoryArray.prototype.createComponentAfter = function (type, cId) {
+        var args = [];
+        for (var _i = 2; _i < arguments.length; _i++) {
+            args[_i - 2] = arguments[_i];
+        }
         var index = this.getComponentIndex(cId);
         var id = this.generateUniqueId();
-        var t = new type(id);
+        var t = new type(id, args);
         this.insertComponent(t, index + 1);
         return t;
     };
     ComponentFactoryArray.prototype.createComponentBefore = function (type, cId) {
+        var args = [];
+        for (var _i = 2; _i < arguments.length; _i++) {
+            args[_i - 2] = arguments[_i];
+        }
         var index = this.getComponentIndex(cId);
         var id = this.generateUniqueId();
-        var t = new type(id);
+        var t = new type(id, args);
         this.insertComponent(t, index);
         return t;
     };

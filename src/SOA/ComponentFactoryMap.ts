@@ -5,23 +5,23 @@ class ComponentFactoryMap<T extends IComponent> implements IComponentFactory {
     constructor() {
     }
 
-    createComponent(type: { new(id: string): T }): T {
+    createComponent(type: { new(id: string, ...args: any[]): T }, ...args: any[]): T {
         let id = this.generateUniqueId();
-        let t = new type(id);
+        let t = new type(id, args);
         this.insertComponent(t);
         return t;
     }
 
-    createComponentAfter(type: { new(id: string): T }, cId: string): T {
+    createComponentAfter(type: { new(id: string, ...args: any[]): T }, cId: string, ...args: any[]): T {
         let id = this.generateUniqueId();
-        let t = new type(id);
+        let t = new type(id, args);
         this.insertComponent(t, cId, true);
         return t;
     }
 
-    createComponentBefore(type: { new(id: string): T }, cId: string): T {
+    createComponentBefore(type: { new(id: string, ...args: any[]): T }, cId: string, ...args: any[]): T {
         let id = this.generateUniqueId();
-        let t = new type(id);
+        let t = new type(id, args);
         this.insertComponent(t, cId);
         return t;
     }

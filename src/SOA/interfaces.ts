@@ -2,12 +2,12 @@ interface IComponent {
     id: string;
 }
 
-interface IComponentFactory {
+interface IComponentFactory<T extends IComponent> {
     pool;
-    getComponent(string):IComponent;
-    createComponent(IComponent):IComponent;
-    createComponentBefore(IComponent, string):IComponent;
-    createComponentAfter(IComponent, string):IComponent;
+    getComponent(string):T;
+    createComponent(IComponent, ...args:any[]):T;
+    createComponentBefore(IComponent, string, ...args:any[]):T;
+    createComponentAfter(IComponent, string, ...args:any[]):T;
     removeComponent(string):boolean;
     removeAll();
     size:number;

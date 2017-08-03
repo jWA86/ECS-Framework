@@ -5,20 +5,32 @@ var ComponentFactoryMap = (function () {
         this.pool = new Map();
     }
     ComponentFactoryMap.prototype.createComponent = function (type) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
         var id = this.generateUniqueId();
-        var t = new type(id);
+        var t = new type(id, args);
         this.insertComponent(t);
         return t;
     };
     ComponentFactoryMap.prototype.createComponentAfter = function (type, cId) {
+        var args = [];
+        for (var _i = 2; _i < arguments.length; _i++) {
+            args[_i - 2] = arguments[_i];
+        }
         var id = this.generateUniqueId();
-        var t = new type(id);
+        var t = new type(id, args);
         this.insertComponent(t, cId, true);
         return t;
     };
     ComponentFactoryMap.prototype.createComponentBefore = function (type, cId) {
+        var args = [];
+        for (var _i = 2; _i < arguments.length; _i++) {
+            args[_i - 2] = arguments[_i];
+        }
         var id = this.generateUniqueId();
-        var t = new type(id);
+        var t = new type(id, args);
         this.insertComponent(t, cId);
         return t;
     };
