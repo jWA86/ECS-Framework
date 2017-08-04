@@ -1,9 +1,9 @@
 //simple benchmark for comparing collection lookup and iteration
-import * as b from "../benchLib";
+import * as b from "../utils/perfTestUtils";
 
 //size of collections
 //fetch random same number of elements in fetch benchmark
-const l = 100;
+const l = 1000;
 
 const generateUniqueId = function () {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {

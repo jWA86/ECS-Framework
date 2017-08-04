@@ -32,14 +32,14 @@ poolImpl.forEach((p) => {
         let components3 = [];
 
         class MultiComponentSystem extends TupleComponentSystem {
-            constructor(factoriesRef: IComponentFactory<IComponent>[]) {
-                super(factoriesRef);
+            constructor(f1: IComponentFactory<IComponent>, f2: IComponentFactory<IComponent>, f3: IComponentFactory<IComponent>) {
+                super(f1, f2, f3);
             }
-            process(idsTuples: IComponentFactory<TupleComponent>) {
-                super.process(idsTuples);
-            }
+            // process(idsTuples: IComponentFactory<TupleComponent>) {
+            //     super.process(idsTuples);
+            // }
             //sum all components val to the first component val in the tuple
-            exec(components: ConcreteComponent[]) {
+            execute(components: ConcreteComponent[]) {
                 let l = components.length;
                 for (let i = 1; i < l; ++i) {
                     components[0].val += components[i].val;
@@ -63,7 +63,7 @@ poolImpl.forEach((p) => {
             components2 = [];
             components3 = [];
 
-            mCSystem = new MultiComponentSystem(factories);
+            mCSystem = new MultiComponentSystem(simpleFactory1, simpleFactory2, simpleFactory3);
 
             for (let i = 0; i < 10; ++i) {
                 components1.push(simpleFactory1.createComponent(ConcreteComponent));
@@ -91,7 +91,6 @@ poolImpl.forEach((p) => {
                 expect(components2[i].val).to.equal(1);
                 expect(components3[i].val).to.equal(1);
                 let t = tuples.createComponent(TupleComponent, components1[i].id, components2[i].id, components3[i].id);
-                // tuples.push([components1[i].id, components2[i].id, components3[i].id]);
             }
             mCSystem.process(tuples);
             for (let i = 0; i < 10; ++i) {

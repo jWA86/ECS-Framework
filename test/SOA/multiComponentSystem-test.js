@@ -47,14 +47,14 @@ poolImpl.forEach(function (p) {
         var components3 = [];
         var MultiComponentSystem = (function (_super) {
             __extends(MultiComponentSystem, _super);
-            function MultiComponentSystem(factoriesRef) {
-                return _super.call(this, factoriesRef) || this;
+            function MultiComponentSystem(f1, f2, f3) {
+                return _super.call(this, f1, f2, f3) || this;
             }
-            MultiComponentSystem.prototype.process = function (idsTuples) {
-                _super.prototype.process.call(this, idsTuples);
-            };
+            // process(idsTuples: IComponentFactory<TupleComponent>) {
+            //     super.process(idsTuples);
+            // }
             //sum all components val to the first component val in the tuple
-            MultiComponentSystem.prototype.exec = function (components) {
+            MultiComponentSystem.prototype.execute = function (components) {
                 var l = components.length;
                 for (var i = 1; i < l; ++i) {
                     components[0].val += components[i].val;
@@ -74,7 +74,7 @@ poolImpl.forEach(function (p) {
             components1 = [];
             components2 = [];
             components3 = [];
-            mCSystem = new MultiComponentSystem(factories);
+            mCSystem = new MultiComponentSystem(simpleFactory1, simpleFactory2, simpleFactory3);
             for (var i = 0; i < 10; ++i) {
                 components1.push(simpleFactory1.createComponent(ConcreteComponent));
                 components2.push(simpleFactory2.createComponent(ConcreteComponent));
@@ -101,7 +101,6 @@ poolImpl.forEach(function (p) {
                 chai_1.expect(components2[i].val).to.equal(1);
                 chai_1.expect(components3[i].val).to.equal(1);
                 var t = tuples.createComponent(TupleComponent, components1[i].id, components2[i].id, components3[i].id);
-                // tuples.push([components1[i].id, components2[i].id, components3[i].id]);
             }
             mCSystem.process(tuples);
             for (var i = 0; i < 10; ++i) {

@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 //simple benchmark for comparing collection lookup and iteration
-var b = require("../benchLib");
+var b = require("../utils/perfTestUtils");
 //size of collections
 //fetch random same number of elements in fetch benchmark
-var l = 100;
+var l = 1000;
 var generateUniqueId = function () {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);

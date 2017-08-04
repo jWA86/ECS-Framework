@@ -1,6 +1,6 @@
 import { IComponent, IComponentFactory } from "./interfaces";
 
-class ComponentFactoryMap<T extends IComponent> implements IComponentFactory {
+class ComponentFactoryMap<T extends IComponent> implements IComponentFactory<IComponent> {
     pool: Map<T> = new Map<T>();
     constructor() {
     }

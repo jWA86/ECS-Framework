@@ -10,13 +10,13 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var easingComponent_1 = require("../easingComponent");
-exports.InterpolableComponent = easingComponent_1.InterpolableComponent;
-exports.easingMethod = easingComponent_1.easingMethod;
-var InterpolateSystem = (function () {
-    function InterpolateSystem() {
+var easing_1 = require("../component/easing");
+exports.InterpolableComponent = easing_1.InterpolableComponent;
+exports.easingMethod = easing_1.easingMethod;
+var EasingSystem = (function () {
+    function EasingSystem() {
     }
-    InterpolateSystem.prototype.process = function (factory, progress) {
+    EasingSystem.prototype.process = function (factory, progress) {
         var l = factory.size;
         for (var i = 0; i < l; ++i) {
             //since it's an array implementation, iterate directly via the pool instead of .get(id)
@@ -25,14 +25,14 @@ var InterpolateSystem = (function () {
             var length_1 = c.endValue - c.startValue;
             if (progress <= length_1) {
                 var nt = progress / length_1;
-                c.currentValue = this.interpolate(nt);
+                c.currentValue = this.execute(nt);
             }
         }
         ;
     };
-    return InterpolateSystem;
+    return EasingSystem;
 }());
-exports.InterpolateSystem = InterpolateSystem;
+exports.EasingSystem = EasingSystem;
 var LinearSystemSys = (function (_super) {
     __extends(LinearSystemSys, _super);
     function LinearSystemSys() {
@@ -41,11 +41,11 @@ var LinearSystemSys = (function (_super) {
     LinearSystemSys.prototype.process = function (factory, progress) {
         _super.prototype.process.call(this, factory, progress);
     };
-    LinearSystemSys.prototype.interpolate = function (t) {
+    LinearSystemSys.prototype.execute = function (t) {
         return t;
     };
     return LinearSystemSys;
-}(InterpolateSystem));
+}(EasingSystem));
 var easeInQuadSys = (function (_super) {
     __extends(easeInQuadSys, _super);
     function easeInQuadSys() {
@@ -54,11 +54,11 @@ var easeInQuadSys = (function (_super) {
     easeInQuadSys.prototype.process = function (factory, progress) {
         _super.prototype.process.call(this, factory, progress);
     };
-    easeInQuadSys.prototype.interpolate = function (t) {
+    easeInQuadSys.prototype.execute = function (t) {
         return t * t;
     };
     return easeInQuadSys;
-}(InterpolateSystem));
+}(EasingSystem));
 var easeOutQuadSys = (function (_super) {
     __extends(easeOutQuadSys, _super);
     function easeOutQuadSys() {
@@ -67,11 +67,11 @@ var easeOutQuadSys = (function (_super) {
     easeOutQuadSys.prototype.process = function (factory, progress) {
         _super.prototype.process.call(this, factory, progress);
     };
-    easeOutQuadSys.prototype.interpolate = function (t) {
+    easeOutQuadSys.prototype.execute = function (t) {
         return t * (2 - t);
     };
     return easeOutQuadSys;
-}(InterpolateSystem));
+}(EasingSystem));
 var easeInOutQuadSys = (function (_super) {
     __extends(easeInOutQuadSys, _super);
     function easeInOutQuadSys() {
@@ -80,11 +80,11 @@ var easeInOutQuadSys = (function (_super) {
     easeInOutQuadSys.prototype.process = function (factory, progress) {
         _super.prototype.process.call(this, factory, progress);
     };
-    easeInOutQuadSys.prototype.interpolate = function (t) {
+    easeInOutQuadSys.prototype.execute = function (t) {
         return t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     };
     return easeInOutQuadSys;
-}(InterpolateSystem));
+}(EasingSystem));
 var easeInCubicSys = (function (_super) {
     __extends(easeInCubicSys, _super);
     function easeInCubicSys() {
@@ -93,11 +93,11 @@ var easeInCubicSys = (function (_super) {
     easeInCubicSys.prototype.process = function (factory, progress) {
         _super.prototype.process.call(this, factory, progress);
     };
-    easeInCubicSys.prototype.interpolate = function (t) {
+    easeInCubicSys.prototype.execute = function (t) {
         return t * t * t;
     };
     return easeInCubicSys;
-}(InterpolateSystem));
+}(EasingSystem));
 var easeOutCubicSys = (function (_super) {
     __extends(easeOutCubicSys, _super);
     function easeOutCubicSys() {
@@ -106,12 +106,12 @@ var easeOutCubicSys = (function (_super) {
     easeOutCubicSys.prototype.process = function (factory, progress) {
         _super.prototype.process.call(this, factory, progress);
     };
-    easeOutCubicSys.prototype.interpolate = function (t) {
+    easeOutCubicSys.prototype.execute = function (t) {
         return (--t) * t * t + 1;
         ;
     };
     return easeOutCubicSys;
-}(InterpolateSystem));
+}(EasingSystem));
 var easeInOutCubicSys = (function (_super) {
     __extends(easeInOutCubicSys, _super);
     function easeInOutCubicSys() {
@@ -120,11 +120,11 @@ var easeInOutCubicSys = (function (_super) {
     easeInOutCubicSys.prototype.process = function (factory, progress) {
         _super.prototype.process.call(this, factory, progress);
     };
-    easeInOutCubicSys.prototype.interpolate = function (t) {
+    easeInOutCubicSys.prototype.execute = function (t) {
         return t < .5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
     };
     return easeInOutCubicSys;
-}(InterpolateSystem));
+}(EasingSystem));
 var easeInQuartSys = (function (_super) {
     __extends(easeInQuartSys, _super);
     function easeInQuartSys() {
@@ -133,11 +133,11 @@ var easeInQuartSys = (function (_super) {
     easeInQuartSys.prototype.process = function (factory, progress) {
         _super.prototype.process.call(this, factory, progress);
     };
-    easeInQuartSys.prototype.interpolate = function (t) {
+    easeInQuartSys.prototype.execute = function (t) {
         return t * t * t * t;
     };
     return easeInQuartSys;
-}(InterpolateSystem));
+}(EasingSystem));
 var easeInOutQuartSys = (function (_super) {
     __extends(easeInOutQuartSys, _super);
     function easeInOutQuartSys() {
@@ -146,11 +146,11 @@ var easeInOutQuartSys = (function (_super) {
     easeInOutQuartSys.prototype.process = function (factory, progress) {
         _super.prototype.process.call(this, factory, progress);
     };
-    easeInOutQuartSys.prototype.interpolate = function (t) {
+    easeInOutQuartSys.prototype.execute = function (t) {
         return t < .5 ? 8 * t * t * t * t : 1 - 8 * (--t) * t * t * t;
     };
     return easeInOutQuartSys;
-}(InterpolateSystem));
+}(EasingSystem));
 var easeOutQuartSys = (function (_super) {
     __extends(easeOutQuartSys, _super);
     function easeOutQuartSys() {
@@ -159,11 +159,11 @@ var easeOutQuartSys = (function (_super) {
     easeOutQuartSys.prototype.process = function (factory, progress) {
         _super.prototype.process.call(this, factory, progress);
     };
-    easeOutQuartSys.prototype.interpolate = function (t) {
+    easeOutQuartSys.prototype.execute = function (t) {
         return 1 - (--t) * t * t * t;
     };
     return easeOutQuartSys;
-}(InterpolateSystem));
+}(EasingSystem));
 var easeInQuintSys = (function (_super) {
     __extends(easeInQuintSys, _super);
     function easeInQuintSys() {
@@ -172,11 +172,11 @@ var easeInQuintSys = (function (_super) {
     easeInQuintSys.prototype.process = function (factory, progress) {
         _super.prototype.process.call(this, factory, progress);
     };
-    easeInQuintSys.prototype.interpolate = function (t) {
+    easeInQuintSys.prototype.execute = function (t) {
         return t * t * t * t * t;
     };
     return easeInQuintSys;
-}(InterpolateSystem));
+}(EasingSystem));
 var easeOutQuintSys = (function (_super) {
     __extends(easeOutQuintSys, _super);
     function easeOutQuintSys() {
@@ -185,11 +185,11 @@ var easeOutQuintSys = (function (_super) {
     easeOutQuintSys.prototype.process = function (factory, progress) {
         _super.prototype.process.call(this, factory, progress);
     };
-    easeOutQuintSys.prototype.interpolate = function (t) {
+    easeOutQuintSys.prototype.execute = function (t) {
         return 1 + (--t) * t * t * t * t;
     };
     return easeOutQuintSys;
-}(InterpolateSystem));
+}(EasingSystem));
 var easeInOutQuintSys = (function (_super) {
     __extends(easeInOutQuintSys, _super);
     function easeInOutQuintSys() {
@@ -198,24 +198,39 @@ var easeInOutQuintSys = (function (_super) {
     easeInOutQuintSys.prototype.process = function (factory, progress) {
         _super.prototype.process.call(this, factory, progress);
     };
-    easeInOutQuintSys.prototype.interpolate = function (t) {
+    easeInOutQuintSys.prototype.execute = function (t) {
         return t < .5 ? 16 * t * t * t * t * t : 1 + 16 * (--t) * t * t * t * t;
     };
     return easeInOutQuintSys;
-}(InterpolateSystem));
-var systems = [new LinearSystemSys(),
-    new easeInQuadSys(),
-    new easeOutQuadSys(),
-    new easeInOutQuadSys(),
-    new easeInCubicSys(),
-    new easeOutCubicSys(),
-    new easeInOutCubicSys(),
-    new easeInQuartSys(),
-    new easeOutQuartSys(),
-    new easeInOutQuartSys(),
-    new easeInQuintSys(),
-    new easeOutQuintSys(),
-    new easeInOutQuintSys()
-];
-var System = new easingComponent_1.easingSystem(systems);
-exports.System = System;
+}(EasingSystem));
+//System that warp all easing systems
+//should use branching instead in real use case ?
+var InterpolationSystem = (function () {
+    function InterpolationSystem() {
+        this.systems = [
+            new LinearSystemSys(),
+            new easeInQuadSys(),
+            new easeOutQuadSys(),
+            new easeInOutQuadSys(),
+            new easeInCubicSys(),
+            new easeOutCubicSys(),
+            new easeInOutCubicSys(),
+            new easeInQuartSys(),
+            new easeOutQuartSys(),
+            new easeInOutQuartSys(),
+            new easeInQuintSys(),
+            new easeOutQuintSys(),
+            new easeInOutQuintSys()
+        ];
+    }
+    InterpolationSystem.prototype.process = function (factories, progress) {
+        var l = factories.length;
+        //iterate over all factories, supposed its in the same order as instanciated in the easingSystem
+        var called = 0;
+        for (var i = 0; i < l; ++i) {
+            this.systems[i].process(factories[i], progress);
+        }
+    };
+    return InterpolationSystem;
+}());
+exports.InterpolationSystem = InterpolationSystem;

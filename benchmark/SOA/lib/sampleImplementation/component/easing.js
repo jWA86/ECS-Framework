@@ -18,12 +18,10 @@ var easingMethod;
 })(easingMethod || (easingMethod = {}));
 exports.easingMethod = easingMethod;
 var InterpolableComponent = (function () {
-    function InterpolableComponent(id, easing, startValue, endValue) {
-        if (easing === void 0) { easing = easingMethod.linear; }
+    function InterpolableComponent(id, startValue, endValue) {
         if (startValue === void 0) { startValue = 0; }
         if (endValue === void 0) { endValue = 1; }
         this.id = id;
-        this.easing = easing;
         this.startValue = startValue;
         this.endValue = endValue;
         this.currentValue = this.startValue;
@@ -31,18 +29,3 @@ var InterpolableComponent = (function () {
     return InterpolableComponent;
 }());
 exports.InterpolableComponent = InterpolableComponent;
-var easingSystem = (function () {
-    function easingSystem(systems) {
-        this.systems = systems;
-    }
-    easingSystem.prototype.process = function (factories, progress) {
-        var l = factories.length;
-        //iterate over all factories, supposed its in the same order as instanciated in the easingSystem
-        var called = 0;
-        for (var i = 0; i < l; ++i) {
-            this.systems[i].process(factories[i], progress);
-        }
-    };
-    return easingSystem;
-}());
-exports.easingSystem = easingSystem;

@@ -1,8 +1,14 @@
-const fs = require('fs');
-const os = require('os');
+interface IPerfTest {
+    //nbComponents per factories
+    system;
+    createSystem: Function;
+    createFactories: Function;
+    createComponents(nbComponents: number);
+    process: Function;
+    clear: Function;
+}
 
-const NS_PER_SEC = 1e9;
-const NS_PER_MS = 1e6;
+//hrtime : [seconds, nanosecondes]
 
 interface IResult {
     unit: number;
@@ -13,6 +19,9 @@ interface IResult {
     first: number;
     raw: Array<any>;
 }
+
+const NS_PER_SEC = 1e9;
+const NS_PER_MS = 1e6;
 
 function hrToNanoSec(hrtime) {
     return hrtime[0] * NS_PER_SEC + hrtime[1];
@@ -27,6 +36,7 @@ function mean(ar) {
     }
     return m / l;
 }
+
 function max(ar) {
     let m = 0;
     let index = 0;
@@ -39,6 +49,7 @@ function max(ar) {
     }
     return { "value": m, "index": index, "of": l };
 }
+
 function min(ar) {
     let m = Number.MAX_VALUE;
     let index = 0;
@@ -51,6 +62,7 @@ function min(ar) {
     }
     return { "value": m, "index": index, "of": l };
 }
+
 function variance(ar, m) {
     let v = 0;
     let l = ar.length;
@@ -60,18 +72,4 @@ function variance(ar, m) {
     return v / (l - 1);
 }
 
-function writeRes(res, path) {
-    let p = path + "/" + Date.now() + ".json";
-    
-    let date = JSON.stringify(new Date()+", ");
-    let cpu = {"cpu":os.cpus(), "platform":os.platform() };
-    let r = res;
-    let o = {"date": date, "os": cpu, "data": r}
-    let buffer = new Buffer(JSON.stringify(o));
-        fs.writeFile(p, buffer, 0, buffer.length, null, function (err) {
-            if (err) throw 'error writing file: ' + err;
-            else{console.log("results written in "+path)}
-        });
-}
-
-export { NS_PER_SEC, NS_PER_MS, IResult, hrToNanoSec, mean, max, min, variance, writeRes }
+export { NS_PER_SEC, NS_PER_MS, IResult, hrToNanoSec, mean, max, min, variance, IPerfTest }
