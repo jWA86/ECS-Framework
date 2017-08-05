@@ -33,19 +33,20 @@ var EasingSystem = (function () {
     return EasingSystem;
 }());
 exports.EasingSystem = EasingSystem;
-var LinearSystemSys = (function (_super) {
-    __extends(LinearSystemSys, _super);
-    function LinearSystemSys() {
+var linearSys = (function (_super) {
+    __extends(linearSys, _super);
+    function linearSys() {
         return _super.call(this) || this;
     }
-    LinearSystemSys.prototype.process = function (factory, progress) {
+    linearSys.prototype.process = function (factory, progress) {
         _super.prototype.process.call(this, factory, progress);
     };
-    LinearSystemSys.prototype.execute = function (t) {
+    linearSys.prototype.execute = function (t) {
         return t;
     };
-    return LinearSystemSys;
+    return linearSys;
 }(EasingSystem));
+exports.linearSys = linearSys;
 var easeInQuadSys = (function (_super) {
     __extends(easeInQuadSys, _super);
     function easeInQuadSys() {
@@ -59,6 +60,7 @@ var easeInQuadSys = (function (_super) {
     };
     return easeInQuadSys;
 }(EasingSystem));
+exports.easeInQuadSys = easeInQuadSys;
 var easeOutQuadSys = (function (_super) {
     __extends(easeOutQuadSys, _super);
     function easeOutQuadSys() {
@@ -72,6 +74,7 @@ var easeOutQuadSys = (function (_super) {
     };
     return easeOutQuadSys;
 }(EasingSystem));
+exports.easeOutQuadSys = easeOutQuadSys;
 var easeInOutQuadSys = (function (_super) {
     __extends(easeInOutQuadSys, _super);
     function easeInOutQuadSys() {
@@ -85,6 +88,7 @@ var easeInOutQuadSys = (function (_super) {
     };
     return easeInOutQuadSys;
 }(EasingSystem));
+exports.easeInOutQuadSys = easeInOutQuadSys;
 var easeInCubicSys = (function (_super) {
     __extends(easeInCubicSys, _super);
     function easeInCubicSys() {
@@ -98,6 +102,7 @@ var easeInCubicSys = (function (_super) {
     };
     return easeInCubicSys;
 }(EasingSystem));
+exports.easeInCubicSys = easeInCubicSys;
 var easeOutCubicSys = (function (_super) {
     __extends(easeOutCubicSys, _super);
     function easeOutCubicSys() {
@@ -112,6 +117,7 @@ var easeOutCubicSys = (function (_super) {
     };
     return easeOutCubicSys;
 }(EasingSystem));
+exports.easeOutCubicSys = easeOutCubicSys;
 var easeInOutCubicSys = (function (_super) {
     __extends(easeInOutCubicSys, _super);
     function easeInOutCubicSys() {
@@ -125,6 +131,7 @@ var easeInOutCubicSys = (function (_super) {
     };
     return easeInOutCubicSys;
 }(EasingSystem));
+exports.easeInOutCubicSys = easeInOutCubicSys;
 var easeInQuartSys = (function (_super) {
     __extends(easeInQuartSys, _super);
     function easeInQuartSys() {
@@ -138,6 +145,7 @@ var easeInQuartSys = (function (_super) {
     };
     return easeInQuartSys;
 }(EasingSystem));
+exports.easeInQuartSys = easeInQuartSys;
 var easeInOutQuartSys = (function (_super) {
     __extends(easeInOutQuartSys, _super);
     function easeInOutQuartSys() {
@@ -151,6 +159,7 @@ var easeInOutQuartSys = (function (_super) {
     };
     return easeInOutQuartSys;
 }(EasingSystem));
+exports.easeInOutQuartSys = easeInOutQuartSys;
 var easeOutQuartSys = (function (_super) {
     __extends(easeOutQuartSys, _super);
     function easeOutQuartSys() {
@@ -164,6 +173,7 @@ var easeOutQuartSys = (function (_super) {
     };
     return easeOutQuartSys;
 }(EasingSystem));
+exports.easeOutQuartSys = easeOutQuartSys;
 var easeInQuintSys = (function (_super) {
     __extends(easeInQuintSys, _super);
     function easeInQuintSys() {
@@ -177,6 +187,7 @@ var easeInQuintSys = (function (_super) {
     };
     return easeInQuintSys;
 }(EasingSystem));
+exports.easeInQuintSys = easeInQuintSys;
 var easeOutQuintSys = (function (_super) {
     __extends(easeOutQuintSys, _super);
     function easeOutQuintSys() {
@@ -190,6 +201,7 @@ var easeOutQuintSys = (function (_super) {
     };
     return easeOutQuintSys;
 }(EasingSystem));
+exports.easeOutQuintSys = easeOutQuintSys;
 var easeInOutQuintSys = (function (_super) {
     __extends(easeInOutQuintSys, _super);
     function easeInOutQuintSys() {
@@ -203,12 +215,13 @@ var easeInOutQuintSys = (function (_super) {
     };
     return easeInOutQuintSys;
 }(EasingSystem));
+exports.easeInOutQuintSys = easeInOutQuintSys;
 //System that warp all easing systems
 //should use branching instead in real use case ?
 var InterpolationSystem = (function () {
     function InterpolationSystem() {
         this.systems = [
-            new LinearSystemSys(),
+            new linearSys(),
             new easeInQuadSys(),
             new easeOutQuadSys(),
             new easeInOutQuadSys(),

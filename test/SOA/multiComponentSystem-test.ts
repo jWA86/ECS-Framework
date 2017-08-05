@@ -50,9 +50,9 @@ poolImpl.forEach((p) => {
         let mCSystem: MultiComponentSystem;
 
         beforeEach(() => {
-            let simpleFactory1 = new p.impl<IComponent>();
-            let simpleFactory2 = new p.impl<IComponent>();
-            let simpleFactory3 = new p.impl<IComponent>();
+            let simpleFactory1 = new p.impl<ConcreteComponent>();
+            let simpleFactory2 = new p.impl<ConcreteComponent>();
+            let simpleFactory3 = new p.impl<ConcreteComponent>();
 
             factories = [];
             factories.push(simpleFactory1);
@@ -78,7 +78,7 @@ poolImpl.forEach((p) => {
         });
         it("should be able to query components by ids in the proper factory ", () => {
             let tuples = new p.impl<TupleComponent>();
-            let q = tuples.createComponent(TupleComponent, components1[0].id, components2[0].id, components3[0].id);
+            let q = tuples.createComponent(TupleComponent, [components1[0].id, components2[0].id, components3[0].id]);
             let result = mCSystem.getComponents(q);
             expect(result[0].id).to.equal(components1[0].id);
             expect(result[1].id).to.equal(components2[0].id);
@@ -90,7 +90,7 @@ poolImpl.forEach((p) => {
                 expect(components1[i].val).to.equal(1);
                 expect(components2[i].val).to.equal(1);
                 expect(components3[i].val).to.equal(1);
-                let t = tuples.createComponent(TupleComponent, components1[i].id, components2[i].id, components3[i].id);
+                let t = tuples.createComponent(TupleComponent, [components1[i].id, components2[i].id, components3[i].id]);
             }
             mCSystem.process(tuples);
             for (let i = 0; i < 10; ++i) {

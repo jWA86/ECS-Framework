@@ -88,7 +88,7 @@ poolImpl.forEach(function (p) {
         });
         it("should be able to query components by ids in the proper factory ", function () {
             var tuples = new p.impl();
-            var q = tuples.createComponent(TupleComponent, components1[0].id, components2[0].id, components3[0].id);
+            var q = tuples.createComponent(TupleComponent, [components1[0].id, components2[0].id, components3[0].id]);
             var result = mCSystem.getComponents(q);
             chai_1.expect(result[0].id).to.equal(components1[0].id);
             chai_1.expect(result[1].id).to.equal(components2[0].id);
@@ -100,7 +100,7 @@ poolImpl.forEach(function (p) {
                 chai_1.expect(components1[i].val).to.equal(1);
                 chai_1.expect(components2[i].val).to.equal(1);
                 chai_1.expect(components3[i].val).to.equal(1);
-                var t = tuples.createComponent(TupleComponent, components1[i].id, components2[i].id, components3[i].id);
+                var t = tuples.createComponent(TupleComponent, [components1[i].id, components2[i].id, components3[i].id]);
             }
             mCSystem.process(tuples);
             for (var i = 0; i < 10; ++i) {

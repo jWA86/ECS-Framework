@@ -7,21 +7,21 @@ class ComponentFactoryMap<T extends IComponent> implements IComponentFactory<ICo
 
     createComponent(type: { new(id: string, ...args: any[]): T }, ...args: any[]): T {
         let id = this.generateUniqueId();
-        let t = new type(id, args);
+        let t = new type(id, ...args);
         this.insertComponent(t);
         return t;
     }
 
     createComponentAfter(type: { new(id: string, ...args: any[]): T }, cId: string, ...args: any[]): T {
         let id = this.generateUniqueId();
-        let t = new type(id, args);
+        let t = new type(id, ...args);
         this.insertComponent(t, cId, true);
         return t;
     }
 
     createComponentBefore(type: { new(id: string, ...args: any[]): T }, cId: string, ...args: any[]): T {
         let id = this.generateUniqueId();
-        let t = new type(id, args);
+        let t = new type(id, ...args);
         this.insertComponent(t, cId);
         return t;
     }

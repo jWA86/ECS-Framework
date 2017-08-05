@@ -6,28 +6,31 @@ interface ITupleComponent extends IComponent {
     tuple:string[];
 }
 
+class TupleComponent implements ITupleComponent{
+    constructor(public id:string, public tuple:string[]){}
+}
+
 abstract class TupleComponentSystem implements ISystem {
     factories = [];
     constructor(firstFactory:IComponentFactory<IComponent>, ...args : IComponentFactory<IComponent>[]){
-        this.factories.push(firstFactory)
-         for (var i = 0; i<args.length; ++i) {
+        this.factories.push(firstFactory);
+        for (var i = 0; i<args.length; ++i) {
             this.factories.push(args[i]);
         }
     }
     //get a tuple of components 
     //should be same number as the number of factories and in the order corresponding
-    getComponents(tComponent:ITupleComponent):IComponent[]{
+    getComponents(tComponent:ITupleComponent):IComponent[] {
         let r = [];
         let l = this.factories.length;
         for (let i=0;i<l;++i) {
             r.push(this.factories[i].getComponent(tComponent.tuple[i]));
-            
         }
         return r;
     }
-    process(idsTuples:IComponentFactory<ITupleComponent>) { 
-        let l = idsTuples.size;
-        idsTuples.pool.forEach((tuple) => {
+    process(tupleFactory:IComponentFactory<ITupleComponent>) { 
+        let l = tupleFactory.size;
+        tupleFactory.pool.forEach((tuple) => {
             let t = this.getComponents(tuple);
             this.execute(t);
         });
@@ -36,4 +39,4 @@ abstract class TupleComponentSystem implements ISystem {
     abstract execute(components:IComponent[]);
 }
 
-export {TupleComponentSystem, ITupleComponent}
+export {TupleComponentSystem, ITupleComponent, TupleComponent}

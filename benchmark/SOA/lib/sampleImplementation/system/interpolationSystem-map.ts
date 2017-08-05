@@ -1,14 +1,14 @@
-import {IComponent, IComponentFactory } from "../../../../../src/SOA/interfaces";
-import { ComponentFactoryMap as ComponentFactory} from "../../../../../src/SOA/ComponentFactoryMap";
+import { IComponent, IComponentFactory } from "../../../../../src/SOA/interfaces";
+import { ComponentFactoryMap as ComponentFactory } from "../../../../../src/SOA/ComponentFactoryMap";
 import { ISystem, ISytemManager } from "../../../../../src/SOA/System";
-import {IInterpolableComponent, InterpolableComponent, easingMethod} from "../component/easing";
+import { IInterpolableComponent, InterpolableComponent, easingMethod } from "../component/easing";
 
 // multiple implementations of single component system
 // real world use case would merge all easing system in one 
 // but this usefull to test how differents computation affect the performance
 
 interface IEasingSystem extends ISystem {
-    process(factory:IComponentFactory<IInterpolableComponent>, progress: number);
+    process(factory: IComponentFactory<IInterpolableComponent>, progress: number);
     execute(t: number): number;
 }
 
@@ -17,9 +17,9 @@ abstract class EasingSystem implements IEasingSystem {
     }
     process(factory: ComponentFactory<IInterpolableComponent>, progress: number) {
         let l = factory.size;
-        factory.pool.forEach((v)=>{
+        factory.pool.forEach((v) => {
             let length = v.endValue - v.startValue;
-            if(progress <= length){
+            if (progress <= length) {
                 let nt = progress / length;
                 v.currentValue = this.execute(nt);
             }
@@ -28,11 +28,11 @@ abstract class EasingSystem implements IEasingSystem {
     abstract execute(t: number): number
 }
 
-class LinearSystemSys extends EasingSystem {
+class linearSys extends EasingSystem {
     constructor() {
         super();
     }
-    process(factory:ComponentFactory<IInterpolableComponent>, progress: number) {
+    process(factory: ComponentFactory<IInterpolableComponent>, progress: number) {
         super.process(factory, progress);
     }
     execute(t: number) {
@@ -44,7 +44,7 @@ class easeInQuadSys extends EasingSystem {
     constructor() {
         super();
     }
-    process(factory:ComponentFactory<IInterpolableComponent>, progress: number) {
+    process(factory: ComponentFactory<IInterpolableComponent>, progress: number) {
         super.process(factory, progress);
     }
     execute(t: number) {
@@ -56,10 +56,10 @@ class easeOutQuadSys extends EasingSystem {
     constructor() {
         super();
     }
-    process(factory:ComponentFactory<IInterpolableComponent>, progress: number) {
+    process(factory: ComponentFactory<IInterpolableComponent>, progress: number) {
         super.process(factory, progress);
     }
-execute(t: number) {
+    execute(t: number) {
         return t * (2 - t);
     }
 }
@@ -68,7 +68,7 @@ class easeInOutQuadSys extends EasingSystem {
     constructor() {
         super();
     }
-    process(factory:ComponentFactory<IInterpolableComponent>, progress: number) {
+    process(factory: ComponentFactory<IInterpolableComponent>, progress: number) {
         super.process(factory, progress);
     }
     execute(t: number) {
@@ -80,7 +80,7 @@ class easeInCubicSys extends EasingSystem {
     constructor() {
         super();
     }
-    process(factory:ComponentFactory<IInterpolableComponent>, progress: number) {
+    process(factory: ComponentFactory<IInterpolableComponent>, progress: number) {
         super.process(factory, progress);
     }
     execute(t: number) {
@@ -92,7 +92,7 @@ class easeOutCubicSys extends EasingSystem {
     constructor() {
         super();
     }
-    process(factory:ComponentFactory<IInterpolableComponent>, progress: number) {
+    process(factory: ComponentFactory<IInterpolableComponent>, progress: number) {
         super.process(factory, progress);
     }
     execute(t: number) {
@@ -104,7 +104,7 @@ class easeInOutCubicSys extends EasingSystem {
     constructor() {
         super();
     }
-    process(factory:ComponentFactory<IInterpolableComponent>, progress: number) {
+    process(factory: ComponentFactory<IInterpolableComponent>, progress: number) {
         super.process(factory, progress);
     }
     execute(t: number) {
@@ -116,7 +116,7 @@ class easeInQuartSys extends EasingSystem {
     constructor() {
         super();
     }
-    process(factory:ComponentFactory<IInterpolableComponent>, progress: number) {
+    process(factory: ComponentFactory<IInterpolableComponent>, progress: number) {
         super.process(factory, progress);
     }
     execute(t: number) {
@@ -129,7 +129,7 @@ class easeInOutQuartSys extends EasingSystem {
     constructor() {
         super();
     }
-    process(factory:ComponentFactory<IInterpolableComponent>, progress: number) {
+    process(factory: ComponentFactory<IInterpolableComponent>, progress: number) {
         super.process(factory, progress);
     }
     execute(t: number) {
@@ -141,7 +141,7 @@ class easeOutQuartSys extends EasingSystem {
     constructor() {
         super();
     }
-    process(factory:ComponentFactory<IInterpolableComponent>, progress: number) {
+    process(factory: ComponentFactory<IInterpolableComponent>, progress: number) {
         super.process(factory, progress);
     }
     execute(t: number) {
@@ -153,7 +153,7 @@ class easeInQuintSys extends EasingSystem {
     constructor() {
         super();
     }
-    process(factory:ComponentFactory<IInterpolableComponent>, progress: number) {
+    process(factory: ComponentFactory<IInterpolableComponent>, progress: number) {
         super.process(factory, progress);
     }
     execute(t: number) {
@@ -165,7 +165,7 @@ class easeOutQuintSys extends EasingSystem {
     constructor() {
         super();
     }
-    process(factory:ComponentFactory<IInterpolableComponent>, progress: number) {
+    process(factory: ComponentFactory<IInterpolableComponent>, progress: number) {
         super.process(factory, progress);
     }
     execute(t: number) {
@@ -177,7 +177,7 @@ class easeInOutQuintSys extends EasingSystem {
     constructor() {
         super();
     }
-    process(factory:ComponentFactory<IInterpolableComponent>, progress: number) {
+    process(factory: ComponentFactory<IInterpolableComponent>, progress: number) {
         super.process(factory, progress);
     }
     execute(t: number) {
@@ -187,11 +187,11 @@ class easeInOutQuintSys extends EasingSystem {
 
 //System that warp all easing systems
 //should use branching instead in real use case ?
-class InterpolationSystem implements ISytemManager{
-    systems:IEasingSystem[];
-    constructor(){
+class InterpolationSystem implements ISytemManager {
+    systems: IEasingSystem[];
+    constructor() {
         this.systems = [
-            new LinearSystemSys(),
+            new linearSys(),
             new easeInQuadSys(),
             new easeOutQuadSys(),
             new easeInOutQuadSys(),
@@ -216,9 +216,21 @@ class InterpolationSystem implements ISytemManager{
     }
 }
 
-
-
-
-
-
-export { easingMethod, IInterpolableComponent, InterpolableComponent, EasingSystem, InterpolationSystem }
+export {
+    easingMethod,
+    IInterpolableComponent, InterpolableComponent,
+    EasingSystem, InterpolationSystem,
+    linearSys,
+    easeInQuadSys,
+    easeOutQuadSys,
+    easeInOutQuadSys,
+    easeInCubicSys,
+    easeOutCubicSys,
+    easeInOutCubicSys,
+    easeInQuartSys,
+    easeOutQuartSys,
+    easeInOutQuartSys,
+    easeInQuintSys,
+    easeOutQuintSys,
+    easeInOutQuintSys
+}

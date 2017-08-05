@@ -10,7 +10,7 @@ var ComponentFactoryArray = (function () {
             args[_i - 1] = arguments[_i];
         }
         var id = this.generateUniqueId();
-        var t = new type(id, args);
+        var t = new (type.bind.apply(type, [void 0, id].concat(args)))();
         this.insertComponent(t);
         return t;
     };
@@ -21,7 +21,7 @@ var ComponentFactoryArray = (function () {
         }
         var index = this.getComponentIndex(cId);
         var id = this.generateUniqueId();
-        var t = new type(id, args);
+        var t = new (type.bind.apply(type, [void 0, id].concat(args)))();
         this.insertComponent(t, index + 1);
         return t;
     };
@@ -32,7 +32,7 @@ var ComponentFactoryArray = (function () {
         }
         var index = this.getComponentIndex(cId);
         var id = this.generateUniqueId();
-        var t = new type(id, args);
+        var t = new (type.bind.apply(type, [void 0, id].concat(args)))();
         this.insertComponent(t, index);
         return t;
     };

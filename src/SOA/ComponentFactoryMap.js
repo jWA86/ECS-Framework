@@ -10,7 +10,7 @@ var ComponentFactoryMap = (function () {
             args[_i - 1] = arguments[_i];
         }
         var id = this.generateUniqueId();
-        var t = new type(id, args);
+        var t = new (type.bind.apply(type, [void 0, id].concat(args)))();
         this.insertComponent(t);
         return t;
     };
@@ -20,7 +20,7 @@ var ComponentFactoryMap = (function () {
             args[_i - 2] = arguments[_i];
         }
         var id = this.generateUniqueId();
-        var t = new type(id, args);
+        var t = new (type.bind.apply(type, [void 0, id].concat(args)))();
         this.insertComponent(t, cId, true);
         return t;
     };
@@ -30,7 +30,7 @@ var ComponentFactoryMap = (function () {
             args[_i - 2] = arguments[_i];
         }
         var id = this.generateUniqueId();
-        var t = new type(id, args);
+        var t = new (type.bind.apply(type, [void 0, id].concat(args)))();
         this.insertComponent(t, cId);
         return t;
     };

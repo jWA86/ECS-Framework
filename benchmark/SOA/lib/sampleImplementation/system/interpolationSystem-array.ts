@@ -32,7 +32,7 @@ abstract class EasingSystem implements IEasingSystem {
     abstract execute(t: number): number
 }
 
-class LinearSystemSys extends EasingSystem {
+class linearSys extends EasingSystem {
     constructor() {
         super();
     }
@@ -195,7 +195,7 @@ class InterpolationSystem implements ISytemManager{
     systems:IEasingSystem[];
     constructor(){
         this.systems = [
-            new LinearSystemSys(),
+            new linearSys(),
             new easeInQuadSys(),
             new easeOutQuadSys(),
             new easeInOutQuadSys(),
@@ -220,9 +220,21 @@ class InterpolationSystem implements ISytemManager{
     }
 }
 
-
-
-
-
-
-export { easingMethod, IInterpolableComponent, InterpolableComponent, EasingSystem, InterpolationSystem }
+export {
+    easingMethod,
+    IInterpolableComponent, InterpolableComponent,
+    EasingSystem, InterpolationSystem,
+    linearSys,
+    easeInQuadSys,
+    easeOutQuadSys,
+    easeInOutQuadSys,
+    easeInCubicSys,
+    easeOutCubicSys,
+    easeInOutCubicSys,
+    easeInQuartSys,
+    easeOutQuartSys,
+    easeInOutQuartSys,
+    easeInQuintSys,
+    easeOutQuintSys,
+    easeInOutQuintSys
+}

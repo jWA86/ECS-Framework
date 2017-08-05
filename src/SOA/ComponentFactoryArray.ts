@@ -1,4 +1,4 @@
-import { IComponent, IComponentFactory} from "./interfaces";
+import { IComponent, IComponentFactory } from "./interfaces";
 
 class ComponentFactoryArray<T extends IComponent> implements IComponentFactory<IComponent> {
     pool: T[] = [];
@@ -6,7 +6,7 @@ class ComponentFactoryArray<T extends IComponent> implements IComponentFactory<I
     }
     createComponent(type: { new(id: string, ...args: any[]): T }, ...args: any[]): T {
         let id = this.generateUniqueId();
-        let t = new type(id, args);
+        let t = new type(id, ...args);
         this.insertComponent(t);
         return t;
     }
@@ -14,7 +14,7 @@ class ComponentFactoryArray<T extends IComponent> implements IComponentFactory<I
     createComponentAfter(type: { new(id: string, ...args: any[]): T }, cId: string, ...args: any[]): T {
         let index = this.getComponentIndex(cId);
         let id = this.generateUniqueId();
-        let t = new type(id, args);
+        let t = new type(id, ...args);
         this.insertComponent(t, index + 1);
         return t;
     }
@@ -22,7 +22,7 @@ class ComponentFactoryArray<T extends IComponent> implements IComponentFactory<I
     createComponentBefore(type: { new(id: string, ...args: any[]): T }, cId: string, ...args: any[]): T {
         let index = this.getComponentIndex(cId);
         let id = this.generateUniqueId();
-        let t = new type(id, args);
+        let t = new type(id, ...args);
         this.insertComponent(t, index);
         return t;
     }

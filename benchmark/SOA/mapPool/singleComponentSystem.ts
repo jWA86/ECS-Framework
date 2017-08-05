@@ -4,8 +4,8 @@ import * as eS from "../lib/sampleImplementation/system/interpolationSystem-map"
 import { ComponentFactoryMap as ComponentFactory} from "../../../src/SOA/ComponentFactoryMap";
 
 
-class benchInterpolableSys implements m.IPerfTest{
-    system:eS.InterpolationSystem;
+class benchInterpolableSys implements m.IPerfTest {
+    system;
     factories:ComponentFactory<eC.IInterpolableComponent>[];
     constructor(nbComponents:number){
         this.system = this.createSystem();
@@ -15,32 +15,37 @@ class benchInterpolableSys implements m.IPerfTest{
     
     createSystem(){
         return new eS.InterpolationSystem();
+        // return new eS.linearSys();
     }
     createFactories(){
         let r = [];
         let nbFact = this.system.systems.length;
+        // let nbFact = 1;
         for(let i = 0; i < nbFact; ++i){
             r.push(new ComponentFactory<eC.InterpolableComponent>());
         }
         return r;
     }
-    createComponents(n:number){
-        this.factories.forEach((f)=>{
-            for(let i =0;i<n;++i){
+    createComponents(n:number) {
+        this.factories.forEach((f) => {
+            for(let i = 0;i<n;++i){
                 f.createComponent(eC.InterpolableComponent);                
             }
         });
     }
-    process(progress:number){
+    process(progress:number) {
+        // this.system.process(this.factories, progress);
         this.system.process(this.factories, progress);
     }
     clear(){
-        this.factories.forEach((f)=>{
+        this.factories.forEach((f) => {
             f.removeAll();
         });
         this.factories = [];
     }
 }
+
+// test y systems with components in y factories
 
 test(1);
 test(1);

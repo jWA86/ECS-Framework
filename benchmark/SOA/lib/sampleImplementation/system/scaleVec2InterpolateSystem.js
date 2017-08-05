@@ -10,10 +10,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var MultiComponentSystem_1 = require("../../../../src/SOA/MultiComponentSystem");
-var vec2_1 = require("../../lib/component/vec2");
-exports.Vec2Component = vec2_1.Vec2Component;
-exports.IVec2Component = vec2_1.IVec2Component;
+var MultiComponentSystem_1 = require("../../../../../src/SOA/MultiComponentSystem");
 //system which combine currentValue of an easingComponent and a 2D size component
 // //>> system that scale based on an easing function
 var ScaleSystem = (function (_super) {

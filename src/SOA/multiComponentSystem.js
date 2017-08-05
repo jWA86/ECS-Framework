@@ -1,5 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var TupleComponent = (function () {
+    function TupleComponent(id, tuple) {
+        this.id = id;
+        this.tuple = tuple;
+    }
+    return TupleComponent;
+}());
+exports.TupleComponent = TupleComponent;
 var TupleComponentSystem = (function () {
     function TupleComponentSystem(firstFactory) {
         var args = [];
@@ -22,10 +30,10 @@ var TupleComponentSystem = (function () {
         }
         return r;
     };
-    TupleComponentSystem.prototype.process = function (idsTuples) {
+    TupleComponentSystem.prototype.process = function (tupleFactory) {
         var _this = this;
-        var l = idsTuples.size;
-        idsTuples.pool.forEach(function (tuple) {
+        var l = tupleFactory.size;
+        tupleFactory.pool.forEach(function (tuple) {
             var t = _this.getComponents(tuple);
             _this.execute(t);
         });

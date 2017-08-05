@@ -11,10 +11,12 @@ var benchInterpolableSys = (function () {
     }
     benchInterpolableSys.prototype.createSystem = function () {
         return new eS.InterpolationSystem();
+        // return new eS.linearSys();
     };
     benchInterpolableSys.prototype.createFactories = function () {
         var r = [];
         var nbFact = this.system.systems.length;
+        // let nbFact = 1;
         for (var i = 0; i < nbFact; ++i) {
             r.push(new ComponentFactoryMap_1.ComponentFactoryMap());
         }
@@ -28,6 +30,7 @@ var benchInterpolableSys = (function () {
         });
     };
     benchInterpolableSys.prototype.process = function (progress) {
+        // this.system.process(this.factories, progress);
         this.system.process(this.factories, progress);
     };
     benchInterpolableSys.prototype.clear = function () {
@@ -38,6 +41,7 @@ var benchInterpolableSys = (function () {
     };
     return benchInterpolableSys;
 }());
+// test y systems with components in y factories
 test(1);
 test(1);
 test(2);

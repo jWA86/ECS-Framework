@@ -1,7 +1,7 @@
-import {IComponent, IComponentFactory } from "../../../../src/SOA/interfaces";
-import { TupleComponentSystem, ITupleComponent } from "../../../../src/SOA/MultiComponentSystem";
+import {IComponent, IComponentFactory } from "../../../../../src/SOA/interfaces";
+import { TupleComponentSystem, ITupleComponent } from "../../../../../src/SOA/MultiComponentSystem";
 import {IInterpolableComponent} from "../component/easing";
-import {Vec2Component, IVec2Component} from "../../lib/component/vec2"
+import {Vec2Component, IVec2Component} from "../component/vec2"
 
 //system which combine currentValue of an easingComponent and a 2D size component
 // //>> system that scale based on an easing function
@@ -19,5 +19,4 @@ class ScaleSystem extends TupleComponentSystem {
     }
 }
 
-
-export { ScaleSystem, Vec2Component, IVec2Component}
+export { ScaleSystem }

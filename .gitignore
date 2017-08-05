@@ -3,4 +3,4 @@ node_modules/
 todo.txt
 .nyc_output/
 coverage
-benchmark/SOA/observation.txt
+benchmark/observation.txt
