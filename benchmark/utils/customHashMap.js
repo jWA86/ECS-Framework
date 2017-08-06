@@ -21,6 +21,12 @@ var FastHashMap = (function () {
             return false;
         }
     };
+    FastHashMap.prototype.forEach = function (callBack) {
+        var l = this._values.length;
+        for (var i = 0; i < l; ++i) {
+            callBack(this._values[i]);
+        }
+    };
     FastHashMap.prototype.get = function (key) {
         return this._values[this._keys.get(key)];
     };

@@ -214,10 +214,21 @@ function benchInsertionMap() {
     return process.hrtime(start);
 }
 
+function benchInsertionFastMap(){
+    let id = sArray[Math.floor(Math.random()*sArray.length)].id;
+    let start = process.hrtime();
+    myCustomMap.insertAfter("inserted", { "index": -1, "prop": 0 }, id);
+    return process.hrtime(start);
+}
+
 console.log("insertion at position");
 let rInsertionMap = [];
+let rInsertionFastMap = [];
 for(let i = 0; i<100; ++i) {
     rInsertionMap.push(benchInsertionMap());
+    rInsertionFastMap.push(benchInsertionFastMap());
 }
 console.log("mean insertion of 1 element in Map by forEach & new Map: "+(b.mean(rInsertionMap)/b.NS_PER_MS).toFixed(4)+"ms");
+console.log("mean insertion of 1 element in FastMap : "+(b.mean(rInsertionFastMap)/b.NS_PER_MS).toFixed(4)+"ms");
+
 //iteration after multi insert ?

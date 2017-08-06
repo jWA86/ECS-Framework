@@ -1,6 +1,7 @@
 interface IFastHashMap<K, V> {
     clear();
     delete(key: K): boolean;
+    forEach(callBack:Function);
     get(key: K): V
     has(key: K): boolean;
     insertAfter(key: K, value: V, keyRef: K): boolean;
@@ -13,6 +14,7 @@ interface IFastHashMap<K, V> {
 
 class FastHashMap<K, V> implements IFastHashMap<K, V> {
     //_keys store the index of the element which is stored in the _values array
+    //keys are not in the same order as values, therefore it shouldn't be iterate
     protected _keys: Map<number>;
     protected _values: V[];
     constructor() {
@@ -33,6 +35,12 @@ class FastHashMap<K, V> implements IFastHashMap<K, V> {
         }
         else {
             return false;
+        }
+    }
+    forEach(callBack:Function){
+        let l = this._values.length;
+        for(let i=0; i<l; ++i){
+            callBack(this._values[i]);
         }
     }
     get(key: K): V {
