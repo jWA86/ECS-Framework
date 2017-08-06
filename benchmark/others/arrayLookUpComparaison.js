@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 //simple benchmark for comparing collection lookup and iteration
 var b = require("../utils/perfTestUtils");
+var customHashMap_1 = require("../utils/customHashMap");
 //size of collections
 //fetch random same number of elements in fetch benchmark
 var l = 1000;
@@ -11,6 +12,11 @@ var generateUniqueId = function () {
         return v.toString(16);
     });
 };
+var ob = (function () {
+    function ob() {
+    }
+    return ob;
+}());
 var sArray = [];
 for (var i = 0; i < l; ++i) {
     sArray.push({ "id": generateUniqueId(), "index": i, "prop": 0 });
@@ -26,6 +32,12 @@ for (var i = 0; i < l; ++i) {
     var id = sArray[i].id;
     var o = { "index": i, "prop": 0 };
     myMap.set(id, o);
+}
+var myCustomMap = new customHashMap_1.FastHashMap();
+for (var i = 0; i < l; ++i) {
+    var id = sArray[i].id;
+    var o = { "index": i, "prop": 0 };
+    myCustomMap.set(id, o);
 }
 var idToLookUp1 = [];
 for (var i = 0; i < l; ++i) {
@@ -54,6 +66,13 @@ function benchMap() {
     var start = process.hrtime();
     for (var i = 0; i < l; ++i) {
         myMap.get(idToLookUp1[i]).prop += 1;
+    }
+    return process.hrtime(start);
+}
+function benchMyCustomMap() {
+    var start = process.hrtime();
+    for (var i = 0; i < l; ++i) {
+        myCustomMap.get(idToLookUp1[i]).prop += 1;
     }
     return process.hrtime(start);
 }
@@ -95,6 +114,21 @@ function iterateMapIterator() {
     }
     return process.hrtime(start);
 }
+function iterateCustomMapForEach() {
+    var start = process.hrtime();
+    myCustomMap.values().forEach(function (v, k) {
+        v.prop += 1;
+    });
+    return process.hrtime(start);
+}
+function iterateCustomMapForLoop() {
+    var start = process.hrtime();
+    var a = myCustomMap.values();
+    for (var i = 0; i < l; ++i) {
+        a[i].prop += 1;
+    }
+    return process.hrtime(start);
+}
 //warm up
 for (var i = 0; i < l; ++i) {
     sArray[i];
@@ -102,32 +136,41 @@ for (var i = 0; i < l; ++i) {
 var fbyId = [];
 var ffind = [];
 var fmap = [];
+var fcMap = [];
 console.log("fetch " + l + " elements");
 for (var i = 0; i < 10; ++i) {
     ffind.push(benchFind());
     fmap.push(benchMap());
     fbyId.push(benchById());
+    fcMap.push(benchMyCustomMap());
 }
 console.log("mean fetch with Id : " + (b.mean(fbyId) / b.NS_PER_MS).toFixed(4) + "ms");
 console.log("mean fetch with find() : " + (b.mean(ffind) / b.NS_PER_MS).toFixed(4) + "ms");
 console.log("mean fetch with hashMap : " + (b.mean(fmap) / b.NS_PER_MS).toFixed(4) + "ms");
+console.log("mean fetch with customHashMap : " + (b.mean(fcMap) / b.NS_PER_MS).toFixed(4) + "ms");
 //fastest : lookup byId (object)
 console.log("iteration over " + l + " elements");
 var rIArray = [];
-var rIMapIterator = [];
+var rICMapForEach = [];
+var rICMapForLoop = [];
 var rIMapForEach = [];
+var rIMapIterator = [];
 var rIObject = [];
 var rIObject2 = [];
 for (var i = 0; i < 10; ++i) {
     rIArray.push(iterateArray());
-    rIMapIterator.push(iterateMapIterator());
+    rICMapForEach.push(iterateCustomMapForEach());
     rIMapForEach.push(iterateMapForEach());
+    rIMapIterator.push(iterateMapIterator());
     rIObject.push(IterateObject2());
     rIObject2.push(IterateOject());
+    rICMapForLoop.push(iterateCustomMapForLoop());
 }
 console.log("mean iteration array : " + (b.mean(rIArray) / b.NS_PER_MS).toFixed(4) + "ms");
 console.log("mean iteration Map with iterator : " + (b.mean(rIMapIterator) / b.NS_PER_MS).toFixed(4) + "ms");
 console.log("mean iteration map with forEach : " + (b.mean(rIMapForEach) / b.NS_PER_MS).toFixed(4) + "ms");
+console.log("mean iteration customMap with forEach : " + (b.mean(rICMapForEach) / b.NS_PER_MS).toFixed(4) + "ms");
+console.log("mean iteration customMap with for loop : " + (b.mean(rICMapForLoop) / b.NS_PER_MS).toFixed(4) + "ms");
 console.log("mean iteration object hasOwnProperty : " + (b.mean(rIObject) / b.NS_PER_MS).toFixed(4) + "ms");
 console.log("mean iteration object Object.keys() : " + (b.mean(rIObject2) / b.NS_PER_MS).toFixed(4) + "ms");
 //fastest for 100+: array iteration then iterate Map with ForEach 

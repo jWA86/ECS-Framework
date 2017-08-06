@@ -1,5 +1,7 @@
 //simple benchmark for comparing collection lookup and iteration
 import * as b from "../utils/perfTestUtils";
+import {FastHashMap} from "../utils/customHashMap";
+
 
 //size of collections
 //fetch random same number of elements in fetch benchmark
@@ -12,6 +14,11 @@ const generateUniqueId = function () {
     });
 }
 
+
+class ob {
+    index:number;
+    prop:number;
+}
 let sArray = [];
 for (let i = 0; i < l; ++i) {
     sArray.push({ "id": generateUniqueId(), "index": i, "prop": 0 });
@@ -29,6 +36,13 @@ for (let i = 0; i < l; ++i) {
     let id = sArray[i].id;
     let o = { "index": i, "prop": 0 };
     myMap.set(id, o);
+}
+
+let myCustomMap = new FastHashMap<string, ob> ();
+for (let i = 0; i < l; ++i) {
+    let id = sArray[i].id;
+    let o = { "index": i, "prop": 0 };
+    myCustomMap.set(id, o);
 }
 
 let idToLookUp1 = [];
@@ -61,6 +75,15 @@ function benchMap() {
     }
     return process.hrtime(start);
 }
+
+function benchMyCustomMap(){
+    let start = process.hrtime();
+    for (let i = 0; i < l; ++i) {
+        myCustomMap.get(idToLookUp1[i]).prop += 1;
+    }
+    return process.hrtime(start);
+}
+
 
 function IterateOject() {
     let start = process.hrtime();
@@ -105,6 +128,24 @@ function iterateMapIterator(){
     return process.hrtime(start);
 }
 
+function iterateCustomMapForEach() {
+    let start = process.hrtime();
+    myCustomMap.values().forEach((v, k)=>{
+        v.prop +=1;
+    });
+    return process.hrtime(start);
+}
+
+function iterateCustomMapForLoop() {
+    let start = process.hrtime();
+    let a = myCustomMap.values();
+    for (let i = 0; i < l; ++i) {
+        a[i].prop += 1;
+    }
+    return process.hrtime(start);
+}
+
+
 //warm up
 for (let i = 0; i < l; ++i) {
     sArray[i];
@@ -113,37 +154,46 @@ for (let i = 0; i < l; ++i) {
 let fbyId = [];
 let ffind = [];
 let fmap = [];
+let fcMap = [];
 console.log("fetch "+l+" elements");
 for (let i=0;i<10;++i){
     
     ffind.push(benchFind());
     fmap.push(benchMap());
     fbyId.push(benchById());
+    fcMap.push(benchMyCustomMap());
 }
 console.log("mean fetch with Id : "+(b.mean(fbyId)/b.NS_PER_MS).toFixed(4)+"ms");
 console.log("mean fetch with find() : "+(b.mean(ffind)/b.NS_PER_MS).toFixed(4)+"ms");
 console.log("mean fetch with hashMap : "+(b.mean(fmap)/b.NS_PER_MS).toFixed(4)+"ms");
+console.log("mean fetch with customHashMap : "+(b.mean(fcMap)/b.NS_PER_MS).toFixed(4)+"ms");
 
 //fastest : lookup byId (object)
 
 console.log("iteration over "+l+" elements");
 let rIArray = [];
-let rIMapIterator =[];
+let rICMapForEach = [];
+let rICMapForLoop = [];
 let rIMapForEach = [];
+let rIMapIterator =[];
 let rIObject = [];
 let rIObject2 = [];
 
 for (let i = 0; i<10; ++i) {
     rIArray.push(iterateArray());
-    rIMapIterator.push(iterateMapIterator());
+    rICMapForEach.push(iterateCustomMapForEach());
     rIMapForEach.push(iterateMapForEach());
+    rIMapIterator.push(iterateMapIterator());
     rIObject.push(IterateObject2());
     rIObject2.push(IterateOject());
+    rICMapForLoop.push(iterateCustomMapForLoop());
 }
 
 console.log("mean iteration array : "+(b.mean(rIArray)/b.NS_PER_MS).toFixed(4)+"ms");
 console.log("mean iteration Map with iterator : "+(b.mean(rIMapIterator)/b.NS_PER_MS).toFixed(4)+"ms");
 console.log("mean iteration map with forEach : "+(b.mean(rIMapForEach)/b.NS_PER_MS).toFixed(4)+"ms");
+console.log("mean iteration customMap with forEach : "+(b.mean(rICMapForEach)/b.NS_PER_MS).toFixed(4)+"ms");
+console.log("mean iteration customMap with for loop : "+(b.mean(rICMapForLoop)/b.NS_PER_MS).toFixed(4)+"ms");
 console.log("mean iteration object hasOwnProperty : "+(b.mean(rIObject)/b.NS_PER_MS).toFixed(4)+"ms");
 console.log("mean iteration object Object.keys() : "+(b.mean(rIObject2)/b.NS_PER_MS).toFixed(4)+"ms");
 
