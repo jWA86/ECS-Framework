@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var eC = require("../lib/sampleImplementation/component/easing");
-var eS = require("../lib/sampleImplementation/system/interpolationSystem-array");
-var ComponentFactoryArray_1 = require("../../../src/SOA/ComponentFactoryArray");
+var eS = require("../lib/sampleImplementation/system/interpolationSystem-fastMap");
+var ComponentFactoryFastMap_1 = require("../../../src/SOA/ComponentFactoryFastMap");
 var benchInterpolableSys = (function () {
     function benchInterpolableSys(nbComponents) {
         this.system = this.createSystem();
@@ -16,7 +16,7 @@ var benchInterpolableSys = (function () {
         var r = [];
         var nbFact = this.system.systems.length;
         for (var i = 0; i < nbFact; ++i) {
-            r.push(new ComponentFactoryArray_1.ComponentFactoryArray());
+            r.push(new ComponentFactoryFastMap_1.ComponentFactoryFastMap());
         }
         return r;
     };

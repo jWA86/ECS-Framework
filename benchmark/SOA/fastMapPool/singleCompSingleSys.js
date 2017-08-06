@@ -1,43 +1,34 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var eC = require("../lib/sampleImplementation/component/easing");
-var eS = require("../lib/sampleImplementation/system/interpolationSystem-array");
-var ComponentFactoryArray_1 = require("../../../src/SOA/ComponentFactoryArray");
+var eS = require("../lib/sampleImplementation/system/interpolationSystem-fastMap");
+var ComponentFactoryFastMap_1 = require("../../../src/SOA/ComponentFactoryFastMap");
 var benchInterpolableSys = (function () {
     function benchInterpolableSys(nbComponents) {
         this.system = this.createSystem();
-        this.factories = this.createFactories();
+        this.factory = this.createFactories();
         this.createComponents(nbComponents);
     }
     benchInterpolableSys.prototype.createSystem = function () {
-        return new eS.InterpolationSystem();
+        return new eS.linearSys();
     };
     benchInterpolableSys.prototype.createFactories = function () {
-        var r = [];
-        var nbFact = this.system.systems.length;
-        for (var i = 0; i < nbFact; ++i) {
-            r.push(new ComponentFactoryArray_1.ComponentFactoryArray());
-        }
-        return r;
+        return new ComponentFactoryFastMap_1.ComponentFactoryFastMap();
     };
     benchInterpolableSys.prototype.createComponents = function (n) {
-        this.factories.forEach(function (f) {
-            for (var i = 0; i < n; ++i) {
-                f.createComponent(eC.InterpolableComponent);
-            }
-        });
+        for (var i = 0; i < n; ++i) {
+            this.factory.createComponent(eC.InterpolableComponent);
+        }
     };
     benchInterpolableSys.prototype.process = function (progress) {
-        this.system.process(this.factories, progress);
+        this.system.process(this.factory, progress);
     };
     benchInterpolableSys.prototype.clear = function () {
-        this.factories.forEach(function (f) {
-            f.removeAll();
-        });
-        this.factories = [];
+        this.factory.removeAll();
     };
     return benchInterpolableSys;
 }());
+// test 1 system process x components
 test(1);
 test(1);
 test(2);
@@ -49,7 +40,7 @@ test(10000);
 test(100000);
 function test(nbComponent) {
     var t = new benchInterpolableSys(nbComponent);
-    var label = nbComponent + " components, 13 systems";
+    var label = nbComponent + " components, 1 system";
     console.time(label);
     t.process(1);
     console.timeEnd(label);

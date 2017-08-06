@@ -18,7 +18,7 @@ poolImpl.forEach((p) => {
             return a;
         }
         class concreteComponent implements IComponent {
-            constructor(public id: string) { }
+            constructor(public id: string) {}
         }
         let simpleFactory: IComponentFactory<IComponent> = new p.impl<IComponent>();
         beforeEach(() => {

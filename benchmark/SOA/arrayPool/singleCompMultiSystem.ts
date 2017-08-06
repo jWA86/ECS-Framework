@@ -55,7 +55,7 @@ test(100000);
 
 function test(nbComponent:number){
     let t = new benchInterpolableSys(nbComponent);
-    let label = nbComponent + " components per system";
+    let label = nbComponent + " components, 13 systems";
     console.time(label);
     t.process(1);
     console.timeEnd(label);

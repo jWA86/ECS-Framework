@@ -2,7 +2,6 @@
 import * as b from "../utils/perfTestUtils";
 import {FastHashMap} from "../utils/customHashMap";
 
-
 //size of collections
 //fetch random same number of elements in fetch benchmark
 const l = 1000;
@@ -13,7 +12,6 @@ const generateUniqueId = function () {
         return v.toString(16);
     });
 }
-
 
 class ob {
     index:number;
@@ -84,7 +82,6 @@ function benchMyCustomMap(){
     return process.hrtime(start);
 }
 
-
 function IterateOject() {
     let start = process.hrtime();
     for (var property in objArray) {
@@ -144,7 +141,6 @@ function iterateCustomMapForLoop() {
     }
     return process.hrtime(start);
 }
-
 
 //warm up
 for (let i = 0; i < l; ++i) {

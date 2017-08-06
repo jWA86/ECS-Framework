@@ -44,17 +44,6 @@ class ComponentFactoryFastMap<T extends IComponent> implements IComponentFactory
         return this.pool.size;
     }
 
-    // protected insertComponent(component: T, index = -1): number {
-    //     //if index out of range
-    //     if (index < 0 || index >= this.pool.size) {
-    //         this.pool.push(component);
-    //         return this.pool.length;
-    //     } else {
-    //         this.pool.splice(index, 0, component);
-    //         return index;
-    //     }
-    // };
-
     /*!
         Math.uuid.js (v1.4)
         http://www.broofa.com
