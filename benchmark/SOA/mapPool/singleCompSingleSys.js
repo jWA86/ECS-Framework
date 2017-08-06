@@ -6,42 +6,29 @@ var ComponentFactoryMap_1 = require("../../../src/SOA/ComponentFactoryMap");
 var benchInterpolableSys = (function () {
     function benchInterpolableSys(nbComponents) {
         this.system = this.createSystem();
-        this.factories = this.createFactories();
+        this.factory = this.createFactories();
         this.createComponents(nbComponents);
     }
     benchInterpolableSys.prototype.createSystem = function () {
-        return new eS.InterpolationSystem();
-        // return new eS.linearSys();
+        return new eS.linearSys();
     };
     benchInterpolableSys.prototype.createFactories = function () {
-        var r = [];
-        var nbFact = this.system.systems.length;
-        // let nbFact = 1;
-        for (var i = 0; i < nbFact; ++i) {
-            r.push(new ComponentFactoryMap_1.ComponentFactoryMap());
-        }
-        return r;
+        return new ComponentFactoryMap_1.ComponentFactoryMap();
     };
     benchInterpolableSys.prototype.createComponents = function (n) {
-        this.factories.forEach(function (f) {
-            for (var i = 0; i < n; ++i) {
-                f.createComponent(eC.InterpolableComponent);
-            }
-        });
+        for (var i = 0; i < n; ++i) {
+            this.factory.createComponent(eC.InterpolableComponent);
+        }
     };
     benchInterpolableSys.prototype.process = function (progress) {
-        // this.system.process(this.factories, progress);
-        this.system.process(this.factories, progress);
+        this.system.process(this.factory, progress);
     };
     benchInterpolableSys.prototype.clear = function () {
-        this.factories.forEach(function (f) {
-            f.removeAll();
-        });
-        this.factories = [];
+        this.factory.removeAll();
     };
     return benchInterpolableSys;
 }());
-// test y systems with components in y factories
+// test 1 system process x components
 test(1);
 test(1);
 test(2);
@@ -53,7 +40,7 @@ test(10000);
 test(100000);
 function test(nbComponent) {
     var t = new benchInterpolableSys(nbComponent);
-    var label = nbComponent + " components per system";
+    var label = nbComponent + " components, 1 system";
     console.time(label);
     t.process(1);
     console.timeEnd(label);

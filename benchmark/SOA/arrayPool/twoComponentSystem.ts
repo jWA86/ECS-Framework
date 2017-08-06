@@ -75,12 +75,7 @@ class benchTupleSys implements m.IPerfTest {
     }
 }
 
-
-
 // test (random associations ?) (parallèle association ?) (inverse association ?)
-
-
-
 
 test(1);
 test(1);
@@ -92,13 +87,11 @@ test(1000);
 test(10000);
 test(100000);
 
-
 function test(nbComponent: number) {
     let t = new benchTupleSys(nbComponent);
-    let label = nbComponent + " components per system";
+    let label = nbComponent + " components, 1 system";
     console.time(label);
     t.process();
     console.timeEnd(label);
     t.clear();
 }
-

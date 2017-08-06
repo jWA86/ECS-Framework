@@ -74,7 +74,7 @@ test(10000);
 test(100000);
 function test(nbComponent) {
     var t = new benchTupleSys(nbComponent);
-    var label = nbComponent + " components per system";
+    var label = nbComponent + " components, 1 system";
     console.time(label);
     t.process();
     console.timeEnd(label);

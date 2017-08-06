@@ -5,7 +5,7 @@ import { ComponentFactoryMap as ComponentFactory} from "../../../src/SOA/Compone
 
 
 class benchInterpolableSys implements m.IPerfTest {
-    system;
+    system:eS.InterpolationSystem;
     factories:ComponentFactory<eC.IInterpolableComponent>[];
     constructor(nbComponents:number){
         this.system = this.createSystem();
@@ -15,12 +15,12 @@ class benchInterpolableSys implements m.IPerfTest {
     
     createSystem(){
         return new eS.InterpolationSystem();
-        // return new eS.linearSys();
+
     }
     createFactories(){
         let r = [];
         let nbFact = this.system.systems.length;
-        // let nbFact = 1;
+
         for(let i = 0; i < nbFact; ++i){
             r.push(new ComponentFactory<eC.InterpolableComponent>());
         }
@@ -34,7 +34,6 @@ class benchInterpolableSys implements m.IPerfTest {
         });
     }
     process(progress:number) {
-        // this.system.process(this.factories, progress);
         this.system.process(this.factories, progress);
     }
     clear(){
@@ -45,7 +44,7 @@ class benchInterpolableSys implements m.IPerfTest {
     }
 }
 
-// test y systems with components in y factories
+// test y systems with x components in y factories
 
 test(1);
 test(1);
@@ -60,7 +59,7 @@ test(100000);
 
 function test(nbComponent:number){
     let t = new benchInterpolableSys(nbComponent);
-    let label = nbComponent + " components per system";
+    let label = nbComponent + " components, 13 system";
     console.time(label);
     t.process(1);
     console.timeEnd(label);
