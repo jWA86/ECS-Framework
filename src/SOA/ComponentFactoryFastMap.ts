@@ -41,7 +41,7 @@ class ComponentFactoryFastMap<T extends IComponent> implements IComponentFactory
     }
 
     get size() {
-        return this.pool.size;
+        return this.pool.length;
     }
 
     /*!

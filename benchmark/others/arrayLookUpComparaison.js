@@ -116,16 +116,15 @@ function iterateMapIterator() {
 }
 function iterateCustomMapForEach() {
     var start = process.hrtime();
-    myCustomMap.values().forEach(function (v, k) {
+    myCustomMap.forEach(function (v, k) {
         v.prop += 1;
     });
     return process.hrtime(start);
 }
 function iterateCustomMapForLoop() {
     var start = process.hrtime();
-    var a = myCustomMap.values();
     for (var i = 0; i < l; ++i) {
-        a[i].prop += 1;
+        myCustomMap[i].prop += 1;
     }
     return process.hrtime(start);
 }

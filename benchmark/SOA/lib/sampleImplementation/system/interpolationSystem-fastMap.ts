@@ -20,7 +20,7 @@ abstract class EasingSystem implements IEasingSystem {
         let l = factory.size;
         for (let i = 0; i < l; ++i) {
             //since it's an array implementation, iterate directly via the pool instead of .get(id)
-            let c = factory.pool.values()[i];
+            let c = factory.pool[i];
             //doesn't check if it's equal 0
             let length = c.endValue - c.startValue;
             if(progress <= length){

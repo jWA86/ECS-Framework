@@ -6,30 +6,48 @@ interface IFastHashMap<K, V> {
     has(key: K): boolean;
     insertAfter(key: K, value: V, keyRef: K): boolean;
     insertBefore(key: K, value: V, keyRef: K): boolean;
-    keys(): Map<number>;
+    push(key: K, value: V);
     set(key: K, value: V);
-    size: number;
-    values(): Array<V>;
+    length: number;
+    [index:number]:V;
 }
 
-class FastHashMap<K, V> implements IFastHashMap<K, V> {
+class XArray<V> {
+    constructor() {
+        Array.apply(this, arguments);   
+        return new Array();
+    }
+    length:number;
+    push(val): number { return 0; };
+}
+//Adding Arrray to XArray prototype chain.
+ XArray["prototype"] = new Array();
+
+class FastHashMap<K, V> extends Array implements IFastHashMap<K, V>{
     //_keys store the index of the element which is stored in the _values array
     //keys are not in the same order as values, therefore it shouldn't be iterate
-    protected _keys: Map<number>;
-    protected _values: V[];
+    protected _keys:Map<number>;
+    // protected _values: V[];
     constructor() {
-        this._values = [];
-        this._keys = new Map<number>();
+        super();
+        this._keys = new Map<number>();     
     }
-    clear() {
+    test = function(){
+         console.log("t");
+     }
+    clear = function() {
         this._keys.clear();
-        this._values = [];
+        while(this.length > 0) {
+            this.pop();
+        }
     }
-    delete(key: K) {
+    
+    delete = function (key: K)   {
+     
         let i = this._keys.get(key);
         let r = this._keys.delete(key);
         this.offsetIndexInKeys(i, -1);
-        let r2 = this._values.splice(i, 1);
+        let r2 = this.splice(i, 1);
         if (r2.length > 0 && r) {
             return true;
         }
@@ -37,22 +55,23 @@ class FastHashMap<K, V> implements IFastHashMap<K, V> {
             return false;
         }
     }
-    forEach(callBack:Function){
-        let l = this._values.length;
+    forEach = function(callBack:Function){
+        let l = this.length;
         for(let i=0; i<l; ++i){
-            callBack(this._values[i]);
+            callBack(this[i]);
         }
     }
-    get(key: K): V {
-        return this._values[this._keys.get(key)];
+    get = function(key: K): V {
+        return this[this._keys.get(key)];
     }
-    has(key: K): boolean {
+    has = function(key: K): boolean {
         return this._keys.has(key);
     }
-    protected insertValue(key:K, value:V, index:number) {
-        return this._values.splice(index, 0, value);
+    protected insertValue = function(key:K, value:V, index:number) {
+        return this.splice(index, 0, value);
     }
-    protected offsetIndexInKeys(after:number, offsetVal:number){
+    protected offsetIndexInKeys = function(after:number, offsetVal:number){
+ 
         var mapIter = this._keys.entries();
         let l = this._keys.size;
         for (let i = 0; i < l; ++i) {
@@ -62,7 +81,7 @@ class FastHashMap<K, V> implements IFastHashMap<K, V> {
             }
         }
     }
-    insertAfter(key: K, value: V, keyRef: K): boolean {
+    insertAfter = function (key: K, value: V, keyRef: K): boolean {
         let i = this._keys.get(keyRef);
         this.insertValue(key, value, i+1);
         if(i === undefined) {
@@ -73,7 +92,7 @@ class FastHashMap<K, V> implements IFastHashMap<K, V> {
             return true;
         }
     }
-    insertBefore(key: K, value: V, keyRef: K): boolean {
+    insertBefore = function (key: K, value: V, keyRef: K): boolean {
         let i = this._keys.get(keyRef);
         this.insertValue(key, value, i);
         if(i === undefined) {
@@ -84,20 +103,22 @@ class FastHashMap<K, V> implements IFastHashMap<K, V> {
             return true;
         }
     }
-    keys(): Map<number> {
+    keys = function(){
         return this._keys;
     }
-    set(key: K, value: V) {
-        let l = this._values.push(value);
+    push = function(key: K, value:V):number{
+        if(value === undefined){return;}
+        arguments[0] = value;
+        arguments.length = 1;
+        let l = Array.prototype.push.apply(this,arguments);
         this._keys.set(key, l - 1);
+        return this.length;
     }
-
-    get size(): number {
-        return this._values.length;
-    }
-    values(): V[] {
-        return this._values;
-    }
+    set = function(key: K, value: V):number {
+         this.push(key, value);
+         return this.length;
+    }    
 }
+
 
 export { FastHashMap, IFastHashMap }

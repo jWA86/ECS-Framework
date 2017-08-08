@@ -46,7 +46,7 @@ var ComponentFactoryFastMap = (function () {
     };
     Object.defineProperty(ComponentFactoryFastMap.prototype, "size", {
         get: function () {
-            return this.pool.size;
+            return this.pool.length;
         },
         enumerable: true,
         configurable: true

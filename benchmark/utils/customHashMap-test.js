@@ -25,14 +25,15 @@ describe("Custom HashMap", function () {
             //checking 
             chai_1.expect(myMap.keys() instanceof Map).to.equal(true);
         });
-        it("values() should return an array", function () {
-            chai_1.expect(myMap.values() instanceof Array).to.equal(true);
+        it("this should return an array", function () {
+            chai_1.expect(myMap instanceof Array).to.equal(true);
         });
     });
     describe("set(key, value)", function () {
         it('should be able to add an element to the values array', function () {
+            //set 
             myMap.set(k, v);
-            chai_1.expect(myMap.values()[0]).to.equal(v);
+            chai_1.expect(myMap[0]).to.equal(v);
         });
         it('should be able to add the key and the corresponding index in the keys Map', function () {
             myMap.set(k, v);
@@ -46,9 +47,35 @@ describe("Custom HashMap", function () {
             chai_1.expect(m[1]).to.equal(k);
         });
         it("size should return the number of element in the hashMap", function () {
-            chai_1.expect(myMap.size).to.equal(0);
+            chai_1.expect(myMap.length).to.equal(0);
             myMap.set(k, v);
-            chai_1.expect(myMap.size).to.equal(1);
+            chai_1.expect(myMap.length).to.equal(1);
+        });
+    });
+    describe("push(key, value) same behavior as set(k,v)", function () {
+        it('push should not add any element if a key is missing', function () {
+            myMap.push(v);
+            chai_1.expect(myMap[0]).to.equal(undefined);
+        });
+        it('should be able to add an element to the values array', function () {
+            myMap.push(k2, v2);
+            chai_1.expect(myMap[0]).to.equal(v2);
+        });
+        it('should be able to add the key and the corresponding index in the keys Map', function () {
+            myMap.push(k, v);
+            var m = [];
+            myMap.keys().forEach(function (v, k) {
+                m.push(v);
+                m.push(k);
+            });
+            //value in the keys is the index of element in the values array
+            chai_1.expect(m[0]).to.equal(0);
+            chai_1.expect(m[1]).to.equal(k);
+        });
+        it("length should return the number of element in the hashMap", function () {
+            chai_1.expect(myMap.length).to.equal(0);
+            myMap.set(k, v);
+            chai_1.expect(myMap.length).to.equal(1);
         });
     });
     describe("get(key)", function () {
@@ -78,9 +105,9 @@ describe("Custom HashMap", function () {
         it("should delete the element from the values array", function () {
             myMap.set(k, v);
             myMap.set(k2, v2);
-            chai_1.expect(myMap.size).to.equal(2);
+            chai_1.expect(myMap.length).to.equal(2);
             myMap.delete(k);
-            chai_1.expect(myMap.values().length).to.equal(1);
+            chai_1.expect(myMap.length).to.equal(1);
         });
         it("should offset index of all the other elements in the keys Map", function () {
             myMap.set(k, v);
@@ -100,7 +127,7 @@ describe("Custom HashMap", function () {
             myMap.set(k2, v2);
             myMap.clear();
             chai_1.expect(myMap.keys().size).to.equal(0);
-            chai_1.expect(myMap.values().length).to.equal(0);
+            chai_1.expect(myMap.length).to.equal(0);
         });
     });
     describe("has()", function () {
@@ -118,15 +145,15 @@ describe("Custom HashMap", function () {
             myMap.set(k2, v2);
             //insert k3 after k so it should be between k and k2
             myMap.insertAfter(k3, v3, k);
-            chai_1.expect(myMap.values()[1].prop1).to.equal(3);
+            chai_1.expect(myMap[1].prop1).to.equal(3);
         });
         it("should offset all other elements in the values array", function () {
             myMap.set(k, v);
             myMap.set(k2, v2);
-            chai_1.expect(myMap.values()[1].prop1).to.equal(2);
+            chai_1.expect(myMap[1].prop1).to.equal(2);
             myMap.insertAfter(k3, v3, k);
             //k2 should be offset by 1
-            chai_1.expect(myMap.values()[2].prop1).to.equal(2);
+            chai_1.expect(myMap[2].prop1).to.equal(2);
         });
         it("should insert the key in the keys Map and update all index of the elements positioned after ", function () {
             myMap.set(k, v);
@@ -172,15 +199,15 @@ describe("Custom HashMap", function () {
             myMap.set(k2, v2);
             //insert k3 before k2 so it should be between k and k2
             myMap.insertBefore(k3, v3, k2);
-            chai_1.expect(myMap.values()[1].prop1).to.equal(3);
+            chai_1.expect(myMap[1].prop1).to.equal(3);
         });
         it("should offset all other elements in the values array", function () {
             myMap.set(k, v);
             myMap.set(k2, v2);
-            chai_1.expect(myMap.values()[1].prop1).to.equal(2);
+            chai_1.expect(myMap[1].prop1).to.equal(2);
             myMap.insertBefore(k3, v3, k2);
             //k2 should be offset by 1
-            chai_1.expect(myMap.values()[2].prop1).to.equal(2);
+            chai_1.expect(myMap[2].prop1).to.equal(2);
         });
         it("should insert the key in the keys Map and update all index of the elements positioned before", function () {
             myMap.set(k, v);
