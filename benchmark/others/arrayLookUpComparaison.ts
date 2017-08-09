@@ -1,6 +1,6 @@
 //simple benchmark for comparing collection lookup and iteration
 import * as b from "../utils/perfTestUtils";
-import {FastHashMap} from "../utils/customHashMap";
+import {FastIteMap} from "../../lib/fastIterationMap/src/fastIteMap";
 
 //size of collections
 //fetch random same number of elements in fetch benchmark
@@ -36,7 +36,7 @@ for (let i = 0; i < l; ++i) {
     myMap.set(id, o);
 }
 
-let myCustomMap = new FastHashMap<string, ob> ();
+let myCustomMap = new FastIteMap<string, ob> ();
 for (let i = 0; i < l; ++i) {
     let id = sArray[i].id;
     let o = { "index": i, "prop": 0 };

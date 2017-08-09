@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 //simple benchmark for comparing collection lookup and iteration
 var b = require("../utils/perfTestUtils");
-var customHashMap_1 = require("../utils/customHashMap");
+var fastIteMap_1 = require("../../lib/fastIterationMap/src/fastIteMap");
 //size of collections
 //fetch random same number of elements in fetch benchmark
 var l = 1000;
@@ -33,7 +33,7 @@ for (var i = 0; i < l; ++i) {
     var o = { "index": i, "prop": 0 };
     myMap.set(id, o);
 }
-var myCustomMap = new customHashMap_1.FastHashMap();
+var myCustomMap = new fastIteMap_1.FastIteMap();
 for (var i = 0; i < l; ++i) {
     var id = sArray[i].id;
     var o = { "index": i, "prop": 0 };

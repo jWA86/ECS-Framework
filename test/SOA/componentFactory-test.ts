@@ -1,11 +1,9 @@
 import "mocha";
 import { expect } from "chai";
 import { IComponent, IComponentFactory } from "../../src/SOA/interfaces";
-import { ComponentFactoryMap} from "../../src/SOA/ComponentFactoryMap";
-import { ComponentFactoryArray } from "../../src/SOA/ComponentFactoryArray";
 import { ComponentFactoryFastMap } from "../../src/SOA/ComponentFactoryFastMap";
 
-const poolImpl = [{"name":"array", "impl": ComponentFactoryArray},{"name":"map", "impl":ComponentFactoryMap},{"name":"fastMap", "impl":ComponentFactoryFastMap}];
+const poolImpl = [{"name":"fastMap", "impl":ComponentFactoryFastMap}];
 poolImpl.forEach((p) => {
     describe("Component Factory with " + p.name, () => {
         //for checking content of the pool whether it is a hashMap or array -> convert it to an array
