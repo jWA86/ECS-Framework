@@ -3,6 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var fastIteMap_1 = require("../../lib/fastIterationMap/src/fastIteMap");
 var ComponentFactoryFastMap = (function () {
     function ComponentFactoryFastMap() {
+        // are elements in a Js array continuous in memory ? 
+        // does it depends on how we add elements ?
+        // should we need to pre-fill the array ?
         this.pool = new fastIteMap_1.FastIteMap();
     }
     ComponentFactoryFastMap.prototype.createComponent = function (type) {

@@ -4,6 +4,9 @@ import { FastIteMap } from "../../lib/fastIterationMap/src/fastIteMap";
 class ComponentFactoryFastMap<T extends IComponent> implements IComponentFactory<IComponent> {
     pool:FastIteMap<string, T>;
     constructor() {
+        // are elements in a Js array continuous in memory ? 
+        // does it depends on how we add elements ?
+        // should we need to pre-fill the array ?
         this.pool = new FastIteMap<string, T>();
     }
     createComponent(type: { new(id: string, ...args: any[]): T }, ...args: any[]): T {
@@ -27,7 +30,6 @@ class ComponentFactoryFastMap<T extends IComponent> implements IComponentFactory
         return t;
     }
 
-   
     getComponent(id: string): T {
         return this.pool.get(id);
     }

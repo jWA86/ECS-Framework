@@ -1,21 +1,12 @@
 import "mocha";
 import { expect } from "chai";
 import { IComponent, IComponentFactory } from "../../src/SOA/interfaces";
-import { ComponentFactoryFastMap } from "../../src/SOA/ComponentFactoryFastMap";
+import { ComponentFactoryFastMap as ComponentFactory } from "../../src/SOA/ComponentFactoryFastMap";
 import { TupleComponentSystem, ITupleComponent } from "../../src/SOA/MultiComponentSystem";
 
-const poolImpl = [{ "name": "fastMap", "impl": ComponentFactoryFastMap }];
-poolImpl.forEach((p) => {
-    describe("MultiComponentSystem with pool factory using " + p.name, () => {
-        //for checking content of the pool whether it is a hashMap or array -> convert it to an array
-        //ie: for checking order of elements in the map
-        function poolToArray(factory: IComponentFactory<IComponent>) {
-            let a = [];
-            factory.pool.forEach((v) => {
-                a.push(v);
-            });
-            return a;
-        }
+
+    describe("MultiComponentSystem ", () => {
+
         class ConcreteComponent implements IComponent {
             public val = 1;
             constructor(public id: string) { }
@@ -46,9 +37,9 @@ poolImpl.forEach((p) => {
         let mCSystem: MultiComponentSystem;
 
         beforeEach(() => {
-            let simpleFactory1 = new p.impl<ConcreteComponent>();
-            let simpleFactory2 = new p.impl<ConcreteComponent>();
-            let simpleFactory3 = new p.impl<ConcreteComponent>();
+            let simpleFactory1 = new ComponentFactory<ConcreteComponent>();
+            let simpleFactory2 = new ComponentFactory<ConcreteComponent>();
+            let simpleFactory3 = new ComponentFactory<ConcreteComponent>();
 
             factories = [];
             factories.push(simpleFactory1);
@@ -73,7 +64,7 @@ poolImpl.forEach((p) => {
             expect(mCSystem.factories[2].getComponent(components3[0].id).id).to.equal(components3[0].id);
         });
         it("should be able to query components by ids in the proper factory ", () => {
-            let tuples = new p.impl<TupleComponent>();
+            let tuples = new ComponentFactory<TupleComponent>();
             let q = tuples.createComponent(TupleComponent, [components1[0].id, components2[0].id, components3[0].id]);
             let result = mCSystem.getComponents(q);
             expect(result[0].id).to.equal(components1[0].id);
@@ -81,7 +72,7 @@ poolImpl.forEach((p) => {
             expect(result[2].id).to.equal(components3[0].id);
         });
         it("should be able to process all components tuples", () => {
-            let tuples = new p.impl<TupleComponent>();
+            let tuples = new ComponentFactory<TupleComponent>();
             for (let i = 0; i < 10; ++i) {
                 expect(components1[i].val).to.equal(1);
                 expect(components2[i].val).to.equal(1);
@@ -89,9 +80,9 @@ poolImpl.forEach((p) => {
                 let t = tuples.createComponent(TupleComponent, [components1[i].id, components2[i].id, components3[i].id]);
             }
             mCSystem.process(tuples);
+            
             for (let i = 0; i < 10; ++i) {
                 expect(components1[i].val).to.equal(3);
             }
         });
     });
-});

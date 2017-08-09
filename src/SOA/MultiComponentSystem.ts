@@ -6,7 +6,7 @@ interface ITupleComponent extends IComponent {
     tuple:string[];
 }
 
-class TupleComponent implements ITupleComponent{
+class TupleComponent implements ITupleComponent {
     constructor(public id:string, public tuple:string[]){}
 }
 
@@ -30,10 +30,10 @@ abstract class TupleComponentSystem implements ISystem {
     }
     process(tupleFactory:IComponentFactory<ITupleComponent>) { 
         let l = tupleFactory.size;
-        tupleFactory.pool.forEach((tuple) => {
-            let t = this.getComponents(tuple);
+        for(let i=0;i<l;++i){
+            let t = this.getComponents(tupleFactory.pool[i]);
             this.execute(t);
-        });
+        }
     }
     //loose typage of components :/
     abstract execute(components:IComponent[]);

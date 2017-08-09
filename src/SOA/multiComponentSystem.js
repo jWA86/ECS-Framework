@@ -31,12 +31,11 @@ var TupleComponentSystem = (function () {
         return r;
     };
     TupleComponentSystem.prototype.process = function (tupleFactory) {
-        var _this = this;
         var l = tupleFactory.size;
-        tupleFactory.pool.forEach(function (tuple) {
-            var t = _this.getComponents(tuple);
-            _this.execute(t);
-        });
+        for (var i = 0; i < l; ++i) {
+            var t = this.getComponents(tupleFactory.pool[i]);
+            this.execute(t);
+        }
     };
     return TupleComponentSystem;
 }());
