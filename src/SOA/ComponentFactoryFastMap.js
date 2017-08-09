@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var customHashMap_1 = require("../../benchmark/utils/customHashMap");
+var fastIteMap_1 = require("../../lib/fastIterationMap/src/fastIteMap");
 var ComponentFactoryFastMap = (function () {
     function ComponentFactoryFastMap() {
-        this.pool = new customHashMap_1.FastHashMap();
+        this.pool = new fastIteMap_1.FastIteMap();
     }
     ComponentFactoryFastMap.prototype.createComponent = function (type) {
         var args = [];

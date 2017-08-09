@@ -14,8 +14,9 @@ require("mocha");
 var chai_1 = require("chai");
 var ComponentFactoryMap_1 = require("../../src/SOA/ComponentFactoryMap");
 var ComponentFactoryArray_1 = require("../../src/SOA/ComponentFactoryArray");
+var ComponentFactoryFastMap_1 = require("../../src/SOA/ComponentFactoryFastMap");
 var MultiComponentSystem_1 = require("../../src/SOA/MultiComponentSystem");
-var poolImpl = [{ "name": "array", "impl": ComponentFactoryArray_1.ComponentFactoryArray }, { "name": "map", "impl": ComponentFactoryMap_1.ComponentFactoryMap }];
+var poolImpl = [{ "name": "array", "impl": ComponentFactoryArray_1.ComponentFactoryArray }, { "name": "map", "impl": ComponentFactoryMap_1.ComponentFactoryMap }, { "name": "fastMap", "impl": ComponentFactoryFastMap_1.ComponentFactoryFastMap }];
 poolImpl.forEach(function (p) {
     describe("MultiComponentSystem with pool factory using " + p.name, function () {
         //for checking content of the pool whether it is a hashMap or array -> convert it to an array

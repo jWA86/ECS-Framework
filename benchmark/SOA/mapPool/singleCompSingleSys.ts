@@ -1,32 +1,32 @@
 import * as m from "../../utils/perfTestUtils"
 import * as eC from "../lib/sampleImplementation/component/easing";
 import * as eS from "../lib/sampleImplementation/system/interpolationSystem-map";
-import { ComponentFactoryMap as ComponentFactory} from "../../../src/SOA/ComponentFactoryMap";
+import { ComponentFactoryMap as ComponentFactory } from "../../../src/SOA/ComponentFactoryMap";
 
 class benchInterpolableSys implements m.IPerfTest {
-    system:eS.EasingSystem;
-    factory:ComponentFactory<eC.IInterpolableComponent>;
-    constructor(nbComponents:number){
+    system: eS.EasingSystem;
+    factory: ComponentFactory<eC.IInterpolableComponent>;
+    constructor(nbComponents: number) {
         this.system = this.createSystem();
         this.factory = this.createFactories();
         this.createComponents(nbComponents);
     }
-    
-    createSystem(){
+
+    createSystem() {
         return new eS.linearSys();
     }
-    createFactories(){
+    createFactories() {
         return new ComponentFactory<eC.InterpolableComponent>();
     }
-    createComponents(n:number) {
-            for(let i = 0;i<n;++i){
-                this.factory.createComponent(eC.InterpolableComponent);                
-            }
+    createComponents(n: number) {
+        for (let i = 0; i < n; ++i) {
+            this.factory.createComponent(eC.InterpolableComponent);
+        }
     }
-    process(progress:number) {
+    process(progress: number) {
         this.system.process(this.factory, progress);
     }
-    clear(){
+    clear() {
         this.factory.removeAll();
     }
 }
@@ -43,7 +43,7 @@ test(1000);
 test(10000);
 test(100000);
 
-function test(nbComponent:number){
+function test(nbComponent: number) {
     let t = new benchInterpolableSys(nbComponent);
     let label = nbComponent + " components, 1 system";
     console.time(label);

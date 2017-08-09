@@ -1,10 +1,10 @@
 import { IComponent, IComponentFactory } from "./interfaces";
-import { FastHashMap } from "../../benchmark/utils/customHashMap";
+import { FastIteMap } from "../../lib/fastIterationMap/src/fastIteMap";
 
 class ComponentFactoryFastMap<T extends IComponent> implements IComponentFactory<IComponent> {
-    pool:FastHashMap<string, T>;
+    pool:FastIteMap<string, T>;
     constructor() {
-        this.pool = new FastHashMap<string, T>();
+        this.pool = new FastIteMap<string, T>();
     }
     createComponent(type: { new(id: string, ...args: any[]): T }, ...args: any[]): T {
         let id = this.generateUniqueId();

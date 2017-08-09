@@ -2,7 +2,7 @@
   "name": "componententitysystem",
   "version": "1.0.0",
   "description": "Simple Component Entity System",
-  "main": "src/main.js",
+  "main": "src/",
   "scripts": {
     "test": "mocha test/"
   },
@@ -17,8 +17,5 @@
     "nyc": "^11.0.3",
     "ts-node": "^3.1.0",
     "typescript": "^2.4.2"
-  },
-  "dependencies": {
-    "webworker-threads": "^0.7.12"
   }
 }

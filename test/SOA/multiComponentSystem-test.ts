@@ -3,9 +3,11 @@ import { expect } from "chai";
 import { IComponent, IComponentFactory } from "../../src/SOA/interfaces";
 import { ComponentFactoryMap } from "../../src/SOA/ComponentFactoryMap";
 import { ComponentFactoryArray } from "../../src/SOA/ComponentFactoryArray";
+import { ComponentFactoryFastMap } from "../../src/SOA/ComponentFactoryFastMap";
+
 import { TupleComponentSystem, ITupleComponent } from "../../src/SOA/MultiComponentSystem";
 
-const poolImpl = [{ "name": "array", "impl": ComponentFactoryArray }, { "name": "map", "impl": ComponentFactoryMap }];
+const poolImpl = [{"name":"array", "impl": ComponentFactoryArray},{"name":"map", "impl":ComponentFactoryMap},{"name":"fastMap", "impl":ComponentFactoryFastMap}];
 poolImpl.forEach((p) => {
     describe("MultiComponentSystem with pool factory using " + p.name, () => {
         //for checking content of the pool whether it is a hashMap or array -> convert it to an array

@@ -1,40 +1,40 @@
 import * as m from "../../utils/perfTestUtils"
 import * as eC from "../lib/sampleImplementation/component/easing";
 import * as eS from "../lib/sampleImplementation/system/interpolationSystem-map";
-import { ComponentFactoryMap as ComponentFactory} from "../../../src/SOA/ComponentFactoryMap";
+import { ComponentFactoryMap as ComponentFactory } from "../../../src/SOA/ComponentFactoryMap";
 
 class benchInterpolableSys implements m.IPerfTest {
-    system:eS.InterpolationSystem;
-    factories:ComponentFactory<eC.IInterpolableComponent>[];
-    constructor(nbComponents:number){
+    system: eS.InterpolationSystem;
+    factories: ComponentFactory<eC.IInterpolableComponent>[];
+    constructor(nbComponents: number) {
         this.system = this.createSystem();
         this.factories = this.createFactories();
         this.createComponents(nbComponents);
     }
-    
-    createSystem(){
+
+    createSystem() {
         return new eS.InterpolationSystem();
     }
-    createFactories(){
+    createFactories() {
         let r = [];
         let nbFact = this.system.systems.length;
 
-        for(let i = 0; i < nbFact; ++i){
+        for (let i = 0; i < nbFact; ++i) {
             r.push(new ComponentFactory<eC.InterpolableComponent>());
         }
         return r;
     }
-    createComponents(n:number) {
+    createComponents(n: number) {
         this.factories.forEach((f) => {
-            for(let i = 0;i<n;++i){
-                f.createComponent(eC.InterpolableComponent);                
+            for (let i = 0; i < n; ++i) {
+                f.createComponent(eC.InterpolableComponent);
             }
         });
     }
-    process(progress:number) {
+    process(progress: number) {
         this.system.process(this.factories, progress);
     }
-    clear(){
+    clear() {
         this.factories.forEach((f) => {
             f.removeAll();
         });
@@ -54,9 +54,9 @@ test(1000);
 test(10000);
 test(100000);
 
-function test(nbComponent:number){
+function test(nbComponent: number) {
     let t = new benchInterpolableSys(nbComponent);
-    let label = nbComponent + " components, 13 system";
+    let label = nbComponent + " components, 13 systems";
     console.time(label);
     t.process(1);
     console.timeEnd(label);
