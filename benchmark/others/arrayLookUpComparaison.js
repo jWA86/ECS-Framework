@@ -2,10 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 //simple benchmark for comparing collection lookup and iteration
 var b = require("../utils/perfTestUtils");
-var fastIteMap_1 = require("../../lib/fastIterationMap/src/fastIteMap");
+var FastIterationMap_1 = require("../../lib/fastIterationMap/src/FastIterationMap");
 //size of collections
 //fetch random same number of elements in fetch benchmark
-var l = 1000;
+var l = 1200;
 var generateUniqueId = function () {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -33,7 +33,7 @@ for (var i = 0; i < l; ++i) {
     var o = { "index": i, "prop": 0 };
     myMap.set(id, o);
 }
-var myCustomMap = new fastIteMap_1.FastIteMap();
+var myCustomMap = new FastIterationMap_1.FastIterationMap();
 for (var i = 0; i < l; ++i) {
     var id = sArray[i].id;
     var o = { "index": i, "prop": 0 };
@@ -42,6 +42,14 @@ for (var i = 0; i < l; ++i) {
 var idToLookUp1 = [];
 for (var i = 0; i < l; ++i) {
     idToLookUp1.push(sArray[Math.floor(Math.random() * l)].id);
+}
+//instead of using keys
+function benchObjArrayFetchByIndex() {
+    var start = process.hrtime();
+    for (var i = 0; i < l; ++i) {
+        objArray[Object.keys(objArray)[i]].prop += 1;
+    }
+    return process.hrtime(start);
 }
 function benchFind() {
     var start = process.hrtime();
@@ -116,7 +124,7 @@ function iterateMapIterator() {
 }
 function iterateCustomMapForEach() {
     var start = process.hrtime();
-    myCustomMap.forEach(function (v, k) {
+    myCustomMap.values.forEach(function (v, k) {
         v.prop += 1;
     });
     return process.hrtime(start);
@@ -124,7 +132,7 @@ function iterateCustomMapForEach() {
 function iterateCustomMapForLoop() {
     var start = process.hrtime();
     for (var i = 0; i < l; ++i) {
-        myCustomMap[i].prop += 1;
+        myCustomMap.values[i].prop += 1;
     }
     return process.hrtime(start);
 }
@@ -136,17 +144,20 @@ var fbyId = [];
 var ffind = [];
 var fmap = [];
 var fcMap = [];
+var fByIndex = [];
 console.log("fetch " + l + " elements");
 for (var i = 0; i < 10; ++i) {
     ffind.push(benchFind());
     fmap.push(benchMap());
     fbyId.push(benchById());
     fcMap.push(benchMyCustomMap());
+    fByIndex.push(benchObjArrayFetchByIndex());
 }
 console.log("mean fetch with Id : " + (b.mean(fbyId) / b.NS_PER_MS).toFixed(4) + "ms");
 console.log("mean fetch with find() : " + (b.mean(ffind) / b.NS_PER_MS).toFixed(4) + "ms");
 console.log("mean fetch with hashMap : " + (b.mean(fmap) / b.NS_PER_MS).toFixed(4) + "ms");
 console.log("mean fetch with customHashMap : " + (b.mean(fcMap) / b.NS_PER_MS).toFixed(4) + "ms");
+console.log("mean fetch with index in Object Array: " + (b.mean(fByIndex) / b.NS_PER_MS).toFixed(4) + "ms");
 //fastest : lookup byId (object)
 console.log("iteration over " + l + " elements");
 var rIArray = [];
@@ -171,7 +182,7 @@ console.log("mean iteration map with forEach : " + (b.mean(rIMapForEach) / b.NS_
 console.log("mean iteration customMap with forEach : " + (b.mean(rICMapForEach) / b.NS_PER_MS).toFixed(4) + "ms");
 console.log("mean iteration customMap with for loop : " + (b.mean(rICMapForLoop) / b.NS_PER_MS).toFixed(4) + "ms");
 console.log("mean iteration object hasOwnProperty : " + (b.mean(rIObject) / b.NS_PER_MS).toFixed(4) + "ms");
-console.log("mean iteration object Object.keys() : " + (b.mean(rIObject2) / b.NS_PER_MS).toFixed(4) + "ms");
+console.log("mean iteration object Object.keys() forEach: " + (b.mean(rIObject2) / b.NS_PER_MS).toFixed(4) + "ms");
 //fastest for 100+: array iteration then iterate Map with ForEach 
 // fastest for < 50 c/system : array then object.keys() then iter by hasOwnProperty
 //insertion at a given positon (based on an element id)

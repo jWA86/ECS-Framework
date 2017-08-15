@@ -4,3 +4,4 @@ todo.txt
 .nyc_output/
 coverage
 benchmark/observation.txt
+observations/

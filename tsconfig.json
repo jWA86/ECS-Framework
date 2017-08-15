@@ -3,7 +3,8 @@
     "target": "es5",
     "module": "commonjs",
     "sourceMap": false,
-    "watch":true
+    "watch":true,
+    "allowJs": true
   },
   "exclude": [
     "node_modules"

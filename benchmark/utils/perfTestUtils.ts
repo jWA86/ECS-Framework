@@ -3,7 +3,7 @@ interface IPerfTest {
     system;
     createSystem: Function;
     createFactories: Function;
-    createComponents(nbComponents: number);
+    createComponents:Function;
     process: Function;
     clear: Function;
 }
