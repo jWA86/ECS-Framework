@@ -3,6 +3,9 @@ import * as eC from "./lib/sampleImplementation/component/easing";
 import * as eS from "./lib/sampleImplementation/system/toggableInterpolationSystem";
 import { ComponentFactory } from "../src/ComponentFactory";
 
+
+//array with active and inactive elements and if in the process (toggableComponent)
+
 class benchToggableInterpolableSys implements m.IPerfTest {
     system: eS.InterpolationSystem;
     factories: ComponentFactory<eC.InterpolableComponent>[];
@@ -31,21 +34,13 @@ class benchToggableInterpolableSys implements m.IPerfTest {
             }
         });
         let a = 0;
-        var j = 0;
         while (a < nbActive) {
-            let rand = Math.random();
-            this.factories.forEach((f) => {
-                if (rand > 0.4 && !f.pool.values[j].active) {
-                    f.pool.values[j].active = true;
-                    a += 1;
-                }
-                else {
-                    f.pool.values[j].active = false;
-                }
-            });
-            j++;
-            if(j>= nbComponent){
-                j=0;
+            let rand = Math.floor(Math.random()*nbActive);
+            if(!this.factories[0].pool.values[rand].active){
+                a++;
+                this.factories.forEach((f)=>{
+                    f.pool.values[rand].active = true;
+                });
             }
         }
 
@@ -62,10 +57,10 @@ class benchToggableInterpolableSys implements m.IPerfTest {
 }
 
 
-// half active
+// // half active
 
-test(1, 1);
-test(1, 1);
+ test(1, 1);
+ test(1, 1);
 test(2, 1);
 test(5, 3);
 test(10, 5);
@@ -74,7 +69,7 @@ test(1000, 500);
 test(10000, 5000);
 test(100000, 50000);
 
-// 1/3 active
+// // 1/3 active
 
 test(5, 2);
 test(10, 3);
@@ -91,6 +86,7 @@ test(100, 100);
 test(1000, 1000);
 test(10000, 10000);
 test(100000, 100000);
+
 
 function test(nbComponent: number, nbActive:number) {
     let t = new benchToggableInterpolableSys(nbComponent, nbActive);

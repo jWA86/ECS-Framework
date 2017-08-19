@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var eC = require("./lib/sampleImplementation/component/easing");
 var eS = require("./lib/sampleImplementation/system/toggableInterpolationSystem");
 var ComponentFactory_1 = require("../src/ComponentFactory");
+//array with active and inactive elements and if in the process (toggableComponent)
 var benchToggableInterpolableSys = (function () {
     function benchToggableInterpolableSys(nbComponents, nbActive) {
         this.system = this.createSystem();
@@ -28,21 +29,13 @@ var benchToggableInterpolableSys = (function () {
             }
         });
         var a = 0;
-        var j = 0;
         var _loop_1 = function () {
-            var rand = Math.random();
-            this_1.factories.forEach(function (f) {
-                if (rand > 0.4 && !f.pool.values[j].active) {
-                    f.pool.values[j].active = true;
-                    a += 1;
-                }
-                else {
-                    f.pool.values[j].active = false;
-                }
-            });
-            j++;
-            if (j >= nbComponent) {
-                j = 0;
+            var rand = Math.floor(Math.random() * nbActive);
+            if (!this_1.factories[0].pool.values[rand].active) {
+                a++;
+                this_1.factories.forEach(function (f) {
+                    f.pool.values[rand].active = true;
+                });
             }
         };
         var this_1 = this;
@@ -61,7 +54,7 @@ var benchToggableInterpolableSys = (function () {
     };
     return benchToggableInterpolableSys;
 }());
-// half active
+// // half active
 test(1, 1);
 test(1, 1);
 test(2, 1);
@@ -71,7 +64,7 @@ test(100, 50);
 test(1000, 500);
 test(10000, 5000);
 test(100000, 50000);
-// 1/3 active
+// // 1/3 active
 test(5, 2);
 test(10, 3);
 test(100, 30);
