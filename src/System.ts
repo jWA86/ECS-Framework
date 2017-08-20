@@ -20,16 +20,16 @@ abstract class System<T extends IComponent> implements ISystem {
     abstract execute(component:T);
 }
 
-//abstract class that iterate over the pool and execute ToggableComponent that have the active proprety setted to true
-// for testing only, should use a ComponentFactory that separate active & inactive so we process only active components
+
 abstract class TSystem<T extends ITogglableComponent> implements ISystem {
     constructor() {
     }
     process(factory: IComponentFactory<T>) {
         let l = factory.size;
+        let f = factory.pool.values;
         for (let i = 0; i < l; ++i) {
-            if(factory.pool.values[i].active){
-                this.execute(factory.pool.values[i]);                
+            if(f[i].active){
+                this.execute(f.values[i]);                
             }
         };
     }

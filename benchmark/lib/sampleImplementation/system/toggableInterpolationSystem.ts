@@ -18,8 +18,9 @@ abstract class EasingSystem implements IEasingSystem {
     constructor() {}
     process(factory: ComponentFactory<InterpolableComponent >, progress: number) {
         let l = factory.size;
+        let f = factory.pool.values;
         for (let i = 0; i < l; ++i) {
-            let c = factory.pool.values[i];
+            let c = f[i];
             //doesn't check if it's equal 0
             let length = c.endValue - c.startValue;
             if(c.active) {
