@@ -13,18 +13,6 @@ class ComponentFactory<T extends IComponent> implements IComponentFactory<T> {
         return t;
     }
 
-    createComponentAfter(componentType: { new(entityId: string, ...args: any[]): T }, entityId: string, afterEId: string, ...args: any[]): T {
-        let t = new componentType(entityId, ...args);
-        this.pool.insertAfter(t.entityId, t, afterEId);
-        return t;
-    }
-
-    createComponentBefore(componentType: { new(entityId: string, ...args: any[]): T }, entityId: string, beforeEId: string, ...args: any[]): T {
-        let t = new componentType(entityId, ...args);
-        this.pool.insertBefore(t.entityId, t, beforeEId);
-        return t;
-    }
-
     getComponent(entityId: string): T {
         return this.pool.get(entityId);
     }
@@ -48,23 +36,5 @@ class TogglableComponentFactory<T extends ITogglableComponent> extends Component
     }
     activate(entityId: string, value: boolean){
         this.pool.get(entityId).active = value;
-    }
-}
-
-class paralleleComponentFactory<T extends ITogglableComponent> extends ComponentFactory<T> implements IComponentFactory<T> {
-    
-    constructor(public factories:ITogglableComponentFactory<T>[]){
-        super();
-    }
-    // overwrite all methode so it make change to all children factories
-
-    // sort pool ?
-    // set active in one pool and move other in another pool
-    // inactivePool: FastIteMap<string, T> = new FastIteMap<string, T>();
-    // is it faster to iterate a pool and computer only when active comp are encounter (if(activate)then computer)
-    // or computer only active component in a sorted array (active first, the stop when inactive are encounter)
-    // or computer a array with only active component (inactive are moved in an other array) 
-    activate() {
-
     }
 }

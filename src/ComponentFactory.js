@@ -24,24 +24,6 @@ var ComponentFactory = (function () {
         this.pool.set(t.entityId, t);
         return t;
     };
-    ComponentFactory.prototype.createComponentAfter = function (componentType, entityId, afterEId) {
-        var args = [];
-        for (var _i = 3; _i < arguments.length; _i++) {
-            args[_i - 3] = arguments[_i];
-        }
-        var t = new (componentType.bind.apply(componentType, [void 0, entityId].concat(args)))();
-        this.pool.insertAfter(t.entityId, t, afterEId);
-        return t;
-    };
-    ComponentFactory.prototype.createComponentBefore = function (componentType, entityId, beforeEId) {
-        var args = [];
-        for (var _i = 3; _i < arguments.length; _i++) {
-            args[_i - 3] = arguments[_i];
-        }
-        var t = new (componentType.bind.apply(componentType, [void 0, entityId].concat(args)))();
-        this.pool.insertBefore(t.entityId, t, beforeEId);
-        return t;
-    };
     ComponentFactory.prototype.getComponent = function (entityId) {
         return this.pool.get(entityId);
     };
@@ -72,21 +54,3 @@ var TogglableComponentFactory = (function (_super) {
     return TogglableComponentFactory;
 }(ComponentFactory));
 exports.TogglableComponentFactory = TogglableComponentFactory;
-var paralleleComponentFactory = (function (_super) {
-    __extends(paralleleComponentFactory, _super);
-    function paralleleComponentFactory(factories) {
-        var _this = _super.call(this) || this;
-        _this.factories = factories;
-        return _this;
-    }
-    // overwrite all methode so it make change to all children factories
-    // sort pool ?
-    // set active in one pool and move other in another pool
-    // inactivePool: FastIteMap<string, T> = new FastIteMap<string, T>();
-    // is it faster to iterate a pool and computer only when active comp are encounter (if(activate)then computer)
-    // or computer only active component in a sorted array (active first, the stop when inactive are encounter)
-    // or computer a array with only active component (inactive are moved in an other array) 
-    paralleleComponentFactory.prototype.activate = function () {
-    };
-    return paralleleComponentFactory;
-}(ComponentFactory));
