@@ -2,7 +2,7 @@ import { IComponent, IComponentFactory } from "../../../../src/interfaces";
 import { TogglableComponentFactory as ComponentFactory } from "../../../../src/ComponentFactory";
 import { ISystem, TSystem } from "../../../../src/System";
 import { IInterpolableComponent, InterpolableComponent, easingMethod } from "../component/easing";
-import { IKeyFrame, IKeyFrameController, KeyFrameControllerComponent, IFrameEvent, PlaybackState } from "../component/AnimationClipComponent";
+import { IKeyFrame, IKeyFrameController, KeyFrameControllerComponent, IFrameEvent, PlaybackState } from "../component/KeyFrameController";
 
 export { AnimationSystem }
 

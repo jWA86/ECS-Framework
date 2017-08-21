@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var AnimationClipComponent_1 = require("../component/AnimationClipComponent");
+var KeyFrameController_1 = require("../component/KeyFrameController");
 var AnimationSystem = (function () {
     function AnimationSystem() {
     }
@@ -15,13 +15,13 @@ var AnimationSystem = (function () {
     };
     AnimationSystem.prototype.execute = function (c, timeRef) {
         // if paused don't update
-        if (c.playState === AnimationClipComponent_1.PlaybackState.paused) {
+        if (c.playState === KeyFrameController_1.PlaybackState.paused) {
             return;
         }
         var loopEnded = c.timer.loopCount >= c.nbLoop && c.nbLoop !== 0;
         // if loopCount reached but not yet set to stopped 
-        if (loopEnded && c.playState === AnimationClipComponent_1.PlaybackState.ended) {
-            c.playState = AnimationClipComponent_1.PlaybackState.stopped;
+        if (loopEnded && c.playState === KeyFrameController_1.PlaybackState.ended) {
+            c.playState = KeyFrameController_1.PlaybackState.stopped;
             c.timer.count += 1;
             return;
         }
@@ -29,9 +29,9 @@ var AnimationSystem = (function () {
         var rFrom = c.from * (c.timer.loopCount + 1);
         var rEnd = c.from + c.duration * (c.timer.loopCount + 1);
         // start
-        if ((c.playState === AnimationClipComponent_1.PlaybackState.stopped)
+        if ((c.playState === KeyFrameController_1.PlaybackState.stopped)
             && timeRef.time >= rFrom && timeRef.time <= rEnd && !loopEnded) {
-            c.playState = AnimationClipComponent_1.PlaybackState.started;
+            c.playState = KeyFrameController_1.PlaybackState.started;
             c.timer.count += 1;
             // when we start directly in reverse
             if (c.timer.reverse) {
@@ -39,9 +39,9 @@ var AnimationSystem = (function () {
             }
             return;
         }
-        else if ((c.playState === AnimationClipComponent_1.PlaybackState.started || c.playState === AnimationClipComponent_1.PlaybackState.playing)
+        else if ((c.playState === KeyFrameController_1.PlaybackState.started || c.playState === KeyFrameController_1.PlaybackState.playing)
             && timeRef.time >= rFrom && timeRef.time <= rEnd && !loopEnded) {
-            c.playState = AnimationClipComponent_1.PlaybackState.playing;
+            c.playState = KeyFrameController_1.PlaybackState.playing;
             if (!c.timer.reverse) {
                 c.timer.time += timeRef.delta;
             }
@@ -53,9 +53,9 @@ var AnimationSystem = (function () {
             c.progress += c.timer.time / c.duration;
             return;
         }
-        else if ((c.playState === AnimationClipComponent_1.PlaybackState.started || c.playState === AnimationClipComponent_1.PlaybackState.playing)
+        else if ((c.playState === KeyFrameController_1.PlaybackState.started || c.playState === KeyFrameController_1.PlaybackState.playing)
             && timeRef.time >= rFrom && timeRef.time > rEnd && !loopEnded) {
-            c.playState = AnimationClipComponent_1.PlaybackState.ended;
+            c.playState = KeyFrameController_1.PlaybackState.ended;
             c.timer.loopCount += 1;
             c.timer.count += 1;
             this.changeDirection(c, timeRef);
@@ -91,7 +91,7 @@ var AnimationSystem = (function () {
             }
         }
         c.progress += c.timer.time / c.duration;
-        c.playState = AnimationClipComponent_1.PlaybackState.started;
+        c.playState = KeyFrameController_1.PlaybackState.started;
     };
     return AnimationSystem;
 }());
