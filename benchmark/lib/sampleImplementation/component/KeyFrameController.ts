@@ -25,6 +25,7 @@ interface IFrameEvent {
 interface IKeyFrame {
     from: number;
     duration: number;
+    // easing:bezierEasing
 }
 
 interface IKeyFrameController {

@@ -6,7 +6,7 @@ import { PlaybackState, IFrameEvent, IKeyFrame, IKeyFrameController, KeyFrameCon
 import { IComponent, IComponentFactory } from "../../../../src/interfaces";
 import { ComponentFactory } from "../../../../src/ComponentFactory";
 
-describe("AnimationClip playstate", () => {
+describe("KeyFrameController playstate", () => {
 
     function incrementFrameEvent(e, delta = 1) {
         if (e.reverse) {
@@ -185,7 +185,7 @@ describe("AnimationClip playstate", () => {
             expect(c.timer.time).to.equal(c.duration - 1);
         });
     });
-    describe("looping", () => {
+    describe("cycling", () => {
         it("toPlayInReverse should set to false by default", () => {
             expect(c.cycling).to.equal(false);
         });
@@ -375,7 +375,55 @@ describe("AnimationClip playstate", () => {
 
 
             });
-            it("loop back in normal direction when looping from reverse", () => {
+            it("increment timer when reach 0", () => {
+                expect(c.from + c.duration).to.equal(20);
+                let e: IFrameEvent = { delta: 0, time: 0, count: 0, loopCount: 0, reverse: false };
+                c.cycling = true;
+                c.nbLoop = 3;
+
+                incrementFrameEvent(e, 10);
+                system.process(factory, e);
+
+                incrementFrameEvent(e, 11);
+                system.process(factory, e);
+                expect(c.timer.loopCount).to.equal(1);
+
+                incrementFrameEvent(e);
+                system.process(factory, e);
+
+                incrementFrameEvent(e, 10);
+                system.process(factory, e);
+                expect(c.timer.time).to.equal(0);
+                expect(c.timer.loopCount).to.equal(2);
+
+                incrementFrameEvent(e, 2);
+                system.process(factory, e);
+                expect(c.timer.time).to.equal(2);
+
+            });
+            it("should set playsate to ended when all loop completed then stopped", ()=>{
+                let from = 1000; //1000ms
+                let duration = 1000 // 1 seconde
+                c = factory.createComponent(KeyFrameControllerComponent, "c1", true, from, duration);
+                c.cycling = true;
+                c.nbLoop = 3;
+                let e: IFrameEvent = { delta: 0, time: 0, count: 0, loopCount: 0, reverse: false };                
+                //start
+                
+                let nbIncrement = c.nbLoop*c.duration+c.from+1;
+                let fps = 1000/60;
+                for(let i = 0; i < nbIncrement/fps;++i) {
+                    incrementFrameEvent(e, fps);
+                    system.process(factory, e);
+                }
+
+                expect(e.time).to.be.at.least(nbIncrement);
+                expect(c.playState).to.equal(PlaybackState.ended);
+
+                incrementFrameEvent(e, fps);
+                system.process(factory, e);
+
+                expect(c.playState).to.equal(PlaybackState.stopped);
 
             });
         });
