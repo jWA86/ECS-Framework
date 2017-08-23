@@ -23,3 +23,9 @@ Search by id
 - array.find();
 - map.get(id);
 - fasteIterationMap.get(id);
+
+
+https://jsperf.com/continous-vs-spare-allocated-array
+
+Comparaison of array that were allocated differently.
+Difference is important on very large number of elements (64k+)
