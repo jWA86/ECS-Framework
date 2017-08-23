@@ -7,10 +7,19 @@ processing on activated array.
 - solution 2 : elements are mixed in one array and their states are checked while processing.
 - solution 3 : activated and desactivated elements are in one array but it's sorted, processing loop break when it encounters a desactivated element.
 - solution 4 : activated and desactivated elements are moved between ES6 Map (hashMap), activated map is processed.
+- solution 5 : use a custom data structure which combine hashMap for searching by id, and an array for iteration. : FastIterationMap
 
 test include : 
  - iterate over the actives elements
  - desactivate half the numbers of actives elements (by index)
  - activate back those elements
 
-Search by id is not included in this test.
+
+
+
+https://jsperf.com/find-by-id-fastiterationmap
+
+Search by id
+- array.find();
+- map.get(id);
+- fasteIterationMap.get(id);

@@ -2,21 +2,24 @@ var onlyActives = [];
 var mix = [];
 var sortedActives = [];
 var onlyActivesMap = new Map();
+var fastIteMap = new FastIterationMap();
 
 var l = 10000;
 
 for(var i = 0; i < l; ++i) {
-    var o = {'id':i, 'it':0, 'actif': true};
-    onlyActives.push(o);
-    mix.push(o);
-    sortedActives.push(o);
-    onlyActivesMap.set(i, o);
+	var o = {'id':i, 'it':0, 'actif': true};
+	onlyActives.push(o);
+	mix.push(o);
+	sortedActives.push(o);
+	onlyActivesMap.set(i, o);
+    fastIteMap.set(i, o);
 }
 
-for(var i = 0; i < l; ++i){
-    var o = {'id':i, 'it':0, 'actif':false}
-    mix.push(o);
-    sortedActives.push(o);
+for(var i = l; i < l*2; ++i){
+	var o = {'id':i, 'it':0, 'actif':false}
+	mix.push(o);
+	sortedActives.push(o);
+    fastIteMap.set(i, o);
 }
 
 function shuffle(a) {
@@ -49,7 +52,7 @@ for(var i = 0; i< l/2; ++i){
 
 
 
-
+// only active array
 
 
 for(var i = 0; i < l;++i) {
@@ -72,7 +75,7 @@ for(var i = 0; i < l;++i) {
 }
 
 
-
+// array with branching processing
 
 
 
@@ -104,7 +107,7 @@ for(var i = 0; i < le;++i) {
 
 
 
-
+// sorted array
 
 var le = l*2;
 for(var i = 0; i < le;++i) {
@@ -131,7 +134,7 @@ for(var i = 0; i < le;++i) {
 }
 
 
-
+// ES6 MAP
 
 onlyActivesMap.forEach(function(e){
 	e.it += Math.random()*10;
@@ -156,3 +159,34 @@ ref.forEach(function(e){
 onlyActivesMap.forEach(function(e){
 	e.it += Math.random()*10;
 });
+
+
+
+// fast iteration map with branching processing
+
+
+var activesEle = fastIteMap.values;
+var le = l*2;
+for(var i = 0; i < le; ++i){
+    if(activesEle[i].actif){
+        activesEle[i].it += Math.random()*10;
+    }
+}
+
+//desactivate
+var ref = [];
+for(var i = 0; i < toDeleteId.length; ++i) {
+    activesEle[toDeleteId[i]].actif = false;
+}
+
+// activate
+for(var i = 0; i < toDeleteId.length; ++i){
+	activesEle[toDeleteId[i]].actif = true;
+}
+
+// iterate again
+for(var i = 0; i < le; ++i){
+    if(activesEle[i].actif){
+        activesEle[i].it += Math.random()*10;
+    }
+}
