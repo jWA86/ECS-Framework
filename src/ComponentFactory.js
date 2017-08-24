@@ -24,6 +24,24 @@ var ComponentFactory = (function () {
         this.pool.set(t.entityId, t);
         return t;
     };
+    ComponentFactory.prototype.createComponentAfter = function (componentType, entityId, afterEId) {
+        var args = [];
+        for (var _i = 3; _i < arguments.length; _i++) {
+            args[_i - 3] = arguments[_i];
+        }
+        var t = new (componentType.bind.apply(componentType, [void 0, entityId].concat(args)))();
+        this.pool.insertAfter(t.entityId, t, afterEId);
+        return t;
+    };
+    ComponentFactory.prototype.createComponentBefore = function (componentType, entityId, beforeEId) {
+        var args = [];
+        for (var _i = 3; _i < arguments.length; _i++) {
+            args[_i - 3] = arguments[_i];
+        }
+        var t = new (componentType.bind.apply(componentType, [void 0, entityId].concat(args)))();
+        this.pool.insertBefore(t.entityId, t, beforeEId);
+        return t;
+    };
     ComponentFactory.prototype.getComponent = function (entityId) {
         return this.pool.get(entityId);
     };

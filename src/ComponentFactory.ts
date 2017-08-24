@@ -5,11 +5,23 @@ export { ComponentFactory, TogglableComponentFactory }
 
 class ComponentFactory<T extends IComponent> implements IComponentFactory<T> {
     pool: FastIterationMap<string, T> = new FastIterationMap<string, T>();
-    constructor() {}
+    constructor() { }
 
     createComponent(componentType: { new(entityId: string, ...args: any[]): T }, entityId: string, ...args: any[]): T {
         let t = new componentType(entityId, ...args);
         this.pool.set(t.entityId, t);
+        return t;
+    }
+
+    createComponentAfter(componentType: { new(entityId: string, ...args: any[]): T }, entityId: string, afterEId: string, ...args: any[]): T {
+        let t = new componentType(entityId, ...args);
+        this.pool.insertAfter(t.entityId, t, afterEId);
+        return t;
+    }
+
+    createComponentBefore(componentType: { new(entityId: string, ...args: any[]): T }, entityId: string, beforeEId: string, ...args: any[]): T {
+        let t = new componentType(entityId, ...args);
+        this.pool.insertBefore(t.entityId, t, beforeEId);
         return t;
     }
 
@@ -34,7 +46,7 @@ class TogglableComponentFactory<T extends ITogglableComponent> extends Component
     constructor() {
         super();
     }
-    activate(entityId: string, value: boolean){
+    activate(entityId: string, value: boolean) {
         this.pool.get(entityId).active = value;
     }
 }
