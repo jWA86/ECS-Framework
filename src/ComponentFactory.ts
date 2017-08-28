@@ -3,42 +3,37 @@ import { FastIterationMap } from "../lib/fastIterationMap/src/FastIterationMap";
 
 export { ComponentFactory, TogglableComponentFactory }
 
-class ComponentFactory<T extends IComponent> implements IComponentFactory<T> {
-    pool: FastIterationMap<string, T> = new FastIterationMap<string, T>();
-    constructor() { }
+class ComponentFactory<T extends IComponent> extends FastIterationMap<string, T> implements IComponentFactory<T> {
+    constructor() { super(); }
 
     createComponent(componentType: { new(entityId: string, ...args: any[]): T }, entityId: string, ...args: any[]): T {
         let t = new componentType(entityId, ...args);
-        this.pool.set(t.entityId, t);
+        this.set(t.entityId, t);
         return t;
     }
 
     createComponentAfter(componentType: { new(entityId: string, ...args: any[]): T }, entityId: string, afterEId: string, ...args: any[]): T {
         let t = new componentType(entityId, ...args);
-        this.pool.insertAfter(t.entityId, t, afterEId);
+        this.insertAfter(t.entityId, t, afterEId);
         return t;
     }
 
     createComponentBefore(componentType: { new(entityId: string, ...args: any[]): T }, entityId: string, beforeEId: string, ...args: any[]): T {
         let t = new componentType(entityId, ...args);
-        this.pool.insertBefore(t.entityId, t, beforeEId);
+        this.insertBefore(t.entityId, t, beforeEId);
         return t;
     }
 
     getComponent(entityId: string): T {
-        return this.pool.get(entityId);
+        return this.get(entityId);
     }
 
     removeComponent(entityId: string): boolean {
-        return this.pool.delete(entityId);
+        return this.delete(entityId);
     }
 
     removeAll() {
-        this.pool.clear();
-    }
-
-    get size() {
-        return this.pool.length;
+        this.clear();
     }
 }
 
@@ -47,6 +42,6 @@ class TogglableComponentFactory<T extends ITogglableComponent> extends Component
         super();
     }
     activate(entityId: string, value: boolean) {
-        this.pool.get(entityId).active = value;
+        this.get(entityId).active = value;
     }
 }

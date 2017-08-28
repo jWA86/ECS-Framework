@@ -18,9 +18,9 @@ var EasingSystem = (function () {
     }
     EasingSystem.prototype.process = function (factory, progress) {
         var l = factory.size;
-        var f = factory.pool.values;
-        for (var i = 0; i < l; ++i) {
-            var c = f[i];
+        var f = factory.values;
+        for (var i_1 = 0; i_1 < l; ++i_1) {
+            var c = f[i_1];
             //doesn't check if it's equal 0
             var length_1 = c.endValue - c.startValue;
             if (c.active) {
@@ -240,8 +240,8 @@ var InterpolationSystem = (function () {
         var l = factories.length;
         //iterate over all factories, supposed its in the same order as instanciated in the easingSystem
         var called = 0;
-        for (var i = 0; i < l; ++i) {
-            this.systems[i].process(factories[i], progress);
+        for (var i_2 = 0; i_2 < l; ++i_2) {
+            this.systems[i_2].process(factories[i_2], progress);
         }
     };
     return InterpolationSystem;

@@ -24,16 +24,16 @@ describe("Camera2DCulling Sytem", function () {
     //create x factories with y concreteComponent with same entityId in each factory
     function createConcreteFactoryWithComp(nbFactories, nbComp) {
         var factories = [];
-        for (var i = 0; i < nbFactories; ++i) {
+        for (var i_1 = 0; i_1 < nbFactories; ++i_1) {
             factories.push(new ComponentFactory_1.TogglableComponentFactory());
         }
-        var _loop_1 = function (i) {
+        var _loop_1 = function (i_2) {
             factories.forEach(function (f) {
-                f.createComponent(ConcreteComponent, "c" + i);
+                f.createComponent(ConcreteComponent, "c" + i_2);
             });
         };
-        for (var i = 0; i < nbComp; ++i) {
-            _loop_1(i);
+        for (var i_2 = 0; i_2 < nbComp; ++i_2) {
+            _loop_1(i_2);
         }
         return factories;
     }
@@ -61,12 +61,12 @@ describe("Camera2DCulling Sytem", function () {
         //in frustrum first, out after
         function createFactoryWithCircleComp(vecInFrustrum, vecOutFrustrum, nbInFrustrum, nbOutFrustrum) {
             var f = new ComponentFactory_1.ComponentFactory();
-            for (var i = 0; i < nbInFrustrum; ++i) {
-                f.createComponent(boundingVolume_1.BoundingCircleComponent, "c" + i, vecInFrustrum, 0);
+            for (var i_3 = 0; i_3 < nbInFrustrum; ++i_3) {
+                f.createComponent(boundingVolume_1.BoundingCircleComponent, "c" + i_3, vecInFrustrum, 0);
             }
             var l = nbInFrustrum + nbOutFrustrum;
-            for (var i = nbInFrustrum; i < l; ++i) {
-                f.createComponent(boundingVolume_1.BoundingCircleComponent, "c" + i, vecOutFrustrum, 0);
+            for (var i_4 = nbInFrustrum; i_4 < l; ++i_4) {
+                f.createComponent(boundingVolume_1.BoundingCircleComponent, "c" + i_4, vecOutFrustrum, 0);
             }
             return f;
         }
@@ -77,19 +77,19 @@ describe("Camera2DCulling Sytem", function () {
             var bV = createFactoryWithCircleComp(circleInside.topLeft, circleOutside.topLeft, 2, 2);
             // checking that the boundingVolume factory hold components with the same entityId as in the concreteFactories.
             cc.forEach(function (c) {
-                for (var i = 0; i < bV.size; ++i) {
-                    chai_1.expect(bV.pool.has(c.pool.values[i].entityId));
+                for (var i_5 = 0; i_5 < bV.size; ++i_5) {
+                    chai_1.expect(bV.has(c.values[i_5].entityId));
                     //checking that concreteComponents are actived
-                    chai_1.expect(c.pool.values[i].active).to.equal(true);
+                    chai_1.expect(c.values[i_5].active).to.equal(true);
                 }
             });
             var sys = new culling2DSystem_1.Camera2DCullingSystem(camera);
             sys.process(bV, cc);
             cc.forEach(function (c) {
-                for (var i = 0; i < bV.size; ++i) {
-                    var currentbV = bV.pool.values[i];
+                for (var i_6 = 0; i_6 < bV.size; ++i_6) {
+                    var currentbV = bV.values[i_6];
                     var r = sys.execute(currentbV);
-                    chai_1.expect(c.pool.get(currentbV.entityId).active).to.equal(r);
+                    chai_1.expect(c.get(currentbV.entityId).active).to.equal(r);
                 }
             });
         });
