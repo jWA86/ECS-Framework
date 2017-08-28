@@ -17,10 +17,10 @@ describe("Component Factory with entityID", function () {
     it("creating 2 components with the same entity Id should create only one component ", function () {
         var c = simpleFactory.createComponent(concreteComponent, "1");
         chai_1.expect(c.entityId).to.not.be.null;
-        chai_1.expect(simpleFactory.pool.values[0].entityId).to.equal(c.entityId);
+        chai_1.expect(simpleFactory.values[0].entityId).to.equal(c.entityId);
         var c2 = simpleFactory.createComponent(concreteComponent, "1");
         chai_1.expect(c2.entityId).to.equal(c.entityId);
-        chai_1.expect(simpleFactory.pool.values[0].entityId).to.equal(c.entityId);
+        chai_1.expect(simpleFactory.values[0].entityId).to.equal(c.entityId);
         chai_1.expect(simpleFactory.size).to.equal(1);
     });
     it("should be able to retrieve a component by entity id", function () {
@@ -36,45 +36,45 @@ describe("Component Factory with entityID", function () {
         var t = simpleFactory.createComponent(concreteComponent, "1");
         var t2 = simpleFactory.createComponent(concreteComponent, "2");
         var t3 = simpleFactory.createComponent(concreteComponent, "3");
-        chai_1.expect(simpleFactory.pool.values[0].entityId).to.equal(t.entityId);
-        chai_1.expect(simpleFactory.pool.values[1].entityId).to.equal(t2.entityId);
-        chai_1.expect(simpleFactory.pool.values[2].entityId).to.equal(t3.entityId);
+        chai_1.expect(simpleFactory.values[0].entityId).to.equal(t.entityId);
+        chai_1.expect(simpleFactory.values[1].entityId).to.equal(t2.entityId);
+        chai_1.expect(simpleFactory.values[2].entityId).to.equal(t3.entityId);
         //inserted t4 should be after t2"
         var t4 = simpleFactory.createComponentAfter(concreteComponent, "4", t2.entityId);
-        chai_1.expect(simpleFactory.pool.values[0].entityId).to.equal(t.entityId);
-        chai_1.expect(simpleFactory.pool.values[1].entityId).to.equal(t2.entityId);
-        chai_1.expect(simpleFactory.pool.values[2].entityId).to.equal(t4.entityId);
-        chai_1.expect(simpleFactory.pool.values[3].entityId).to.equal(t3.entityId);
+        chai_1.expect(simpleFactory.values[0].entityId).to.equal(t.entityId);
+        chai_1.expect(simpleFactory.values[1].entityId).to.equal(t2.entityId);
+        chai_1.expect(simpleFactory.values[2].entityId).to.equal(t4.entityId);
+        chai_1.expect(simpleFactory.values[3].entityId).to.equal(t3.entityId);
     });
     it("should be able to insert a component before another one in pool", function () {
         var t = simpleFactory.createComponent(concreteComponent, "1");
         var t2 = simpleFactory.createComponent(concreteComponent, "2");
         var t3 = simpleFactory.createComponent(concreteComponent, "3");
-        chai_1.expect(simpleFactory.pool.values[0].entityId).to.equal(t.entityId);
-        chai_1.expect(simpleFactory.pool.values[1].entityId).to.equal(t2.entityId);
-        chai_1.expect(simpleFactory.pool.values[2].entityId).to.equal(t3.entityId);
+        chai_1.expect(simpleFactory.values[0].entityId).to.equal(t.entityId);
+        chai_1.expect(simpleFactory.values[1].entityId).to.equal(t2.entityId);
+        chai_1.expect(simpleFactory.values[2].entityId).to.equal(t3.entityId);
         //inserted t4 should be before t2
         var t4 = simpleFactory.createComponentBefore(concreteComponent, "4", t2.entityId);
-        chai_1.expect(simpleFactory.pool.values[0].entityId).to.equal(t.entityId);
-        chai_1.expect(simpleFactory.pool.values[1].entityId).to.equal(t4.entityId);
-        chai_1.expect(simpleFactory.pool.values[2].entityId).to.equal(t2.entityId);
-        chai_1.expect(simpleFactory.pool.values[3].entityId).to.equal(t3.entityId);
+        chai_1.expect(simpleFactory.values[0].entityId).to.equal(t.entityId);
+        chai_1.expect(simpleFactory.values[1].entityId).to.equal(t4.entityId);
+        chai_1.expect(simpleFactory.values[2].entityId).to.equal(t2.entityId);
+        chai_1.expect(simpleFactory.values[3].entityId).to.equal(t3.entityId);
     });
     it("should be able to remove a component from the pool and keep the same order", function () {
         var t = simpleFactory.createComponent(concreteComponent, "1");
         var t2 = simpleFactory.createComponent(concreteComponent, "2");
         var t3 = simpleFactory.createComponent(concreteComponent, "3");
         chai_1.expect(simpleFactory.size).to.equal(3);
-        chai_1.expect(simpleFactory.pool.values[0].entityId).to.equal(t.entityId);
-        chai_1.expect(simpleFactory.pool.values[1].entityId).to.equal(t2.entityId);
-        chai_1.expect(simpleFactory.pool.values[2].entityId).to.equal(t3.entityId);
+        chai_1.expect(simpleFactory.values[0].entityId).to.equal(t.entityId);
+        chai_1.expect(simpleFactory.values[1].entityId).to.equal(t2.entityId);
+        chai_1.expect(simpleFactory.values[2].entityId).to.equal(t3.entityId);
         simpleFactory.removeComponent(t2.entityId);
         chai_1.expect(simpleFactory.size).to.equal(2);
-        chai_1.expect(simpleFactory.pool.values[0].entityId).to.equal(t.entityId);
-        chai_1.expect(simpleFactory.pool.values[1].entityId).to.equal(t3.entityId);
+        chai_1.expect(simpleFactory.values[0].entityId).to.equal(t.entityId);
+        chai_1.expect(simpleFactory.values[1].entityId).to.equal(t3.entityId);
         simpleFactory.removeComponent(t.entityId);
         chai_1.expect(simpleFactory.size).to.equal(1);
-        chai_1.expect(simpleFactory.pool.values[0].entityId).to.equal(t3.entityId);
+        chai_1.expect(simpleFactory.values[0].entityId).to.equal(t3.entityId);
         simpleFactory.removeComponent(t3.entityId);
         chai_1.expect(simpleFactory.size).to.equal(0);
     });

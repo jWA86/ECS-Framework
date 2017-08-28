@@ -31,10 +31,10 @@ var benchToggableInterpolableSys = (function () {
         var a = 0;
         var _loop_1 = function () {
             var rand = Math.floor(Math.random() * nbActive);
-            if (!this_1.factories[0].pool.values[rand].active) {
+            if (!this_1.factories[0].values[rand].active) {
                 a++;
                 this_1.factories.forEach(function (f) {
-                    f.pool.values[rand].active = true;
+                    f.values[rand].active = true;
                 });
             }
         };

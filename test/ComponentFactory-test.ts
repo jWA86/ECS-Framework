@@ -15,10 +15,10 @@ describe("Component Factory with entityID", () => {
     it("creating 2 components with the same entity Id should create only one component ", () => {
         let c = simpleFactory.createComponent(concreteComponent, "1");
         expect(c.entityId).to.not.be.null;
-        expect(simpleFactory.pool.values[0].entityId).to.equal(c.entityId);
+        expect(simpleFactory.values[0].entityId).to.equal(c.entityId);
         let c2 = simpleFactory.createComponent(concreteComponent, "1");
         expect(c2.entityId).to.equal(c.entityId);
-        expect(simpleFactory.pool.values[0].entityId).to.equal(c.entityId);
+        expect(simpleFactory.values[0].entityId).to.equal(c.entityId);
         expect(simpleFactory.size).to.equal(1);
     });
     it("should be able to retrieve a component by entity id", () => {
@@ -34,49 +34,49 @@ describe("Component Factory with entityID", () => {
         let t = simpleFactory.createComponent(concreteComponent, "1");
         let t2 = simpleFactory.createComponent(concreteComponent, "2");
         let t3 = simpleFactory.createComponent(concreteComponent, "3");
-        expect(simpleFactory.pool.values[0].entityId).to.equal(t.entityId);
-        expect(simpleFactory.pool.values[1].entityId).to.equal(t2.entityId);
-        expect(simpleFactory.pool.values[2].entityId).to.equal(t3.entityId);
+        expect(simpleFactory.values[0].entityId).to.equal(t.entityId);
+        expect(simpleFactory.values[1].entityId).to.equal(t2.entityId);
+        expect(simpleFactory.values[2].entityId).to.equal(t3.entityId);
 
         //inserted t4 should be after t2"
         let t4 = simpleFactory.createComponentAfter(concreteComponent, "4", t2.entityId);
-        expect(simpleFactory.pool.values[0].entityId).to.equal(t.entityId);
-        expect(simpleFactory.pool.values[1].entityId).to.equal(t2.entityId);
-        expect(simpleFactory.pool.values[2].entityId).to.equal(t4.entityId);
-        expect(simpleFactory.pool.values[3].entityId).to.equal(t3.entityId);
+        expect(simpleFactory.values[0].entityId).to.equal(t.entityId);
+        expect(simpleFactory.values[1].entityId).to.equal(t2.entityId);
+        expect(simpleFactory.values[2].entityId).to.equal(t4.entityId);
+        expect(simpleFactory.values[3].entityId).to.equal(t3.entityId);
     });
     it("should be able to insert a component before another one in pool", () => {
         let t = simpleFactory.createComponent(concreteComponent, "1");
         let t2 = simpleFactory.createComponent(concreteComponent, "2");
         let t3 = simpleFactory.createComponent(concreteComponent, "3");
-        expect(simpleFactory.pool.values[0].entityId).to.equal(t.entityId);
-        expect(simpleFactory.pool.values[1].entityId).to.equal(t2.entityId);
-        expect(simpleFactory.pool.values[2].entityId).to.equal(t3.entityId);
+        expect(simpleFactory.values[0].entityId).to.equal(t.entityId);
+        expect(simpleFactory.values[1].entityId).to.equal(t2.entityId);
+        expect(simpleFactory.values[2].entityId).to.equal(t3.entityId);
 
         //inserted t4 should be before t2
         let t4 = simpleFactory.createComponentBefore(concreteComponent, "4", t2.entityId);
-        expect(simpleFactory.pool.values[0].entityId).to.equal(t.entityId);
-        expect(simpleFactory.pool.values[1].entityId).to.equal(t4.entityId);
-        expect(simpleFactory.pool.values[2].entityId).to.equal(t2.entityId);
-        expect(simpleFactory.pool.values[3].entityId).to.equal(t3.entityId);
+        expect(simpleFactory.values[0].entityId).to.equal(t.entityId);
+        expect(simpleFactory.values[1].entityId).to.equal(t4.entityId);
+        expect(simpleFactory.values[2].entityId).to.equal(t2.entityId);
+        expect(simpleFactory.values[3].entityId).to.equal(t3.entityId);
     });
     it("should be able to remove a component from the pool and keep the same order", () => {
         let t = simpleFactory.createComponent(concreteComponent, "1");
         let t2 = simpleFactory.createComponent(concreteComponent, "2");
         let t3 = simpleFactory.createComponent(concreteComponent, "3");
         expect(simpleFactory.size).to.equal(3);
-        expect(simpleFactory.pool.values[0].entityId).to.equal(t.entityId);
-        expect(simpleFactory.pool.values[1].entityId).to.equal(t2.entityId);
-        expect(simpleFactory.pool.values[2].entityId).to.equal(t3.entityId);
+        expect(simpleFactory.values[0].entityId).to.equal(t.entityId);
+        expect(simpleFactory.values[1].entityId).to.equal(t2.entityId);
+        expect(simpleFactory.values[2].entityId).to.equal(t3.entityId);
 
         simpleFactory.removeComponent(t2.entityId);
         expect(simpleFactory.size).to.equal(2);
-        expect(simpleFactory.pool.values[0].entityId).to.equal(t.entityId);
-        expect(simpleFactory.pool.values[1].entityId).to.equal(t3.entityId);
+        expect(simpleFactory.values[0].entityId).to.equal(t.entityId);
+        expect(simpleFactory.values[1].entityId).to.equal(t3.entityId);
 
         simpleFactory.removeComponent(t.entityId);
         expect(simpleFactory.size).to.equal(1);
-        expect(simpleFactory.pool.values[0].entityId).to.equal(t3.entityId);
+        expect(simpleFactory.values[0].entityId).to.equal(t3.entityId);
 
         simpleFactory.removeComponent(t3.entityId);
         expect(simpleFactory.size).to.equal(0);

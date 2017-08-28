@@ -1,8 +1,8 @@
 import { IComponent, IComponentFactory, ITogglableComponent, ITogglableComponentFactory } from "../../../../src/interfaces"
 import { ISystem } from "../../../../src/System";
-import {IShape2D, IActivator, Rectangle, BoundingCircleComponent} from "../component/boundingVolume";
+import { IShape2D, IActivator, Rectangle, BoundingCircleComponent } from "../component/boundingVolume";
 
-export {CullingSystem, Camera2DCullingSystem } 
+export { CullingSystem, Camera2DCullingSystem }
 // System that take a view frustrum in entry and a collection of boundingVolume + a collection of factory
 // test collision between the view frustrum and the bounding volumes.
 // after collision checking :
@@ -19,7 +19,7 @@ abstract class CullingSystem<T extends IShape2D & IActivator & IComponent> imple
     process(factory: IComponentFactory<T>, siblingsFactories: ITogglableComponentFactory<ITogglableComponent>[]): any {
         let l = factory.size;
         for (let i = 0; i < l; ++i) {
-            factory.pool.values[i].toActive = this.execute(factory.pool.values[i]);
+            factory.values[i].toActive = this.execute(factory.values[i]);
         }
         this.activateSiblings(factory, siblingsFactories);
     }
@@ -27,46 +27,46 @@ abstract class CullingSystem<T extends IShape2D & IActivator & IComponent> imple
     // process(factory: IComponentFactory<T>, siblingsFactories: ITogglableComponentFactory<ITogglableComponent>[]): any {
     //     let l = factory.size;
     //     for (let i = 0; i < l; ++i) {
-    //         factory.pool.values[i].toActive = this.collide(factory.pool.values[i]);
-            
+    //         factory.values[i].toActive = this.collide(factory.values[i]);
+
     //         for(let j = 0; j <siblingsFactories.length; ++j){
-    //             siblingsFactories[j].activate(factory.pool.values[i].entityId, factory.pool.values[i].toActive);
+    //             siblingsFactories[j].activate(factory.values[i].entityId, factory.pool.values[i].toActive);
     //         }
     //     }
     //     // this.activateSiblings(factory, siblingsFactories);
     // }
 
-    activateSiblings(factory: IComponentFactory<T>,  siblingsFactories: ITogglableComponentFactory<ITogglableComponent>[]) {
+    activateSiblings(factory: IComponentFactory<T>, siblingsFactories: ITogglableComponentFactory<ITogglableComponent>[]) {
         // how to change siblings ?
         // at every collision detection activate siblings ?
         // process all collision detection, save result in boundingVolume (btw it should be renamed )
         // then iterate again the boundingVolumes with factories one by one to activate siblings
-        
-        this.activateFactByFact(factory,  siblingsFactories);
+
+        this.activateFactByFact(factory, siblingsFactories);
     }
 
     // boundVolumes.forEach -> factories.forEach -> f.activate(bv.Id, value) 
-    activateByiterationOfBV(f:IComponentFactory<T>,  siblingsFactories: ITogglableComponentFactory<ITogglableComponent>[]) {
+    activateByiterationOfBV(f: IComponentFactory<T>, siblingsFactories: ITogglableComponentFactory<ITogglableComponent>[]) {
         let l = f.size;
         let nbF = siblingsFactories.length;
-        for(let i = 0; i<l; ++i) {
-            let eId = f.pool.values[i].entityId;
-            let val = f.pool.values[i].toActive;
-            
-            for(let j = 0; j < nbF; ++j) {
+        for (let i = 0; i < l; ++i) {
+            let eId = f.values[i].entityId;
+            let val = f.values[i].toActive;
+
+            for (let j = 0; j < nbF; ++j) {
                 siblingsFactories[j].activate(eId, val);
             }
         }
     }
 
     // factories.forEach -> boundingVolume.forEach -> f.activate(bv.Id, value)
-    activateFactByFact(f:IComponentFactory<T>,  siblingsFactories: ITogglableComponentFactory<ITogglableComponent>[]) {
+    activateFactByFact(f: IComponentFactory<T>, siblingsFactories: ITogglableComponentFactory<ITogglableComponent>[]) {
         let l = siblingsFactories.length;
         let bvL = f.size;
-        for(let i = 0; i < l; ++i) {
-            for(let j = 0; j < bvL; ++j){
-                let val = f.pool.values[j].toActive;
-                let eId = f.pool.values[j].entityId;
+        for (let i = 0; i < l; ++i) {
+            for (let j = 0; j < bvL; ++j) {
+                let val = f.values[j].toActive;
+                let eId = f.values[j].entityId;
                 siblingsFactories[i].activate(eId, val);
             }
         }

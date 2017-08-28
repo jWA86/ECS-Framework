@@ -18,7 +18,7 @@ var EasingSystem = (function () {
     }
     EasingSystem.prototype.process = function (factory, progress) {
         var l = factory.size;
-        var f = factory.pool.values;
+        var f = factory.values;
         for (var i_1 = 0; i_1 < l; ++i_1) {
             var c = f[i_1];
             //doesn't check if it's equal 0

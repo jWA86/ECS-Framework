@@ -11,9 +11,10 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var FastIterationMap_1 = require("../lib/fastIterationMap/src/FastIterationMap");
-var ComponentFactory = (function () {
+var ComponentFactory = (function (_super) {
+    __extends(ComponentFactory, _super);
     function ComponentFactory() {
-        this.pool = new FastIterationMap_1.FastIterationMap();
+        return _super.call(this) || this;
     }
     ComponentFactory.prototype.createComponent = function (componentType, entityId) {
         var args = [];
@@ -21,7 +22,7 @@ var ComponentFactory = (function () {
             args[_i - 2] = arguments[_i];
         }
         var t = new (componentType.bind.apply(componentType, [void 0, entityId].concat(args)))();
-        this.pool.set(t.entityId, t);
+        this.set(t.entityId, t);
         return t;
     };
     ComponentFactory.prototype.createComponentAfter = function (componentType, entityId, afterEId) {
@@ -30,7 +31,7 @@ var ComponentFactory = (function () {
             args[_i - 3] = arguments[_i];
         }
         var t = new (componentType.bind.apply(componentType, [void 0, entityId].concat(args)))();
-        this.pool.insertAfter(t.entityId, t, afterEId);
+        this.insertAfter(t.entityId, t, afterEId);
         return t;
     };
     ComponentFactory.prototype.createComponentBefore = function (componentType, entityId, beforeEId) {
@@ -39,27 +40,20 @@ var ComponentFactory = (function () {
             args[_i - 3] = arguments[_i];
         }
         var t = new (componentType.bind.apply(componentType, [void 0, entityId].concat(args)))();
-        this.pool.insertBefore(t.entityId, t, beforeEId);
+        this.insertBefore(t.entityId, t, beforeEId);
         return t;
     };
     ComponentFactory.prototype.getComponent = function (entityId) {
-        return this.pool.get(entityId);
+        return this.get(entityId);
     };
     ComponentFactory.prototype.removeComponent = function (entityId) {
-        return this.pool.delete(entityId);
+        return this.delete(entityId);
     };
     ComponentFactory.prototype.removeAll = function () {
-        this.pool.clear();
+        this.clear();
     };
-    Object.defineProperty(ComponentFactory.prototype, "size", {
-        get: function () {
-            return this.pool.length;
-        },
-        enumerable: true,
-        configurable: true
-    });
     return ComponentFactory;
-}());
+}(FastIterationMap_1.FastIterationMap));
 exports.ComponentFactory = ComponentFactory;
 var TogglableComponentFactory = (function (_super) {
     __extends(TogglableComponentFactory, _super);
@@ -67,7 +61,7 @@ var TogglableComponentFactory = (function (_super) {
         return _super.call(this) || this;
     }
     TogglableComponentFactory.prototype.activate = function (entityId, value) {
-        this.pool.get(entityId).active = value;
+        this.get(entityId).active = value;
     };
     return TogglableComponentFactory;
 }(ComponentFactory));

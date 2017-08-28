@@ -25,16 +25,16 @@ var CullingSystem = (function () {
     CullingSystem.prototype.process = function (factory, siblingsFactories) {
         var l = factory.size;
         for (var i_1 = 0; i_1 < l; ++i_1) {
-            factory.pool.values[i_1].toActive = this.execute(factory.pool.values[i_1]);
+            factory.values[i_1].toActive = this.execute(factory.values[i_1]);
         }
         this.activateSiblings(factory, siblingsFactories);
     };
     // process(factory: IComponentFactory<T>, siblingsFactories: ITogglableComponentFactory<ITogglableComponent>[]): any {
     //     let l = factory.size;
     //     for (let i = 0; i < l; ++i) {
-    //         factory.pool.values[i].toActive = this.collide(factory.pool.values[i]);
+    //         factory.values[i].toActive = this.collide(factory.values[i]);
     //         for(let j = 0; j <siblingsFactories.length; ++j){
-    //             siblingsFactories[j].activate(factory.pool.values[i].entityId, factory.pool.values[i].toActive);
+    //             siblingsFactories[j].activate(factory.values[i].entityId, factory.pool.values[i].toActive);
     //         }
     //     }
     //     // this.activateSiblings(factory, siblingsFactories);
@@ -51,8 +51,8 @@ var CullingSystem = (function () {
         var l = f.size;
         var nbF = siblingsFactories.length;
         for (var i_2 = 0; i_2 < l; ++i_2) {
-            var eId = f.pool.values[i_2].entityId;
-            var val = f.pool.values[i_2].toActive;
+            var eId = f.values[i_2].entityId;
+            var val = f.values[i_2].toActive;
             for (var j = 0; j < nbF; ++j) {
                 siblingsFactories[j].activate(eId, val);
             }
@@ -64,8 +64,8 @@ var CullingSystem = (function () {
         var bvL = f.size;
         for (var i_3 = 0; i_3 < l; ++i_3) {
             for (var j = 0; j < bvL; ++j) {
-                var val = f.pool.values[j].toActive;
-                var eId = f.pool.values[j].entityId;
+                var val = f.values[j].toActive;
+                var eId = f.values[j].entityId;
                 siblingsFactories[i_3].activate(eId, val);
             }
         }

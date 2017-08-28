@@ -36,10 +36,10 @@ class benchToggableInterpolableSys implements m.IPerfTest {
         let a = 0;
         while (a < nbActive) {
             let rand = Math.floor(Math.random()*nbActive);
-            if(!this.factories[0].pool.values[rand].active){
+            if(!this.factories[0].values[rand].active){
                 a++;
                 this.factories.forEach((f)=>{
-                    f.pool.values[rand].active = true;
+                    f.values[rand].active = true;
                 });
             }
         }

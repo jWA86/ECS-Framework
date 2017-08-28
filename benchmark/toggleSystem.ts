@@ -1,5 +1,5 @@
 import * as m from "./utils/perfTestUtils";
-import { writeRes }from "./utils/nodeUtils";
+import { writeRes } from "./utils/nodeUtils";
 import { IComponent, IComponentFactory, ITogglableComponent, ITogglableComponentFactory } from "../src/interfaces";
 import { IShape2D, IActivator, Rectangle, BoundingCircleComponent } from "./lib/sampleImplementation/component/boundingVolume";
 import { Camera2DCullingSystem } from "./lib/sampleImplementation/system/culling2DSystem";
@@ -82,8 +82,8 @@ function createConcreteFactoryWithComp(nbFactories: number, nbComp: number): Tog
 }
 
 
-    test(2, 1);
-for(let i =0;i<100;++i) {
+test(2, 1);
+for (let i = 0; i < 100; ++i) {
     test(2, 1);
     test(2, 2);
     test(2, 5);
@@ -166,19 +166,19 @@ function test(nbComp: number, nbFactories: number) {
     console.timeEnd(label);
     siblings.forEach((c) => {
         for (let i = 0; i < t.boundingVFactory.size; ++i) {
-            let currentbV = t.boundingVFactory.pool.values[i];
+            let currentbV = t.boundingVFactory.values[i];
             let r = t.system.execute(currentbV);
-            if (c.pool.get(currentbV.entityId).active !== r) {
+            if (c.get(currentbV.entityId).active !== r) {
                 console.log("false");
             };
         }
     });
-    let lb2 = nbComp + " components activated per factories " + nbFactories+ " BVIteration";
+    let lb2 = nbComp + " components activated per factories " + nbFactories + " BVIteration";
     console.time(lb2);
     t.activateSiblingByBVIteration(t.boundingVFactory, siblings);
     console.timeEnd(lb2);
 
-    let lb3 = nbComp + " components activated per factories " + nbFactories+ " BVIteration";
+    let lb3 = nbComp + " components activated per factories " + nbFactories + " BVIteration";
     console.time(lb3);
     t.activateSiblingByFactIteration(t.boundingVFactory, siblings);
     console.timeEnd(lb3);

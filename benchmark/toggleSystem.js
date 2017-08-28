@@ -146,9 +146,9 @@ function test(nbComp, nbFactories) {
     console.timeEnd(label);
     siblings.forEach(function (c) {
         for (var i_6 = 0; i_6 < t.boundingVFactory.size; ++i_6) {
-            var currentbV = t.boundingVFactory.pool.values[i_6];
+            var currentbV = t.boundingVFactory.values[i_6];
             var r = t.system.execute(currentbV);
-            if (c.pool.get(currentbV.entityId).active !== r) {
+            if (c.get(currentbV.entityId).active !== r) {
                 console.log("false");
             }
             ;

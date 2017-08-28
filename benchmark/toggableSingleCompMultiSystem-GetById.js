@@ -32,7 +32,7 @@ var benchToggableInterpolableSys = (function () {
         var a = 0;
         var _loop_1 = function () {
             var rand = Math.floor(Math.random() * nbActive);
-            var id = this_1.factories[0].pool.values[rand].entityId;
+            var id = this_1.factories[0].values[rand].entityId;
             if (this_1.actives.indexOf(id) === -1) {
                 this_1.actives.push(id);
                 this_1.factories.forEach(function (f) {

@@ -78,18 +78,18 @@ describe("Camera2DCulling Sytem", function () {
             // checking that the boundingVolume factory hold components with the same entityId as in the concreteFactories.
             cc.forEach(function (c) {
                 for (var i_5 = 0; i_5 < bV.size; ++i_5) {
-                    chai_1.expect(bV.pool.has(c.pool.values[i_5].entityId));
+                    chai_1.expect(bV.has(c.values[i_5].entityId));
                     //checking that concreteComponents are actived
-                    chai_1.expect(c.pool.values[i_5].active).to.equal(true);
+                    chai_1.expect(c.values[i_5].active).to.equal(true);
                 }
             });
             var sys = new culling2DSystem_1.Camera2DCullingSystem(camera);
             sys.process(bV, cc);
             cc.forEach(function (c) {
                 for (var i_6 = 0; i_6 < bV.size; ++i_6) {
-                    var currentbV = bV.pool.values[i_6];
+                    var currentbV = bV.values[i_6];
                     var r = sys.execute(currentbV);
-                    chai_1.expect(c.pool.get(currentbV.entityId).active).to.equal(r);
+                    chai_1.expect(c.get(currentbV.entityId).active).to.equal(r);
                 }
             });
         });

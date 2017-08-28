@@ -79,9 +79,9 @@ describe("Camera2DCulling Sytem", () => {
             // checking that the boundingVolume factory hold components with the same entityId as in the concreteFactories.
             cc.forEach((c) => {
                 for (let i = 0; i < bV.size; ++i) {
-                    expect(bV.pool.has(c.pool.values[i].entityId));
+                    expect(bV.has(c.values[i].entityId));
                     //checking that concreteComponents are actived
-                    expect(c.pool.values[i].active).to.equal(true);
+                    expect(c.values[i].active).to.equal(true);
                 }
             });
 
@@ -89,9 +89,9 @@ describe("Camera2DCulling Sytem", () => {
             sys.process(bV, cc);
             cc.forEach((c) => {
                 for (let i = 0; i < bV.size; ++i) {
-                    let currentbV = bV.pool.values[i];
+                    let currentbV = bV.values[i];
                     let r = sys.execute(currentbV);
-                    expect(c.pool.get(currentbV.entityId).active).to.equal(r);
+                    expect(c.get(currentbV.entityId).active).to.equal(r);
                 }
             });
         });

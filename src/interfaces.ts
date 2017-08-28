@@ -9,13 +9,13 @@ interface ITogglableComponent extends IComponent {
 }
 
 interface IComponentFactory<T extends IComponent> {
-    pool;
     getComponent(entityId: string): T;
     createComponent(componentType: { new(entityId: string, ...args: any[]): T }, ...args: any[]): T;
     createComponentBefore(componentType: { new(entityId: string, ...args: any[]): T }, entityId: string, ...args: any[]): T;
     createComponentAfter(componentType: { new(entityId: string, ...args: any[]): T }, entityId: string, ...args: any[]): T;
     removeComponent(entityId: string): boolean;
     removeAll();
+    values:T[];
     size: number;
 }
 
