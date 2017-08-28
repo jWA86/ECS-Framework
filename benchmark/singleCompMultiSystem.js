@@ -15,15 +15,15 @@ var benchInterpolableSys = (function () {
     benchInterpolableSys.prototype.createFactories = function () {
         var r = [];
         var nbFact = this.system.systems.length;
-        for (var i = 0; i < nbFact; ++i) {
+        for (var i_1 = 0; i_1 < nbFact; ++i_1) {
             r.push(new ComponentFactory_1.ComponentFactory());
         }
         return r;
     };
     benchInterpolableSys.prototype.createComponents = function (n) {
         this.factories.forEach(function (f) {
-            for (var i = 0; i < n; ++i) {
-                f.createComponent(eC.InterpolableComponent, "c" + i);
+            for (var i_2 = 0; i_2 < n; ++i_2) {
+                f.createComponent(eC.InterpolableComponent, "c" + i_2);
             }
         });
     };

@@ -11,8 +11,8 @@ exports.hrToNanoSec = hrToNanoSec;
 function mean(ar) {
     var m = 0;
     var l = ar.length;
-    for (var i = 0; i < l; ++i) {
-        var t = hrToNanoSec(ar[i]);
+    for (var i_1 = 0; i_1 < l; ++i_1) {
+        var t = hrToNanoSec(ar[i_1]);
         m += t;
     }
     return m / l;
@@ -22,10 +22,10 @@ function max(ar) {
     var m = 0;
     var index = 0;
     var l = ar.length;
-    for (var i = 0; i < l; ++i) {
-        if (ar[i][1] > m) {
-            m = hrToNanoSec(ar[i]);
-            index = i;
+    for (var i_2 = 0; i_2 < l; ++i_2) {
+        if (ar[i_2][1] > m) {
+            m = hrToNanoSec(ar[i_2]);
+            index = i_2;
         }
     }
     return { "value": m, "index": index, "of": l };
@@ -35,10 +35,10 @@ function min(ar) {
     var m = Number.MAX_VALUE;
     var index = 0;
     var l = ar.length;
-    for (var i = 0; i < l; ++i) {
-        if (ar[i][1] < m) {
-            m = hrToNanoSec(ar[i]);
-            index = i;
+    for (var i_3 = 0; i_3 < l; ++i_3) {
+        if (ar[i_3][1] < m) {
+            m = hrToNanoSec(ar[i_3]);
+            index = i_3;
         }
     }
     return { "value": m, "index": index, "of": l };
@@ -47,8 +47,8 @@ exports.min = min;
 function variance(ar, m) {
     var v = 0;
     var l = ar.length;
-    for (var i = 0; i < l; ++i) {
-        v += Math.pow(hrToNanoSec(ar[i]) - m, 2);
+    for (var i_4 = 0; i_4 < l; ++i_4) {
+        v += Math.pow(hrToNanoSec(ar[i_4]) - m, 2);
     }
     return v / (l - 1);
 }

@@ -17,16 +17,16 @@ var benchToggableInterpolableSys = (function () {
     benchToggableInterpolableSys.prototype.createFactories = function () {
         var r = [];
         var nbFact = this.system.systems.length;
-        for (var i = 0; i < nbFact; ++i) {
+        for (var i_1 = 0; i_1 < nbFact; ++i_1) {
             r.push(new ComponentFactory_1.TogglableComponentFactory());
         }
         return r;
     };
     benchToggableInterpolableSys.prototype.createComponents = function (nbComponent, nbActive) {
         this.factories.forEach(function (f) {
-            for (var i = 0; i < nbComponent; ++i) {
-                f.createComponent(eC.InterpolableComponent, "c" + i);
-                f.activate("c" + i, true);
+            for (var i_2 = 0; i_2 < nbComponent; ++i_2) {
+                f.createComponent(eC.InterpolableComponent, "c" + i_2);
+                f.activate("c" + i_2, true);
             }
         });
         var a = 0;

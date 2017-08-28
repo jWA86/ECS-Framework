@@ -24,8 +24,8 @@ var CullingSystem = (function () {
     }
     CullingSystem.prototype.process = function (factory, siblingsFactories) {
         var l = factory.size;
-        for (var i = 0; i < l; ++i) {
-            factory.pool.values[i].toActive = this.execute(factory.pool.values[i]);
+        for (var i_1 = 0; i_1 < l; ++i_1) {
+            factory.pool.values[i_1].toActive = this.execute(factory.pool.values[i_1]);
         }
         this.activateSiblings(factory, siblingsFactories);
     };
@@ -50,9 +50,9 @@ var CullingSystem = (function () {
     CullingSystem.prototype.activateByiterationOfBV = function (f, siblingsFactories) {
         var l = f.size;
         var nbF = siblingsFactories.length;
-        for (var i = 0; i < l; ++i) {
-            var eId = f.pool.values[i].entityId;
-            var val = f.pool.values[i].toActive;
+        for (var i_2 = 0; i_2 < l; ++i_2) {
+            var eId = f.pool.values[i_2].entityId;
+            var val = f.pool.values[i_2].toActive;
             for (var j = 0; j < nbF; ++j) {
                 siblingsFactories[j].activate(eId, val);
             }
@@ -62,11 +62,11 @@ var CullingSystem = (function () {
     CullingSystem.prototype.activateFactByFact = function (f, siblingsFactories) {
         var l = siblingsFactories.length;
         var bvL = f.size;
-        for (var i = 0; i < l; ++i) {
+        for (var i_3 = 0; i_3 < l; ++i_3) {
             for (var j = 0; j < bvL; ++j) {
                 var val = f.pool.values[j].toActive;
                 var eId = f.pool.values[j].entityId;
-                siblingsFactories[i].activate(eId, val);
+                siblingsFactories[i_3].activate(eId, val);
             }
         }
     };

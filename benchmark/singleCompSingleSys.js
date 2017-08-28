@@ -16,8 +16,8 @@ var benchInterpolableSys = (function () {
         return new ComponentFactory_1.ComponentFactory();
     };
     benchInterpolableSys.prototype.createComponents = function (n) {
-        for (var i = 0; i < n; ++i) {
-            this.factory.createComponent(eC.InterpolableComponent, "c" + i);
+        for (var i_1 = 0; i_1 < n; ++i_1) {
+            this.factory.createComponent(eC.InterpolableComponent, "c" + i_1);
         }
     };
     benchInterpolableSys.prototype.process = function (progress) {
