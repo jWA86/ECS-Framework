@@ -1,6 +1,7 @@
 import { IComponent, ITogglableComponent } from "../../../../src/interfaces"
-
+import * as bezier from "../../../../node_modules/bezier-easing/dist/bezier-easing.js"
 export { PlaybackState, IFrameEvent, IKeyFrame, IKeyFrameController, KeyFrameControllerComponent  }
+export {bezier}
 
 enum PlaybackState {
     //first update flag to start
@@ -25,7 +26,7 @@ interface IFrameEvent {
 interface IKeyFrame {
     from: number;
     duration: number;
-    // easing:bezierEasing
+    easing:Easing;
 }
 
 interface IKeyFrameController {
@@ -44,7 +45,8 @@ class KeyFrameControllerComponent implements IKeyFrameController, IKeyFrame, ICo
     public timer: IFrameEvent = {'count':0, 'delta':0, 'loopCount':0, 'reverse': false, 'time':0};
     public cycling:boolean = false;
     public fadeLoop: boolean = false;
-    constructor(public entityId, public active, public from:number, public duration:number) {
-        duration < 1 ?this.duration = 1 : this.duration = duration;
+    constructor(public entityId, public active, public from:number, public duration:number, public easing:Easing = bezier(0.0, 0.0, 1.0, 1.0)) {
+        duration < 1 ? this.duration = 1 : this.duration = duration;
     }
 }
+

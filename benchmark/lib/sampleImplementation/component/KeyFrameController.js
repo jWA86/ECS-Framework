@@ -1,5 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var bezier = require("../../../../node_modules/bezier-easing/dist/bezier-easing.js");
+exports.bezier = bezier;
 var PlaybackState;
 (function (PlaybackState) {
     //first update flag to start
@@ -14,11 +16,13 @@ var PlaybackState;
 })(PlaybackState || (PlaybackState = {}));
 exports.PlaybackState = PlaybackState;
 var KeyFrameControllerComponent = (function () {
-    function KeyFrameControllerComponent(entityId, active, from, duration) {
+    function KeyFrameControllerComponent(entityId, active, from, duration, easing) {
+        if (easing === void 0) { easing = bezier(0.0, 0.0, 1.0, 1.0); }
         this.entityId = entityId;
         this.active = active;
         this.from = from;
         this.duration = duration;
+        this.easing = easing;
         this.nbLoop = 1;
         this.progress = 0;
         this.playState = PlaybackState.stopped;
