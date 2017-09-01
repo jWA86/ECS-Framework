@@ -15,11 +15,14 @@ interface IComponentFactory<T extends IComponent> {
     createComponentAfter(componentType: { new(entityId: string, ...args: any[]): T }, entityId: string, ...args: any[]): T;
     removeComponent(entityId: string): boolean;
     removeAll();
-    values:T[];
+    values:T[]; // use for iterate components in Systems
     size: number;
 }
 
 //Factory is used when we need to activate or desactivate component
 interface ITogglableComponentFactory<T extends ITogglableComponent> extends IComponentFactory<T> {
-    activate(entityId: string, value: boolean);
+    activateComponent(entityId: string, value: boolean);
+    activateAll(value:boolean);
+    nbActive:number;
+    nbInactive:number;
 }
