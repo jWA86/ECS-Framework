@@ -10,7 +10,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var FastIterationMap_1 = require("../lib/fastIterationMap/src/FastIterationMap");
+var FastIterationMap_1 = require("./../node_modules/fastiterationmap/src/FastIterationMap");
 var ComponentFactory = (function (_super) {
     __extends(ComponentFactory, _super);
     function ComponentFactory(_size, componentType) {
