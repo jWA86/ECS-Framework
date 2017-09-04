@@ -6,25 +6,25 @@ var ComponentFactory_1 = require("../src/ComponentFactory");
 var benchInterpolableSys = (function () {
     function benchInterpolableSys(nbComponents) {
         this.system = this.createSystem();
-        this.factory = this.createFactories();
+        this.factory = this.createFactories(nbComponents);
         this.createComponents(nbComponents);
     }
     benchInterpolableSys.prototype.createSystem = function () {
         return new eS.linearSys();
     };
-    benchInterpolableSys.prototype.createFactories = function () {
-        return new ComponentFactory_1.ComponentFactory();
+    benchInterpolableSys.prototype.createFactories = function (nbComponents) {
+        return new ComponentFactory_1.ComponentFactory(nbComponents, eC.InterpolableComponent, true);
     };
     benchInterpolableSys.prototype.createComponents = function (n) {
         for (var i_1 = 0; i_1 < n; ++i_1) {
-            this.factory.createComponent(eC.InterpolableComponent, "c" + i_1);
+            this.factory.create(eC.InterpolableComponent, "c" + i_1, true);
         }
     };
     benchInterpolableSys.prototype.process = function (progress) {
         this.system.process(this.factory, progress);
     };
     benchInterpolableSys.prototype.clear = function () {
-        this.factory.removeAll();
+        this.factory.clear();
     };
     return benchInterpolableSys;
 }());

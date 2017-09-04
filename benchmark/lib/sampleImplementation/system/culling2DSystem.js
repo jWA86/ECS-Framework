@@ -24,8 +24,9 @@ var CullingSystem = (function () {
     }
     CullingSystem.prototype.process = function (factory, siblingsFactories) {
         var l = factory.size;
+        var v = factory.values;
         for (var i_1 = 0; i_1 < l; ++i_1) {
-            factory.values[i_1].toActive = this.execute(factory.values[i_1]);
+            v[i_1].toActive = this.execute(v[i_1]);
         }
         this.activateSiblings(factory, siblingsFactories);
     };

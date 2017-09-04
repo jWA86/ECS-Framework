@@ -1,5 +1,5 @@
 import { IComponent, IComponentFactory } from "../../../../src/interfaces";
-import { TogglableComponentFactory as ComponentFactory } from "../../../../src/ComponentFactory";
+import { ComponentFactory as ComponentFactory } from "../../../../src/ComponentFactory";
 import { ISystem } from "../../../../src/System";
 import { IInterpolableComponent, InterpolableComponent, easingMethod } from "../component/easing";
 

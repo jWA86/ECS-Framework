@@ -13,51 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var FastIterationMap_1 = require("../lib/fastIterationMap/src/FastIterationMap");
 var ComponentFactory = (function (_super) {
     __extends(ComponentFactory, _super);
-    function ComponentFactory() {
-        return _super.call(this) || this;
-    }
-    ComponentFactory.prototype.createComponent = function (componentType, entityId) {
-        var args = [];
-        for (var _i = 2; _i < arguments.length; _i++) {
-            args[_i - 2] = arguments[_i];
-        }
-        var t = new (componentType.bind.apply(componentType, [void 0, entityId].concat(args)))();
-        this.set(t.entityId, t);
-        return t;
-    };
-    ComponentFactory.prototype.createComponentAfter = function (componentType, entityId, afterEId) {
-        var args = [];
-        for (var _i = 3; _i < arguments.length; _i++) {
-            args[_i - 3] = arguments[_i];
-        }
-        var t = new (componentType.bind.apply(componentType, [void 0, entityId].concat(args)))();
-        this.insertAfter(t.entityId, t, afterEId);
-        return t;
-    };
-    ComponentFactory.prototype.createComponentBefore = function (componentType, entityId, beforeEId) {
-        var args = [];
-        for (var _i = 3; _i < arguments.length; _i++) {
-            args[_i - 3] = arguments[_i];
-        }
-        var t = new (componentType.bind.apply(componentType, [void 0, entityId].concat(args)))();
-        this.insertBefore(t.entityId, t, beforeEId);
-        return t;
-    };
-    ComponentFactory.prototype.getComponent = function (entityId) {
-        return this.get(entityId);
-    };
-    ComponentFactory.prototype.removeComponent = function (entityId) {
-        return this.delete(entityId);
-    };
-    ComponentFactory.prototype.removeAll = function () {
-        this.clear();
-    };
-    return ComponentFactory;
-}(FastIterationMap_1.FastIterationMap));
-exports.ComponentFactory = ComponentFactory;
-var TogglableComponentFactory = (function (_super) {
-    __extends(TogglableComponentFactory, _super);
-    function TogglableComponentFactory(_size, componentType) {
+    function ComponentFactory(_size, componentType) {
         var args = [];
         for (var _i = 2; _i < arguments.length; _i++) {
             args[_i - 2] = arguments[_i];
@@ -74,7 +30,7 @@ var TogglableComponentFactory = (function (_super) {
         _this._zeroedRef = new (componentType.bind.apply(componentType, [void 0, "zeroedCompRef", false].concat(args)))();
         return _this;
     }
-    TogglableComponentFactory.prototype.activateComponent = function (entityId, value) {
+    ComponentFactory.prototype.activate = function (entityId, value) {
         var c = this.get(entityId);
         if (c.active !== value) {
             c.active = value;
@@ -88,7 +44,7 @@ var TogglableComponentFactory = (function (_super) {
             }
         }
     };
-    TogglableComponentFactory.prototype.activateAll = function (value) {
+    ComponentFactory.prototype.activateAll = function (value) {
         for (var i_2 = 0; i_2 < this.size; ++i_2) {
             this.values[i_2].active = value;
         }
@@ -101,7 +57,14 @@ var TogglableComponentFactory = (function (_super) {
             this._nbInactive = this._nbCreated;
         }
     };
-    TogglableComponentFactory.prototype.createComponent = function (componentType, entityId, active) {
+    ComponentFactory.prototype.clear = function () {
+        _super.prototype.clear.call(this);
+        this._nbActive = 0;
+        this._nbInactive = 0;
+        this._nbCreated = 0;
+        this._iterationLength = 0;
+    };
+    ComponentFactory.prototype.create = function (componentType, entityId, active) {
         var args = [];
         for (var _i = 3; _i < arguments.length; _i++) {
             args[_i - 3] = arguments[_i];
@@ -113,7 +76,7 @@ var TogglableComponentFactory = (function (_super) {
             // get the key and index of the first zeroed component in the values array
             index = this.getIndexOfFirstAvailableSpot();
             if (index === -1) {
-                throw new Error("no more space left in the pool");
+                throw new Error("no free slot available, please resize the pool");
             }
             else {
                 // add the key of our newly created component and 
@@ -151,7 +114,7 @@ var TogglableComponentFactory = (function (_super) {
         this.incrementCreatedLength(index);
         return this.values[index];
     };
-    TogglableComponentFactory.prototype.getIndexOfFirstAvailableSpot = function () {
+    ComponentFactory.prototype.getIndexOfFirstAvailableSpot = function () {
         var l = this._values.length;
         for (var i_3 = 0; i_3 < l; ++i_3) {
             if (this._values[i_3].entityId === '0') {
@@ -160,24 +123,24 @@ var TogglableComponentFactory = (function (_super) {
         }
         return -1;
     };
-    TogglableComponentFactory.prototype.mapObject = function (oldC, newC) {
+    ComponentFactory.prototype.mapObject = function (oldC, newC) {
         for (var i_4 in newC) {
             if (oldC.hasOwnProperty(i_4)) {
                 oldC[i_4] = newC[i_4];
             }
         }
     };
-    TogglableComponentFactory.prototype.incrementCreatedLength = function (inputIndex) {
+    ComponentFactory.prototype.incrementCreatedLength = function (inputIndex) {
         if (inputIndex >= this._iterationLength) {
             this._iterationLength += 1;
         }
     };
-    TogglableComponentFactory.prototype.decrementCreatedLength = function (inputIndex) {
+    ComponentFactory.prototype.decrementCreatedLength = function (inputIndex) {
         if (inputIndex >= this._iterationLength - 1) {
             this._iterationLength -= 1;
         }
     };
-    TogglableComponentFactory.prototype.removeComponent = function (entityId) {
+    ComponentFactory.prototype.delete = function (entityId) {
         var index = this._keys.get(entityId);
         if (index === undefined) {
             return false;
@@ -197,41 +160,75 @@ var TogglableComponentFactory = (function (_super) {
         this._nbCreated -= 1;
         return true;
     };
-    Object.defineProperty(TogglableComponentFactory.prototype, "iterationLength", {
+    ComponentFactory.prototype.resize = function (size) {
+        var _this = this;
+        var dif = size - this._size;
+        if (dif > 0) {
+            var _loop_1 = function (i_5) {
+                // parsing Date ?
+                var prop = JSON.parse(JSON.stringify(this_1._zeroedRef));
+                this_1._values.push(Object.create(this_1._zeroedRef));
+                Object.keys(this_1._zeroedRef).forEach(function (p) {
+                    _this._values[_this.size - 1][p] = prop[p];
+                });
+                this_1._values[this_1.size - 1].entityId = '0';
+            };
+            var this_1 = this;
+            for (var i_5 = 0; i_5 < dif; ++i_5) {
+                _loop_1(i_5);
+            }
+        }
+        else if (dif < 0) {
+            dif = Math.abs(dif);
+            for (var i_6 = 0; i_6 < dif; ++i_6) {
+                var toDelete = this._values[this.size - 1];
+                this._keys.delete(toDelete.entityId);
+                this._values.pop();
+            }
+        }
+    };
+    Object.defineProperty(ComponentFactory.prototype, "iterationLength", {
         get: function () {
             return this._iterationLength;
         },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(TogglableComponentFactory.prototype, "nbActive", {
+    Object.defineProperty(ComponentFactory.prototype, "nbActive", {
         get: function () {
             return this._nbActive;
         },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(TogglableComponentFactory.prototype, "nbInactive", {
+    Object.defineProperty(ComponentFactory.prototype, "nbInactive", {
         get: function () {
             return this._nbInactive;
         },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(TogglableComponentFactory.prototype, "nbCreated", {
+    Object.defineProperty(ComponentFactory.prototype, "nbCreated", {
         get: function () {
             return this._nbCreated;
         },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(TogglableComponentFactory.prototype, "nbFreeSlot", {
+    Object.defineProperty(ComponentFactory.prototype, "nbFreeSlot", {
         get: function () {
             return this._size - this._nbActive - this._nbInactive;
         },
         enumerable: true,
         configurable: true
     });
-    return TogglableComponentFactory;
-}(ComponentFactory));
-exports.TogglableComponentFactory = TogglableComponentFactory;
+    // overwrite fastIterationMap method we don't want to use
+    ComponentFactory.prototype.insertAfter = function (key, value, keyRef) {
+        return false;
+    };
+    ComponentFactory.prototype.insertBefore = function (key, value, keyRef) {
+        return false;
+    };
+    return ComponentFactory;
+}(FastIterationMap_1.FastIterationMap));
+exports.ComponentFactory = ComponentFactory;

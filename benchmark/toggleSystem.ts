@@ -1,9 +1,9 @@
 import * as m from "./utils/perfTestUtils";
 import { writeRes } from "./utils/nodeUtils";
-import { IComponent, IComponentFactory, ITogglableComponent, ITogglableComponentFactory } from "../src/interfaces";
+import { IComponent, IComponentFactory} from "../src/interfaces";
 import { IShape2D, IActivator, Rectangle, BoundingCircleComponent } from "./lib/sampleImplementation/component/boundingVolume";
 import { Camera2DCullingSystem } from "./lib/sampleImplementation/system/culling2DSystem";
-import { ComponentFactory, TogglableComponentFactory } from "../src/ComponentFactory";
+import { ComponentFactory } from "../src/ComponentFactory";
 import * as GLM from 'gl-matrix';
 
 function createVec2(x: number, y: number) {
@@ -11,7 +11,7 @@ function createVec2(x: number, y: number) {
     return GLM.vec2.set(v, x, y);
 }
 
-class ConcreteComponent implements ITogglableComponent {
+class ConcreteComponent implements IComponent {
     public active: boolean = true;
     constructor(public entityId: string) { }
 }
@@ -28,10 +28,10 @@ class benchToggleSystem implements m.IPerfTest {
         this.camera = new Rectangle(cameraPos, cameraSize);
         let circleIn = createVec2(6.0, 6.0);
         let circleOut = createVec2(1.0, 1.0);
-        this.circleInside = new BoundingCircleComponent("c1", circleIn, 2.0);
-        this.circleOutside = new BoundingCircleComponent("c2", circleOut, 1.0);
+        this.circleInside = new BoundingCircleComponent("c1", true, circleIn, 2.0);
+        this.circleOutside = new BoundingCircleComponent("c2", true, circleOut, 1.0);
         this.system = this.createSystem();
-        this.boundingVFactory = this.createFactories();
+        this.boundingVFactory = this.createFactories(nbCompInsideFrustrum+nbCompOutsideFrustrum);
         this.createComponents(this.circleInside.topLeft, this.circleOutside.topLeft, nbCompInsideFrustrum, nbCompOutsideFrustrum);
     }
 
@@ -39,43 +39,43 @@ class benchToggleSystem implements m.IPerfTest {
         return new Camera2DCullingSystem<Rectangle, BoundingCircleComponent>(this.camera);
     }
 
-    createFactories() {
-        return new ComponentFactory<BoundingCircleComponent>();
+    createFactories(nbComp) {
+        return new ComponentFactory<BoundingCircleComponent>(nbComp, BoundingCircleComponent);
     }
 
     createComponents(vecInFrustrum: GLM.vec2, vecOutFrustrum: GLM.vec2, nbInFrustrum: number, nbOutFrustrum: number) {
         for (let i = 0; i < nbInFrustrum; ++i) {
-            this.boundingVFactory.createComponent(BoundingCircleComponent, "c" + i, vecInFrustrum, 0);
+            this.boundingVFactory.create(BoundingCircleComponent, "c" + i, true, vecInFrustrum, 0);
         }
         let l = nbInFrustrum + nbOutFrustrum;
         for (let i = nbInFrustrum; i < l; ++i) {
-            this.boundingVFactory.createComponent(BoundingCircleComponent, "c" + i, vecOutFrustrum, 0);
+            this.boundingVFactory.create(BoundingCircleComponent, "c" + i, true, vecOutFrustrum, 0);
         }
     }
 
-    process(siblingsFactories: TogglableComponentFactory<ConcreteComponent>[]) {
+    process(siblingsFactories: ComponentFactory<ConcreteComponent>[]) {
         this.system.process(this.boundingVFactory, siblingsFactories);
     }
 
-    activateSiblingByBVIteration(f: ComponentFactory<BoundingCircleComponent>, siblingsFactories: TogglableComponentFactory<ConcreteComponent>[]) {
+    activateSiblingByBVIteration(f: ComponentFactory<BoundingCircleComponent>, siblingsFactories: ComponentFactory<ConcreteComponent>[]) {
         this.system.activateByiterationOfBV(f, siblingsFactories);
     }
-    activateSiblingByFactIteration(f: ComponentFactory<BoundingCircleComponent>, siblingsFactories: TogglableComponentFactory<ConcreteComponent>[]) {
+    activateSiblingByFactIteration(f: ComponentFactory<BoundingCircleComponent>, siblingsFactories: ComponentFactory<ConcreteComponent>[]) {
         this.system.activateFactByFact(f, siblingsFactories);
     }
     clear() {
-        this.boundingVFactory.removeAll();
+        this.boundingVFactory.clear();
     }
 }
 
-function createConcreteFactoryWithComp(nbFactories: number, nbComp: number): TogglableComponentFactory<ConcreteComponent>[] {
-    let factories: TogglableComponentFactory<ConcreteComponent>[] = [];
+function createConcreteFactoryWithComp(nbFactories: number, nbComp: number): ComponentFactory<ConcreteComponent>[] {
+    let factories: ComponentFactory<ConcreteComponent>[] = [];
     for (let i = 0; i < nbFactories; ++i) {
-        factories.push(new TogglableComponentFactory<ConcreteComponent>());
+        factories.push(new ComponentFactory<ConcreteComponent>(nbComp, ConcreteComponent));
     }
     for (let i = 0; i < nbComp; ++i) {
         factories.forEach((f) => {
-            f.createComponent(ConcreteComponent, "c" + i);
+            f.create(ConcreteComponent, "c" + i, true);
         });
     }
     return factories;

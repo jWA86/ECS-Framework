@@ -1,4 +1,4 @@
-import { IComponent, ITogglableComponent } from "../../../../src/interfaces"
+import { IComponent } from "../../../../src/interfaces"
 import * as bezier from "../../../../node_modules/bezier-easing/dist/bezier-easing.js"
 export { PlaybackState, IFrameEvent, IKeyFrame, IKeyFrameController, KeyFrameControllerComponent  }
 export {bezier}
@@ -38,7 +38,7 @@ interface IKeyFrameController {
     nbLoop: number; // 0 = infinit 
 }
 
-class KeyFrameControllerComponent implements IKeyFrameController, IKeyFrame, IComponent, ITogglableComponent {
+class KeyFrameControllerComponent implements IKeyFrameController, IKeyFrame, IComponent {
     public nbLoop:number = 1;
     public progress:number = 0;
     public playState: PlaybackState = PlaybackState.stopped;

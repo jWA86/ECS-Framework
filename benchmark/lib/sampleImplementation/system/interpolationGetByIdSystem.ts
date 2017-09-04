@@ -1,5 +1,5 @@
 import { IComponent, IComponentFactory } from "../../../../src/interfaces";
-import { TogglableComponentFactory as ComponentFactory } from "../../../../src/ComponentFactory";
+import { ComponentFactory as ComponentFactory } from "../../../../src/ComponentFactory";
 import { ISystem } from "../../../../src/System";
 import { IInterpolableComponent, InterpolableComponent, easingMethod } from "../component/easing";
 
@@ -20,7 +20,7 @@ abstract class EasingSystem implements IEasingSystem {
     process(factory: ComponentFactory<InterpolableComponent >, ids:string[], progress: number) {
         let l = ids.length;
         for(let i = 0; i < l; ++i) {
-            let c = factory.getComponent(ids[i]);
+            let c = factory.get(ids[i]);
             let length = c.endValue - c.startValue;
             let nt = progress / length;
             c.currentValue = this.execute(nt);

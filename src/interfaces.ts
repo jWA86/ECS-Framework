@@ -1,28 +1,29 @@
-export { IComponent, ITogglableComponent, IComponentFactory, ITogglableComponentFactory}
+export { IComponent, IComponentFactory }
 
 interface IComponent {
     entityId: string;
-}
-
-interface ITogglableComponent extends IComponent {
     active: boolean;
 }
 
-interface IComponentFactory<T extends IComponent> {
-    getComponent(entityId: string): T;
-    createComponent(componentType: { new(entityId: string, ...args: any[]): T }, ...args: any[]): T;
-    createComponentBefore(componentType: { new(entityId: string, ...args: any[]): T }, entityId: string, ...args: any[]): T;
-    createComponentAfter(componentType: { new(entityId: string, ...args: any[]): T }, entityId: string, ...args: any[]): T;
-    removeComponent(entityId: string): boolean;
-    removeAll();
-    values:T[]; // use for iterate components in Systems
-    size: number;
-}
 
-//Factory is used when we need to activate or desactivate component
-interface ITogglableComponentFactory<T extends ITogglableComponent> extends IComponentFactory<T> {
-    activateComponent(entityId: string, value: boolean);
-    activateAll(value:boolean);
-    nbActive:number;
-    nbInactive:number;
+interface IComponentFactory<T extends IComponent> {
+    activate(entityId: string, value: boolean); // set the ative proprety of a component
+    activateAll(value:boolean); // set the active proprety of all component in the pool
+    clear(); // empty the pool from zeroed and created components 
+    create(componentType: { new(entityId: string, ...args: any[]): T }, ...args: any[]): T; // create a component with the provided values
+    delete(entityId: string): boolean; // delete a component by its id if it's in the pool 
+    get(entityId: string): T; // get a component by its id 
+    has(entityId: string): boolean; // does the pool contain a component with this id 
+    iterationLength: number // return the length to iterate created components and avoid iterate maximum number of zeored components
+    keys: Map<string, number>; // return keys of all created components and their index in the values array
+    length: number; // same as size
+    nbActive:number; // nb of created active components
+    nbCreated: number; // nb actives and inactives created components
+    nbFreeSlot: number; // nb of zeroed components ( free slot for creating components)
+    nbInactive:number; // nb of created inactive components
+    push(key: string, value: T); // add components but instanciated outside the pool (should probably not be used)
+    resize(size: number); // resize the pool, either add zeroed components or delete last components (created or zeroed indistinctly)
+    set(key: string, value: T); // same as push
+    size: number; // return the size of the pool
+    values:T[]; // hold components, use for iteration in Systems. 
 }

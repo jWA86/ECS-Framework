@@ -1,4 +1,4 @@
-import { IComponent, IComponentFactory, ITogglableComponent, ITogglableComponentFactory } from "../../../../src/interfaces"
+import { IComponent, IComponentFactory } from "../../../../src/interfaces"
 import { ISystem } from "../../../../src/System";
 import { ComponentFactory } from "../../../../src/ComponentFactory";
 import * as GLM from 'gl-matrix';
@@ -19,17 +19,17 @@ interface IActivator {
 
 
 class CircleComponent implements IShape2D, IComponent {
-    constructor(public entityId: string,
+    constructor(public entityId: string,  public active:boolean, 
         public topLeft: GLM.vec2,
         public radius: number) { }
 }
 
 class BoundingCircleComponent extends CircleComponent implements IShape2D, IActivator, IComponent {
-    constructor(public entityId: string,
+    constructor(public entityId: string, public active = true, 
         public topLeft: GLM.vec2,
         public radius: number,
      public toActive: boolean = false) {
-         super(entityId, topLeft, radius);
+         super(entityId, active, topLeft, radius);
       }
 }
 

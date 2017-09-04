@@ -11,26 +11,26 @@ class benchToggableInterpolableSys implements m.IPerfTest {
     factories: ComponentFactory<eC.InterpolableComponent>[];
     constructor(nbComponents: number, nbActive: number) {
         this.system = this.createSystem();
-        this.factories = this.createFactories();
+        this.factories = this.createFactories(nbComponents);
         this.createComponents(nbComponents, nbActive);
     }
 
     createSystem() {
         return new eS.InterpolationSystem();
     }
-    createFactories() {
+    createFactories(nbComponents) {
         let r = [];
         let nbFact = this.system.systems.length;
         for (let i = 0; i < nbFact; ++i) {
-            r.push(new ComponentFactory<eC.InterpolableComponent>());
+            r.push(new ComponentFactory<eC.InterpolableComponent>(nbComponents, eC.InterpolableComponent, true));
         }
         return r;
     }
     createComponents(nbComponent: number, nbActive: number) {
         this.factories.forEach((f) => {
             for (let i = 0; i < nbComponent; ++i) {
-                f.createComponent(eC.InterpolableComponent, "c"+i);
-                f.getComponent("c"+i).active = false;
+                f.create(eC.InterpolableComponent, "c"+i, true);
+                f.get("c"+i).active = false;
             }
         });
         let a = 0;
@@ -50,7 +50,7 @@ class benchToggableInterpolableSys implements m.IPerfTest {
     }
     clear() {
         this.factories.forEach((f) => {
-            f.removeAll();
+            f.clear();
         });
         this.factories = [];
     }

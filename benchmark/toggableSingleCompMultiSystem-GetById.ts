@@ -31,7 +31,7 @@ class benchToggableInterpolableSys implements m.IPerfTest {
         this.factories.forEach((f) => {
             for (let i = 0; i < nbComponent; ++i) {
                 f.createComponent(eC.InterpolableComponent, "c"+i);
-                f.activate("c"+i, true);
+                f.activateComponent("c"+i, true);
             }
         });
         let a = 0;
@@ -41,7 +41,7 @@ class benchToggableInterpolableSys implements m.IPerfTest {
             if(this.actives.indexOf(id) === -1) {
                 this.actives.push(id);
                 this.factories.forEach((f) => {
-                    f.activate(id, true);                    
+                    f.activateComponent(id, true);                    
                 });
                 a++;
             }

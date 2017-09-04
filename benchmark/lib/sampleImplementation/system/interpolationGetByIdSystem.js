@@ -19,9 +19,9 @@ var EasingSystem = (function () {
     EasingSystem.prototype.process = function (factory, ids, progress) {
         var l = ids.length;
         for (var i_1 = 0; i_1 < l; ++i_1) {
-            var c = factory.getComponent(ids[i_1]);
-            var length_1 = c.endValue - c.startValue;
-            var nt = progress / length_1;
+            var c = factory.get(ids[i_1]);
+            var length = c.endValue - c.startValue;
+            var nt = progress / length;
             c.currentValue = this.execute(nt);
         }
     };

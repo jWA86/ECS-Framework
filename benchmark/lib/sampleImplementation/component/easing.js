@@ -18,14 +18,14 @@ var easingMethod;
 })(easingMethod || (easingMethod = {}));
 exports.easingMethod = easingMethod;
 var InterpolableComponent = (function () {
-    function InterpolableComponent(entityId, startValue, endValue, active) {
+    function InterpolableComponent(entityId, active, startValue, endValue) {
+        if (active === void 0) { active = true; }
         if (startValue === void 0) { startValue = 0; }
         if (endValue === void 0) { endValue = 1; }
-        if (active === void 0) { active = true; }
         this.entityId = entityId;
+        this.active = active;
         this.startValue = startValue;
         this.endValue = endValue;
-        this.active = active;
         this.currentValue = this.startValue;
     }
     return InterpolableComponent;

@@ -1,43 +1,10 @@
-import { IComponent, IComponentFactory, ITogglableComponent, ITogglableComponentFactory } from "./interfaces";
+import { IComponent, IComponentFactory } from "./interfaces";
 import { FastIterationMap } from "../lib/fastIterationMap/src/FastIterationMap";
 
-export { ComponentFactory, TogglableComponentFactory }
+export { ComponentFactory}
 
-class ComponentFactory<T extends IComponent> extends FastIterationMap<string, T> implements IComponentFactory<T> {
-    constructor() { super(); }
 
-    createComponent(componentType: { new(entityId: string, ...args: any[]): T }, entityId: string, ...args: any[]): T {
-        let t = new componentType(entityId, ...args);
-        this.set(t.entityId, t);
-        return t;
-    }
-
-    createComponentAfter(componentType: { new(entityId: string, ...args: any[]): T }, entityId: string, afterEId: string, ...args: any[]): T {
-        let t = new componentType(entityId, ...args);
-        this.insertAfter(t.entityId, t, afterEId);
-        return t;
-    }
-
-    createComponentBefore(componentType: { new(entityId: string, ...args: any[]): T }, entityId: string, beforeEId: string, ...args: any[]): T {
-        let t = new componentType(entityId, ...args);
-        this.insertBefore(t.entityId, t, beforeEId);
-        return t;
-    }
-
-    getComponent(entityId: string): T {
-        return this.get(entityId);
-    }
-
-    removeComponent(entityId: string): boolean {
-        return this.delete(entityId);
-    }
-
-    removeAll() {
-        this.clear();
-    }
-}
-
-class TogglableComponentFactory<T extends ITogglableComponent> extends ComponentFactory<T> implements ITogglableComponentFactory<T> {
+class ComponentFactory<T extends IComponent>  extends FastIterationMap<string, T> implements IComponentFactory<T> {
     protected _iterationLength: number = 0; // use by the system for iteration, avoid iterate over zeroed components
     protected _zeroedRef: T;
     protected _nbActive: number = 0;
@@ -53,7 +20,7 @@ class TogglableComponentFactory<T extends ITogglableComponent> extends Component
      
     }
 
-    activateComponent(entityId: string, value: boolean) {
+    activate(entityId: string, value: boolean) {
         let c = this.get(entityId);
         if (c.active !== value) {
             c.active = value;
@@ -81,7 +48,15 @@ class TogglableComponentFactory<T extends ITogglableComponent> extends Component
         }
     }
 
-    createComponent(componentType: { new(entityId: string, active: boolean, ...args: any[]): T }, entityId: string, active: boolean, ...args: any[]): T {
+    clear():void {
+        super.clear();
+        this._nbActive = 0;
+        this._nbInactive = 0;
+        this._nbCreated = 0;
+        this._iterationLength = 0;
+    }
+
+    create(componentType: { new(entityId: string, active: boolean, ...args: any[]): T }, entityId: string, active: boolean, ...args: any[]): T {
         let index:number;
         let toReplaceComp:T;
         // if the key doesn't exist yet 
@@ -89,7 +64,7 @@ class TogglableComponentFactory<T extends ITogglableComponent> extends Component
             // get the key and index of the first zeroed component in the values array
             index = this.getIndexOfFirstAvailableSpot();
             if(index === -1) {
-                throw new Error("no more space left in the pool");
+                throw new Error("no free slot available, please resize the pool");
             } else {
                 // add the key of our newly created component and 
                 this._keys.set(entityId, index);
@@ -157,7 +132,7 @@ class TogglableComponentFactory<T extends ITogglableComponent> extends Component
         }
     }
 
-    removeComponent(entityId:string): boolean {
+    delete(entityId:string): boolean {
         let index = this._keys.get(entityId);
         if(index === undefined) { return false; }
         // update nbActive/Inactive counter
@@ -177,6 +152,33 @@ class TogglableComponentFactory<T extends ITogglableComponent> extends Component
         this._nbCreated -= 1;
         
         return true;
+    }
+
+ 
+
+    resize(size: number) {
+        let dif = size - this._size;
+        if(dif > 0) {
+            for(let i = 0; i < dif; ++i) {
+                // parsing Date ?
+                let prop = JSON.parse(JSON.stringify(this._zeroedRef));
+                
+                this._values.push(Object.create(this._zeroedRef));
+                Object.keys(this._zeroedRef).forEach((p) => {
+                    this._values[this.size - 1][p] = prop[p];
+                });
+                this._values[this.size - 1].entityId = '0';
+                
+            }
+        }
+        else if(dif < 0) {
+            dif = Math.abs(dif);
+            for(let i = 0; i < dif; ++i) {
+                let toDelete = this._values[this.size - 1];
+                this._keys.delete(toDelete.entityId);
+                this._values.pop();
+            }
+        }
     }
 
     get iterationLength(): number {
@@ -199,11 +201,11 @@ class TogglableComponentFactory<T extends ITogglableComponent> extends Component
         return this._size - this._nbActive - this._nbInactive;
     }
 
-    // get size() {
-
-    // }
-
-    // get length() {
-
-    // }
+    // overwrite fastIterationMap method we don't want to use
+    insertAfter(key: string, value: T, keyRef: string): boolean {
+        return false;
+    }
+    insertBefore(key: string, value: T, keyRef: string): boolean {
+        return false;
+    }
 }

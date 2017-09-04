@@ -22,16 +22,16 @@ describe("KeyFrameController", function () {
     var c;
     beforeEach(function () {
         system = new KeyFrameSystem_1.KeyFrameSystem();
-        factory = new ComponentFactory_1.ComponentFactory();
-        c = factory.createComponent(KeyFrameController_1.KeyFrameControllerComponent, "c1", true, 10, 10);
+        factory = new ComponentFactory_1.ComponentFactory(10, KeyFrameController_1.KeyFrameControllerComponent, '0', false, 0, 10);
+        c = factory.create(KeyFrameController_1.KeyFrameControllerComponent, "c1", true, 10, 10);
     });
     describe("playstate", function () {
         it("instanciated KeyFrameControllerComponent should have it state set to stopped", function () {
             chai_1.expect(c.from + c.duration).to.equal(20);
-            chai_1.expect(factory.getComponent("c1").playState).to.equal(KeyFrameController_1.PlaybackState.stopped);
+            chai_1.expect(factory.get("c1").playState).to.equal(KeyFrameController_1.PlaybackState.stopped);
         });
         it("duration should be at least 1", function () {
-            c = factory.createComponent(KeyFrameController_1.KeyFrameControllerComponent, "c1", true, 10, 0);
+            c = factory.create(KeyFrameController_1.KeyFrameControllerComponent, "c1", true, 10, 0);
             chai_1.expect(c.duration).to.equal(1);
         });
         it("set playstate to started when timeRef >= from and <= from+duration", function () {
@@ -40,11 +40,11 @@ describe("KeyFrameController", function () {
             incrementFrameEvent(e);
             chai_1.expect(e.time).to.equal(1);
             system.process(factory, e);
-            chai_1.expect(factory.getComponent("c1").playState).to.equal(KeyFrameController_1.PlaybackState.stopped);
+            chai_1.expect(factory.get("c1").playState).to.equal(KeyFrameController_1.PlaybackState.stopped);
             incrementFrameEvent(e, 9);
             chai_1.expect(e.time).to.equal(10);
             system.process(factory, e);
-            chai_1.expect(factory.getComponent("c1").playState).to.equal(KeyFrameController_1.PlaybackState.started);
+            chai_1.expect(factory.get("c1").playState).to.equal(KeyFrameController_1.PlaybackState.started);
         });
         it("set playstate to playing when timeRef >= from and <= from+duration and it was already set to started", function () {
             chai_1.expect(c.from + c.duration).to.equal(20);
@@ -52,11 +52,11 @@ describe("KeyFrameController", function () {
             incrementFrameEvent(e, 11);
             chai_1.expect(e.time).to.equal(11);
             system.process(factory, e);
-            chai_1.expect(factory.getComponent("c1").playState).to.equal(KeyFrameController_1.PlaybackState.started);
+            chai_1.expect(factory.get("c1").playState).to.equal(KeyFrameController_1.PlaybackState.started);
             incrementFrameEvent(e);
             chai_1.expect(e.time).to.equal(12);
             system.process(factory, e);
-            chai_1.expect(factory.getComponent("c1").playState).to.equal(KeyFrameController_1.PlaybackState.playing);
+            chai_1.expect(factory.get("c1").playState).to.equal(KeyFrameController_1.PlaybackState.playing);
         });
         it("set playstate to ended when timeRef >= from and > from+duration and it was set as playing", function () {
             chai_1.expect(c.from + c.duration).to.equal(20);
@@ -72,7 +72,7 @@ describe("KeyFrameController", function () {
             incrementFrameEvent(e, 9);
             chai_1.expect(e.time).to.equal(21);
             system.process(factory, e);
-            chai_1.expect(factory.getComponent("c1").playState).to.equal(KeyFrameController_1.PlaybackState.ended);
+            chai_1.expect(factory.get("c1").playState).to.equal(KeyFrameController_1.PlaybackState.ended);
         });
         it("set playstate to stopped if state was set on ended", function () {
             chai_1.expect(c.from + c.duration).to.equal(20);
@@ -92,7 +92,7 @@ describe("KeyFrameController", function () {
             incrementFrameEvent(e);
             chai_1.expect(e.time).to.equal(22);
             system.process(factory, e);
-            chai_1.expect(factory.getComponent("c1").playState).to.equal(KeyFrameController_1.PlaybackState.stopped);
+            chai_1.expect(factory.get("c1").playState).to.equal(KeyFrameController_1.PlaybackState.stopped);
         });
     });
     describe("timer ", function () {
@@ -327,7 +327,7 @@ describe("KeyFrameController", function () {
             it("should set playsate to ended when all loop completed then stopped", function () {
                 var from = 1000; //1000ms
                 var duration = 1000; // 1 seconde
-                c = factory.createComponent(KeyFrameController_1.KeyFrameControllerComponent, "c1", true, from, duration);
+                c = factory.create(KeyFrameController_1.KeyFrameControllerComponent, "c1", true, from, duration);
                 c.cycling = true;
                 c.nbLoop = 3;
                 var e = { delta: 0, time: 0, count: 0, loopCount: 0, reverse: false };

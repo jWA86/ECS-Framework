@@ -8,26 +8,26 @@ class benchInterpolableSys implements m.IPerfTest {
     factory:ComponentFactory<eC.InterpolableComponent>;
     constructor(nbComponents:number){
         this.system = this.createSystem();
-        this.factory = this.createFactories();
+        this.factory = this.createFactories(nbComponents);
         this.createComponents(nbComponents);
     }
     
     createSystem(){
         return new eS.linearSys();
     }
-    createFactories(){
-        return new ComponentFactory<eC.InterpolableComponent>();
+    createFactories(nbComponents){
+        return new ComponentFactory<eC.InterpolableComponent>(nbComponents, eC.InterpolableComponent, true);
     }
     createComponents(n:number) {
             for(let i = 0;i<n;++i){
-                this.factory.createComponent(eC.InterpolableComponent, "c"+i);                
+                this.factory.create(eC.InterpolableComponent, "c"+i, true);                
             }
     }
     process(progress:number) {
         this.system.process(this.factory, progress);
     }
     clear(){
-        this.factory.removeAll();
+        this.factory.clear();
     }
 }
 

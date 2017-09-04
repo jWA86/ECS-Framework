@@ -1,4 +1,4 @@
-import { IComponent, IComponentFactory, ITogglableComponent, ITogglableComponentFactory } from "../../../../src/interfaces"
+import { IComponent, IComponentFactory } from "../../../../src/interfaces"
 import { ISystem } from "../../../../src/System";
 import { IShape2D, IActivator, Rectangle, BoundingCircleComponent } from "../component/boundingVolume";
 
@@ -16,10 +16,11 @@ export { CullingSystem, Camera2DCullingSystem }
 abstract class CullingSystem<T extends IShape2D & IActivator & IComponent> implements ISystem {
     constructor(public refShape: IShape2D) {
     }
-    process(factory: IComponentFactory<T>, siblingsFactories: ITogglableComponentFactory<ITogglableComponent>[]): any {
+    process(factory: IComponentFactory<T>, siblingsFactories: IComponentFactory<IComponent>[]): any {
         let l = factory.size;
+        let v =factory.values;
         for (let i = 0; i < l; ++i) {
-            factory.values[i].toActive = this.execute(factory.values[i]);
+            v[i].toActive = this.execute(v[i]);
         }
         this.activateSiblings(factory, siblingsFactories);
     }
@@ -36,7 +37,7 @@ abstract class CullingSystem<T extends IShape2D & IActivator & IComponent> imple
     //     // this.activateSiblings(factory, siblingsFactories);
     // }
 
-    activateSiblings(factory: IComponentFactory<T>, siblingsFactories: ITogglableComponentFactory<ITogglableComponent>[]) {
+    activateSiblings(factory: IComponentFactory<T>, siblingsFactories: IComponentFactory<IComponent>[]) {
         // how to change siblings ?
         // at every collision detection activate siblings ?
         // process all collision detection, save result in boundingVolume (btw it should be renamed )
@@ -46,7 +47,7 @@ abstract class CullingSystem<T extends IShape2D & IActivator & IComponent> imple
     }
 
     // boundVolumes.forEach -> factories.forEach -> f.activate(bv.Id, value) 
-    activateByiterationOfBV(f: IComponentFactory<T>, siblingsFactories: ITogglableComponentFactory<ITogglableComponent>[]) {
+    activateByiterationOfBV(f: IComponentFactory<T>, siblingsFactories: IComponentFactory<IComponent>[]) {
         let l = f.size;
         let nbF = siblingsFactories.length;
         for (let i = 0; i < l; ++i) {
@@ -60,7 +61,7 @@ abstract class CullingSystem<T extends IShape2D & IActivator & IComponent> imple
     }
 
     // factories.forEach -> boundingVolume.forEach -> f.activate(bv.Id, value)
-    activateFactByFact(f: IComponentFactory<T>, siblingsFactories: ITogglableComponentFactory<ITogglableComponent>[]) {
+    activateFactByFact(f: IComponentFactory<T>, siblingsFactories: IComponentFactory<IComponent>[]) {
         let l = siblingsFactories.length;
         let bvL = f.size;
         for (let i = 0; i < l; ++i) {

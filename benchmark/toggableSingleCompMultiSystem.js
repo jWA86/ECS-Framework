@@ -7,25 +7,25 @@ var ComponentFactory_1 = require("../src/ComponentFactory");
 var benchToggableInterpolableSys = (function () {
     function benchToggableInterpolableSys(nbComponents, nbActive) {
         this.system = this.createSystem();
-        this.factories = this.createFactories();
+        this.factories = this.createFactories(nbComponents);
         this.createComponents(nbComponents, nbActive);
     }
     benchToggableInterpolableSys.prototype.createSystem = function () {
         return new eS.InterpolationSystem();
     };
-    benchToggableInterpolableSys.prototype.createFactories = function () {
+    benchToggableInterpolableSys.prototype.createFactories = function (nbComponents) {
         var r = [];
         var nbFact = this.system.systems.length;
         for (var i_1 = 0; i_1 < nbFact; ++i_1) {
-            r.push(new ComponentFactory_1.ComponentFactory());
+            r.push(new ComponentFactory_1.ComponentFactory(nbComponents, eC.InterpolableComponent, true));
         }
         return r;
     };
     benchToggableInterpolableSys.prototype.createComponents = function (nbComponent, nbActive) {
         this.factories.forEach(function (f) {
             for (var i_2 = 0; i_2 < nbComponent; ++i_2) {
-                f.createComponent(eC.InterpolableComponent, "c" + i_2);
-                f.getComponent("c" + i_2).active = false;
+                f.create(eC.InterpolableComponent, "c" + i_2, true);
+                f.get("c" + i_2).active = false;
             }
         });
         var a = 0;
@@ -48,7 +48,7 @@ var benchToggableInterpolableSys = (function () {
     };
     benchToggableInterpolableSys.prototype.clear = function () {
         this.factories.forEach(function (f) {
-            f.removeAll();
+            f.clear();
         });
         this.factories = [];
     };

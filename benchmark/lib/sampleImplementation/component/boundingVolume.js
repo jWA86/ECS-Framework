@@ -13,8 +13,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var GLM = require("gl-matrix");
 // interface ICullingShape extends IShape2DComponent, IActivatorComponent{}
 var CircleComponent = (function () {
-    function CircleComponent(entityId, topLeft, radius) {
+    function CircleComponent(entityId, active, topLeft, radius) {
         this.entityId = entityId;
+        this.active = active;
         this.topLeft = topLeft;
         this.radius = radius;
     }
@@ -23,10 +24,12 @@ var CircleComponent = (function () {
 exports.CircleComponent = CircleComponent;
 var BoundingCircleComponent = (function (_super) {
     __extends(BoundingCircleComponent, _super);
-    function BoundingCircleComponent(entityId, topLeft, radius, toActive) {
+    function BoundingCircleComponent(entityId, active, topLeft, radius, toActive) {
+        if (active === void 0) { active = true; }
         if (toActive === void 0) { toActive = false; }
-        var _this = _super.call(this, entityId, topLeft, radius) || this;
+        var _this = _super.call(this, entityId, active, topLeft, radius) || this;
         _this.entityId = entityId;
+        _this.active = active;
         _this.topLeft = topLeft;
         _this.radius = radius;
         _this.toActive = toActive;

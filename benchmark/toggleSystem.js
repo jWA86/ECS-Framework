@@ -22,25 +22,25 @@ var benchToggleSystem = (function () {
         this.camera = new boundingVolume_1.Rectangle(cameraPos, cameraSize);
         var circleIn = createVec2(6.0, 6.0);
         var circleOut = createVec2(1.0, 1.0);
-        this.circleInside = new boundingVolume_1.BoundingCircleComponent("c1", circleIn, 2.0);
-        this.circleOutside = new boundingVolume_1.BoundingCircleComponent("c2", circleOut, 1.0);
+        this.circleInside = new boundingVolume_1.BoundingCircleComponent("c1", true, circleIn, 2.0);
+        this.circleOutside = new boundingVolume_1.BoundingCircleComponent("c2", true, circleOut, 1.0);
         this.system = this.createSystem();
-        this.boundingVFactory = this.createFactories();
+        this.boundingVFactory = this.createFactories(nbCompInsideFrustrum + nbCompOutsideFrustrum);
         this.createComponents(this.circleInside.topLeft, this.circleOutside.topLeft, nbCompInsideFrustrum, nbCompOutsideFrustrum);
     }
     benchToggleSystem.prototype.createSystem = function () {
         return new culling2DSystem_1.Camera2DCullingSystem(this.camera);
     };
-    benchToggleSystem.prototype.createFactories = function () {
-        return new ComponentFactory_1.ComponentFactory();
+    benchToggleSystem.prototype.createFactories = function (nbComp) {
+        return new ComponentFactory_1.ComponentFactory(nbComp, boundingVolume_1.BoundingCircleComponent);
     };
     benchToggleSystem.prototype.createComponents = function (vecInFrustrum, vecOutFrustrum, nbInFrustrum, nbOutFrustrum) {
         for (var i_1 = 0; i_1 < nbInFrustrum; ++i_1) {
-            this.boundingVFactory.createComponent(boundingVolume_1.BoundingCircleComponent, "c" + i_1, vecInFrustrum, 0);
+            this.boundingVFactory.create(boundingVolume_1.BoundingCircleComponent, "c" + i_1, true, vecInFrustrum, 0);
         }
         var l = nbInFrustrum + nbOutFrustrum;
         for (var i_2 = nbInFrustrum; i_2 < l; ++i_2) {
-            this.boundingVFactory.createComponent(boundingVolume_1.BoundingCircleComponent, "c" + i_2, vecOutFrustrum, 0);
+            this.boundingVFactory.create(boundingVolume_1.BoundingCircleComponent, "c" + i_2, true, vecOutFrustrum, 0);
         }
     };
     benchToggleSystem.prototype.process = function (siblingsFactories) {
@@ -53,18 +53,18 @@ var benchToggleSystem = (function () {
         this.system.activateFactByFact(f, siblingsFactories);
     };
     benchToggleSystem.prototype.clear = function () {
-        this.boundingVFactory.removeAll();
+        this.boundingVFactory.clear();
     };
     return benchToggleSystem;
 }());
 function createConcreteFactoryWithComp(nbFactories, nbComp) {
     var factories = [];
     for (var i_3 = 0; i_3 < nbFactories; ++i_3) {
-        factories.push(new ComponentFactory_1.TogglableComponentFactory());
+        factories.push(new ComponentFactory_1.ComponentFactory(nbComp, ConcreteComponent));
     }
     var _loop_1 = function (i_4) {
         factories.forEach(function (f) {
-            f.createComponent(ConcreteComponent, "c" + i_4);
+            f.create(ConcreteComponent, "c" + i_4, true);
         });
     };
     for (var i_4 = 0; i_4 < nbComp; ++i_4) {

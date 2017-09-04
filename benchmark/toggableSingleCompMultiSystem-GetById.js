@@ -26,7 +26,7 @@ var benchToggableInterpolableSys = (function () {
         this.factories.forEach(function (f) {
             for (var i_2 = 0; i_2 < nbComponent; ++i_2) {
                 f.createComponent(eC.InterpolableComponent, "c" + i_2);
-                f.activate("c" + i_2, true);
+                f.activateComponent("c" + i_2, true);
             }
         });
         var a = 0;
@@ -36,7 +36,7 @@ var benchToggableInterpolableSys = (function () {
             if (this_1.actives.indexOf(id) === -1) {
                 this_1.actives.push(id);
                 this_1.factories.forEach(function (f) {
-                    f.activate(id, true);
+                    f.activateComponent(id, true);
                 });
                 a++;
             }

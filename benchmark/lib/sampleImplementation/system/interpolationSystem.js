@@ -22,9 +22,9 @@ var EasingSystem = (function () {
             //since it's an array implementation, iterate directly via the pool instead of .get(id)
             var c = factory.values[i_1];
             //doesn't check if it's equal 0
-            var length_1 = c.endValue - c.startValue;
-            if (progress <= length_1) {
-                var nt = progress / length_1;
+            var length = c.endValue - c.startValue;
+            if (progress <= length) {
+                var nt = progress / length;
                 c.currentValue = this.execute(nt);
             }
         }
