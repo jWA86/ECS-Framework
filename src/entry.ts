@@ -1,2 +1,2 @@
-import {ComponentFactory, TogglableComponentFactory } from './ComponentFactory';
-import {ISystem, System, TSystem} from './System';
+import {ComponentFactory } from './ComponentFactory';
+import {ISystem, System} from './System';

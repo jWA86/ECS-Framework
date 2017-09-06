@@ -1,5 +1,5 @@
 import { IComponent, IComponentFactory } from "./interfaces";
-import { FastIterationMap } from "./../node_modules/fastiterationmap/src/FastIterationMap";
+import { FastIterationMap } from "FastIterationMap";
 
 export { ComponentFactory }
 
@@ -11,13 +11,14 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<string, T>
     protected _nbInactive: number = 0;
     protected _nbCreated: number = 0;
 
+    
+
     constructor(protected _size: number, componentType: { new(entityId: string, active: boolean, ...args: any[]): T }, ...args: any[]) {
         super();
         for (let i = 0; i < _size; ++i) {
             this._values.push(new componentType('0', false, ...args));
         }
         this._zeroedRef = new componentType("zeroedCompRef", false, ...args);
-
     }
 
     activate(entityId: string, value: boolean) {
