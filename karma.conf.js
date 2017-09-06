@@ -3,11 +3,12 @@ module.exports = function(config) {
       frameworks: ["mocha", "karma-typescript"],
       files: [
           { pattern: "src/**/*.ts" },
+          { pattern: "test/**/*.ts" },
           "node_modules/es6-shim/es6-shim.js"
       ],
       preprocessors: {
-          "**/*.ts": ["karma-typescript"]
-          
+        "src/**/*.ts": ["karma-typescript", "coverage"],
+        "test/**/*.ts": ["karma-typescript"]
       },
       reporters: ["dots", "karma-typescript"],
 
