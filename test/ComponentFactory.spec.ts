@@ -248,5 +248,18 @@ describe("Togglable Component Factory", () => {
         expect(multiPropFactory.values[multiPropFactory.size - 2].prop3.x).to.not.equal(multiPropFactory.values[multiPropFactory.size - 1].prop3.x);
 
     });
+    describe("Parallel Pool", ()=>{
+        it("instanciation should initiale all child pool with the same size", ()=>{
 
+        });
+        it("create() should create a component in each child pool with the same entityID", () => {
+
+        });
+        it("remove() should remove component sin every child pool", () => {
+
+        });
+        it("resize() should resize all child pool", () => {
+
+        });
+    });
 });
