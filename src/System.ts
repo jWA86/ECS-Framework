@@ -7,10 +7,12 @@ interface ISystem {
     execute(...args: any[]);
 }
 
+
+
 // are generics need here ?
-abstract class System<T extends IComponent> implements ISystem {
+abstract class System implements ISystem {
     constructor() {}
-    process(factory: IComponentFactory<T>) {
+    process(factory: IComponentFactory<IComponent>) {
         let l = factory.iterationLength;
         let f = factory.values;
         for (let i = 0; i < l; ++i) {
@@ -19,7 +21,7 @@ abstract class System<T extends IComponent> implements ISystem {
             }
         };
     }
-    abstract execute(component:T);
+    abstract execute(component:IComponent);
 }
 
 // system that iterate on pool that have their values array set in parallel, ie: same entityId at same index, same number of components
