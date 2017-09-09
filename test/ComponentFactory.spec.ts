@@ -338,9 +338,9 @@ describe("Component Factory", () => {
             // non existing factory name 
             expect(movingObjectFactory.getComponent("c1", "nonExistingName")).to.equal(undefined);
         });
-        it("getEntity()", () => {
+        it("get() return the entity's components", () => {
             movingObjectFactory.create("c1", true);
-            let myC1 = movingObjectFactory.getEntity("c1");
+            let myC1 = movingObjectFactory.get("c1");
             expect(myC1.length).to.equal(2);
             expect(myC1[0]).to.have.property("position");
             expect(myC1[1]).to.have.property("vec");
@@ -371,6 +371,8 @@ describe("Component Factory", () => {
             movingObjectFactory.create("c1", false);
             expect(movingObjectFactory.nbInactive).to.equal(1);
         });
-      
+        it("", () => {
+
+        });
     });
 });
