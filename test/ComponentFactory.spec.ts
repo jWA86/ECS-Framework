@@ -371,8 +371,53 @@ describe("Component Factory", () => {
             movingObjectFactory.create("c1", false);
             expect(movingObjectFactory.nbInactive).to.equal(1);
         });
-        it("", () => {
+        it("activate all components", () => {
+            movingObjectFactory.create("c1", true);
+            movingObjectFactory.create("c2", true);
+            movingObjectFactory.create("c3", false);
 
+            movingObjectFactory.activateAll(false);
+            for(let i = 1; i < movingObjectFactory.nbCreated+1; ++i){
+                movingObjectFactory.get("c"+i).forEach((c) => {
+                    expect(c.active).to.equal(false);
+                });
+            }
+
+            movingObjectFactory.activateAll(true);
+            for(let i = 1; i < movingObjectFactory.nbCreated+1; ++i){
+                movingObjectFactory.get("c"+i).forEach((c) => {
+                    expect(c.active).to.equal(true);
+                });
+            }
+        });
+        it("activate should mopdify the activate proprety of all the components of the entity", () => {
+            movingObjectFactory.create("c1", true);
+            movingObjectFactory.create("c2", false);
+
+            movingObjectFactory.activate("c1", false);
+            movingObjectFactory.get("c1").forEach((c) => {
+                expect(c.active).to.equal(false);
+            });
+
+            movingObjectFactory.activate("c2", true);
+            movingObjectFactory.get("c2").forEach((c) => {
+                expect(c.active).to.equal(true);
+            });
+
+        });
+        it("activate with factories name should modify activate proprety of the corresponding components only", () => {
+            movingObjectFactory.create("c1", true);
+            movingObjectFactory.create("c2", false);
+
+            movingObjectFactory.activate("c1", false, ["position"]);
+            
+            expect(movingObjectFactory.getComponent("c1", "position").active).to.equal(false);
+            expect(movingObjectFactory.getComponent("c1", "velocity").active).to.equal(true);
+        
+            movingObjectFactory.activate("c2", true, ["position", "velocity"]);
+            expect(movingObjectFactory.getComponent("c2", "position").active).to.equal(true);
+            expect(movingObjectFactory.getComponent("c2", "velocity").active).to.equal(true);
+            
         });
     });
 });

@@ -225,6 +225,29 @@ class EntityFactory implements IEntityFactory {
         this._factories = new Map();
     }
 
+    activate(entityId: string, value:boolean, factoriesName?:string[]){
+        
+        if(factoriesName) {
+            factoriesName.forEach((f)=>{
+                let ff = this.getFactory(f);
+                if(ff) {
+                    ff.activate(entityId, value);
+                }
+            });
+        }
+        else {
+            this._factories.forEach((f) => {
+                f.activate(entityId, value);
+            });
+        }
+    }
+
+    activateAll(value: boolean) {
+        this._factories.forEach((f)=>{
+            f.activateAll(value);
+        });
+    }
+
     addFactory(name: string, factory: ComponentFactory<IComponent>) {
         if(factory.size !== this._size) {
             factory.resize(this._size);

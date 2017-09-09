@@ -6,6 +6,7 @@ interface IComponent {
 }
 
 interface IPool {
+    activateAll(value: boolean); // set the active proprety of all component in the pool
     create(entityId: string, active: boolean); // create a component with the provided values
     delete(entityId: string): boolean; // delete a component by its id if it's in the pool     
     get(entityId: string); // get a component by its id 
@@ -21,7 +22,6 @@ interface IPool {
 
 interface IComponentFactory<T extends IComponent> extends IPool {
     activate(entityId: string, value: boolean); // set the ative proprety of a component
-    activateAll(value: boolean); // set the active proprety of all component in the pool
     clear(); // empty the pool from zeroed and created components 
     keys: Map<string, number>; // return keys of all created components and their index in the values array
     length: number; // same as size
