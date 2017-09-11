@@ -1,4 +1,9 @@
-export { IComponent, IComponentFactory, IEntityFactory }
+export { ISystem, IComponent, IComponentFactory, IEntityFactory }
+
+interface ISystem {
+    process(factory:IComponentFactory<IComponent>, ...args: any[]);
+    execute(...args: any[]);
+}
 
 interface IComponent {
     entityId: string;

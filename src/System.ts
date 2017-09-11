@@ -1,11 +1,6 @@
-import {IComponent, IComponentFactory} from "./interfaces";
+import {IComponent, IComponentFactory, ISystem} from "./interfaces";
 
-export {ISystem, System, MultiParallelSystem, MultiNonParallelSystem}
-
-interface ISystem {
-    process(factory:IComponentFactory<IComponent>, ...args: any[]);
-    execute(...args: any[]);
-}
+export {System, MultiParallelSystem, MultiNonParallelSystem}
 
 
 

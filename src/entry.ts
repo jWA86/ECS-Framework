@@ -1,2 +1,3 @@
-import {ComponentFactory } from './ComponentFactory';
-import {ISystem, System} from './System';
+import { ComponentFactory, EntityFactory } from './ComponentFactory';
+import { System, MultiParallelSystem, MultiNonParallelSystem } from './System';
+import { ISystem, IComponent, IComponentFactory, IEntityFactory } from "./interfaces";
