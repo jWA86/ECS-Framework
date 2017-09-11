@@ -10,9 +10,14 @@ module.exports = function(config) {
         "src/**/*.ts": ["karma-typescript", "coverage"],
         "test/**/*.ts": ["karma-typescript"]
       },
-      reporters: ["dots", "karma-typescript"],
+      reporters: ["progress", "karma-typescript", "coverage"],
 
       browsers: ["Chrome", "Firefox", "IE", "PhantomJS"],
+      
+      coverageReporter: {
+        type : 'html',
+        dir : 'coverage/'
+      },
 
       singleRun: false,
       concurrency: Infinity

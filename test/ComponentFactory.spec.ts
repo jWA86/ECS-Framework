@@ -247,6 +247,13 @@ describe("Component Factory", () => {
         simpleFactory.values[simpleFactory.size - 1].prop3.x += 1;
         expect(simpleFactory.values[simpleFactory.size - 2].prop3.x).to.not.equal(simpleFactory.values[simpleFactory.size - 1].prop3.x);
     });
+    it("clear should remove everyting from the pool", () => {
+        simpleFactory.create("c1", true);
+        simpleFactory.create("c2", false);
+        expect(simpleFactory.size).to.equal(5);        
+        simpleFactory.clear();
+        expect(simpleFactory.size).to.equal(0);
+    });
 
     describe("Parallel Pool", () => {
 
