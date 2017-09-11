@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for src\System.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">src/</a> System.ts
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>53/53</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">80% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>8/10</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>11/11</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>52/52</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">(function(global){global.wrappers['E:/Dev/ComponentEntitySystem/src/System.ts']=[function(require,module,exports,__dirname,__filename){ "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// are generics need here ?
+var System = (function () {
+    function System() {
+    }
+    System.prototype.process = function (factory) {
+        var l = factory.iterationLength;
+        var f = factory.values;
+        for (var i = 0; i &lt; l; ++i) {
+            if (f[i].active) {
+                this.execute(f[i]);
+            }
+        }
+        ;
+    };
+    return System;
+}());
+exports.System = System;
+// system that iterate on pool that have their values array set in parallel, ie: same entityId at same index, same number of components
+// how to make sure they are parallel ? use a parent pool that .
+// call in sync instead of parallel ?
+var MultiParallelSystem = (function () {
+    function MultiParallelSystem() {
+    }
+    MultiParallelSystem.prototype.process = function (factory) {
+        var args = [];
+        for (var _i = 1; _i &lt; arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
+        var l = factory.iterationLength;
+        var f = factory.values;
+        for (var i = 0; i &lt; l; ++i) {
+            <span class="missing-if-branch" title="else path not taken" >E</span>if (f[i].active) {
+                var arr = [];
+                arr.push(f[i]);
+                for (var j = 0; j &lt; args.length; ++j) {
+                    arr.push(args[j].values[i]);
+                }
+                this.execute.apply(null, arr);
+            }
+        }
+        ;
+    };
+    return MultiParallelSystem;
+}());
+exports.MultiParallelSystem = MultiParallelSystem;
+// non parallel pool, components are query by id (slower)
+var MultiNonParallelSystem = (function () {
+    function MultiNonParallelSystem() {
+    }
+    MultiNonParallelSystem.prototype.process = function (factory) {
+        var args = [];
+        for (var _i = 1; _i &lt; arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
+        var l = factory.iterationLength;
+        var f = factory.values;
+        for (var i = 0; i &lt; l; ++i) {
+            <span class="missing-if-branch" title="else path not taken" >E</span>if (f[i].active) {
+                var arr = [];
+                arr.push(f[i]);
+                var isFound = true;
+                for (var j = 0; j &lt; args.length; ++j) {
+                    var c = args[j].get(f[i].entityId);
+                    if (!c) {
+                        isFound = false;
+                        break;
+                    }
+                    arr.push(c);
+                }
+                if (isFound) {
+                    this.execute.apply(null, arr);
+                }
+            }
+        }
+        ;
+    };
+    return MultiNonParallelSystem;
+}());
+exports.MultiNonParallelSystem = MultiNonParallelSystem;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiU3lzdGVtLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiU3lzdGVtLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7O0FBV0EsMkJBQTJCO0FBQzNCO0lBQ0k7SUFBZSxDQUFDO0lBQ2hCLHdCQUFPLEdBQVAsVUFBUSxPQUFzQztRQUMxQyxJQUFJLENBQUMsR0FBRyxPQUFPLENBQUMsZUFBZSxDQUFDO1FBQ2hDLElBQUksQ0FBQyxHQUFHLE9BQU8sQ0FBQyxNQUFNLENBQUM7UUFDdkIsR0FBRyxDQUFDLENBQUMsSUFBSSxDQUFDLEdBQUcsQ0FBQyxFQUFFLENBQUMsR0FBRyxDQUFDLEVBQUUsRUFBRSxDQUFDLEVBQUUsQ0FBQztZQUN6QixFQUFFLENBQUEsQ0FBQyxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsTUFBTSxDQUFDLENBQUMsQ0FBQztnQkFDYixJQUFJLENBQUMsT0FBTyxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsQ0FBQyxDQUFDO1lBQ3ZCLENBQUM7UUFDTCxDQUFDO1FBQUEsQ0FBQztJQUNOLENBQUM7SUFFTCxhQUFDO0FBQUQsQ0FBQyxBQVpELElBWUM7QUF0QmdCLHdCQUFNO0FBd0J2Qix1SUFBdUk7QUFDdkksZ0VBQWdFO0FBQ2hFLHFDQUFxQztBQUNyQztJQUNJO0lBQWMsQ0FBQztJQUNmLHFDQUFPLEdBQVAsVUFBUSxPQUFzQztRQUFFLGNBQXlDO2FBQXpDLFVBQXlDLEVBQXpDLHFCQUF5QyxFQUF6QyxJQUF5QztZQUF6Qyw2QkFBeUM7O1FBQ3JGLElBQUksQ0FBQyxHQUFHLE9BQU8sQ0FBQyxlQUFlLENBQUM7UUFDaEMsSUFBSSxDQUFDLEdBQUcsT0FBTyxDQUFDLE1BQU0sQ0FBQztRQUN2QixHQUFHLENBQUMsQ0FBQyxJQUFJLENBQUMsR0FBRyxDQUFDLEVBQUUsQ0FBQyxHQUFHLENBQUMsRUFBRSxFQUFFLENBQUMsRUFBRSxDQUFDO1lBQ3pCLEVBQUUsQ0FBQSxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsQ0FBQyxNQUFNLENBQUMsQ0FBQyxDQUFDO2dCQUNiLElBQUksR0FBRyxHQUFnQixFQUFFLENBQUM7Z0JBQzFCLEdBQUcsQ0FBQyxJQUFJLENBQUMsQ0FBQyxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUM7Z0JBQ2YsR0FBRyxDQUFBLENBQUMsSUFBSSxDQUFDLEdBQUcsQ0FBQyxFQUFFLENBQUMsR0FBRyxJQUFJLENBQUMsTUFBTSxFQUFFLEVBQUUsQ0FBQyxFQUFDLENBQUM7b0JBQ2pDLEdBQUcsQ0FBQyxJQUFJLENBQUMsSUFBSSxDQUFDLENBQUMsQ0FBQyxDQUFDLE1BQU0sQ0FBQyxDQUFDLENBQUMsQ0FBQyxDQUFDO2dCQUNoQyxDQUFDO2dCQUNELElBQUksQ0FBQyxPQUFPLENBQUMsS0FBSyxDQUFDLElBQUksRUFBRSxHQUFHLENBQUMsQ0FBQztZQUNsQyxDQUFDO1FBQ0wsQ0FBQztRQUFBLENBQUM7SUFDTixDQUFDO0lBRUwsMEJBQUM7QUFBRCxDQUFDLEFBakJELElBaUJDO0FBNUN3QixrREFBbUI7QUE4QzVDLHlEQUF5RDtBQUN6RDtJQUNJO0lBQWMsQ0FBQztJQUNmLHdDQUFPLEdBQVAsVUFBUSxPQUFzQztRQUFFLGNBQXlDO2FBQXpDLFVBQXlDLEVBQXpDLHFCQUF5QyxFQUF6QyxJQUF5QztZQUF6Qyw2QkFBeUM7O1FBQ3JGLElBQUksQ0FBQyxHQUFHLE9BQU8sQ0FBQyxlQUFlLENBQUM7UUFDaEMsSUFBSSxDQUFDLEdBQUcsT0FBTyxDQUFDLE1BQU0sQ0FBQztRQUN2QixHQUFHLENBQUMsQ0FBQyxJQUFJLENBQUMsR0FBRyxDQUFDLEVBQUUsQ0FBQyxHQUFHLENBQUMsRUFBRSxFQUFFLENBQUMsRUFBRSxDQUFDO1lBQ3pCLEVBQUUsQ0FBQSxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsQ0FBQyxNQUFNLENBQUMsQ0FBQyxDQUFDO2dCQUNiLElBQUksR0FBRyxHQUFnQixFQUFFLENBQUM7Z0JBQzFCLEdBQUcsQ0FBQyxJQUFJLENBQUMsQ0FBQyxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUM7Z0JBQ2YsSUFBSSxPQUFPLEdBQUcsSUFBSSxDQUFDO2dCQUNuQixHQUFHLENBQUEsQ0FBQyxJQUFJLENBQUMsR0FBRyxDQUFDLEVBQUUsQ0FBQyxHQUFHLElBQUksQ0FBQyxNQUFNLEVBQUUsRUFBRSxDQUFDLEVBQUMsQ0FBQztvQkFDakMsSUFBSSxDQUFDLEdBQUcsSUFBSSxDQUFDLENBQUMsQ0FBQyxDQUFDLEdBQUcsQ0FBQyxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsUUFBUSxDQUFDLENBQUM7b0JBQ25DLEVBQUUsQ0FBQSxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUEsQ0FBQzt3QkFBQSxPQUFPLEdBQUMsS0FBSyxDQUFDO3dCQUFBLEtBQUssQ0FBQztvQkFBQSxDQUFDO29CQUM1QixHQUFHLENBQUMsSUFBSSxDQUFDLENBQUMsQ0FBQyxDQUFDO2dCQUNoQixDQUFDO2dCQUNELEVBQUUsQ0FBQSxDQUFDLE9BQU8sQ0FBQyxDQUFDLENBQUM7b0JBQ1QsSUFBSSxDQUFDLE9BQU8sQ0FBQyxLQUFLLENBQUMsSUFBSSxFQUFFLEdBQUcsQ0FBQyxDQUFDO2dCQUNsQyxDQUFDO1lBQ0wsQ0FBQztRQUNMLENBQUM7UUFBQSxDQUFDO0lBQ04sQ0FBQztJQUVMLDZCQUFDO0FBQUQsQ0FBQyxBQXRCRCxJQXNCQztBQXJFNkMsd0RBQXNCIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHtJQ29tcG9uZW50LCBJQ29tcG9uZW50RmFjdG9yeX0gZnJvbSBcIi4vaW50ZXJmYWNlc1wiO1xyXG5cclxuZXhwb3J0IHtJU3lzdGVtLCBTeXN0ZW0sIE11bHRpUGFyYWxsZWxTeXN0ZW0sIE11bHRpTm9uUGFyYWxsZWxTeXN0ZW19XHJcblxyXG5pbnRlcmZhY2UgSVN5c3RlbSB7XHJcbiAgICBwcm9jZXNzKGZhY3Rvcnk6SUNvbXBvbmVudEZhY3Rvcnk8SUNvbXBvbmVudD4sIC4uLmFyZ3M6IGFueVtdKTtcclxuICAgIGV4ZWN1dGUoLi4uYXJnczogYW55W10pO1xyXG59XHJcblxyXG5cclxuXHJcbi8vIGFyZSBnZW5lcmljcyBuZWVkIGhlcmUgP1xyXG5hYnN0cmFjdCBjbGFzcyBTeXN0ZW0gaW1wbGVtZW50cyBJU3lzdGVtIHtcclxuICAgIGNvbnN0cnVjdG9yKCkge31cclxuICAgIHByb2Nlc3MoZmFjdG9yeTogSUNvbXBvbmVudEZhY3Rvcnk8SUNvbXBvbmVudD4pIHtcclxuICAgICAgICBsZXQgbCA9IGZhY3RvcnkuaXRlcmF0aW9uTGVuZ3RoO1xyXG4gICAgICAgIGxldCBmID0gZmFjdG9yeS52YWx1ZXM7XHJcbiAgICAgICAgZm9yIChsZXQgaSA9IDA7IGkgPCBsOyArK2kpIHtcclxuICAgICAgICAgICAgaWYoZltpXS5hY3RpdmUpIHtcclxuICAgICAgICAgICAgICAgIHRoaXMuZXhlY3V0ZShmW2ldKTsgICAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9O1xyXG4gICAgfVxyXG4gICAgYWJzdHJhY3QgZXhlY3V0ZShjb21wb25lbnQ6SUNvbXBvbmVudCk7XHJcbn1cclxuXHJcbi8vIHN5c3RlbSB0aGF0IGl0ZXJhdGUgb24gcG9vbCB0aGF0IGhhdmUgdGhlaXIgdmFsdWVzIGFycmF5IHNldCBpbiBwYXJhbGxlbCwgaWU6IHNhbWUgZW50aXR5SWQgYXQgc2FtZSBpbmRleCwgc2FtZSBudW1iZXIgb2YgY29tcG9uZW50c1xyXG4vLyBob3cgdG8gbWFrZSBzdXJlIHRoZXkgYXJlIHBhcmFsbGVsID8gdXNlIGEgcGFyZW50IHBvb2wgdGhhdCAuXHJcbi8vIGNhbGwgaW4gc3luYyBpbnN0ZWFkIG9mIHBhcmFsbGVsID9cclxuYWJzdHJhY3QgY2xhc3MgTXVsdGlQYXJhbGxlbFN5c3RlbSBpbXBsZW1lbnRzIElTeXN0ZW0ge1xyXG4gICAgY29uc3RydWN0b3IoKXt9XHJcbiAgICBwcm9jZXNzKGZhY3Rvcnk6IElDb21wb25lbnRGYWN0b3J5PElDb21wb25lbnQ+LCAuLi4gYXJnczogSUNvbXBvbmVudEZhY3Rvcnk8SUNvbXBvbmVudD5bXSkge1xyXG4gICAgICAgIGxldCBsID0gZmFjdG9yeS5pdGVyYXRpb25MZW5ndGg7XHJcbiAgICAgICAgbGV0IGYgPSBmYWN0b3J5LnZhbHVlcztcclxuICAgICAgICBmb3IgKGxldCBpID0gMDsgaSA8IGw7ICsraSkge1xyXG4gICAgICAgICAgICBpZihmW2ldLmFjdGl2ZSkge1xyXG4gICAgICAgICAgICAgICAgbGV0IGFycjpJQ29tcG9uZW50W10gPSBbXTtcclxuICAgICAgICAgICAgICAgIGFyci5wdXNoKGZbaV0pO1xyXG4gICAgICAgICAgICAgICAgZm9yKGxldCBqID0gMDsgaiA8IGFyZ3MubGVuZ3RoOyArK2ope1xyXG4gICAgICAgICAgICAgICAgICAgIGFyci5wdXNoKGFyZ3Nbal0udmFsdWVzW2ldKTtcclxuICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgIHRoaXMuZXhlY3V0ZS5hcHBseShudWxsLCBhcnIpOyAgICAgICAgXHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9O1xyXG4gICAgfVxyXG4gICAgYWJzdHJhY3QgZXhlY3V0ZShjb21wb25lbnQ6SUNvbXBvbmVudCwgLi4uYXJnczogSUNvbXBvbmVudFtdKTtcclxufVxyXG5cclxuLy8gbm9uIHBhcmFsbGVsIHBvb2wsIGNvbXBvbmVudHMgYXJlIHF1ZXJ5IGJ5IGlkIChzbG93ZXIpXHJcbmFic3RyYWN0IGNsYXNzIE11bHRpTm9uUGFyYWxsZWxTeXN0ZW0gaW1wbGVtZW50cyBJU3lzdGVtIHtcclxuICAgIGNvbnN0cnVjdG9yKCl7fVxyXG4gICAgcHJvY2VzcyhmYWN0b3J5OiBJQ29tcG9uZW50RmFjdG9yeTxJQ29tcG9uZW50PiwgLi4uIGFyZ3M6IElDb21wb25lbnRGYWN0b3J5PElDb21wb25lbnQ+W10pIHtcclxuICAgICAgICBsZXQgbCA9IGZhY3RvcnkuaXRlcmF0aW9uTGVuZ3RoO1xyXG4gICAgICAgIGxldCBmID0gZmFjdG9yeS52YWx1ZXM7XHJcbiAgICAgICAgZm9yIChsZXQgaSA9IDA7IGkgPCBsOyArK2kpIHtcclxuICAgICAgICAgICAgaWYoZltpXS5hY3RpdmUpIHtcclxuICAgICAgICAgICAgICAgIGxldCBhcnI6SUNvbXBvbmVudFtdID0gW107XHJcbiAgICAgICAgICAgICAgICBhcnIucHVzaChmW2ldKTtcclxuICAgICAgICAgICAgICAgIGxldCBpc0ZvdW5kID0gdHJ1ZTtcclxuICAgICAgICAgICAgICAgIGZvcihsZXQgaiA9IDA7IGogPCBhcmdzLmxlbmd0aDsgKytqKXtcclxuICAgICAgICAgICAgICAgICAgICBsZXQgYyA9IGFyZ3Nbal0uZ2V0KGZbaV0uZW50aXR5SWQpO1xyXG4gICAgICAgICAgICAgICAgICAgIGlmKCFjKXtpc0ZvdW5kPWZhbHNlO2JyZWFrO31cclxuICAgICAgICAgICAgICAgICAgICBhcnIucHVzaChjKTtcclxuICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgIGlmKGlzRm91bmQpIHtcclxuICAgICAgICAgICAgICAgICAgICB0aGlzLmV4ZWN1dGUuYXBwbHkobnVsbCwgYXJyKTsgICAgICAgIFxyXG4gICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfTtcclxuICAgIH1cclxuICAgIGFic3RyYWN0IGV4ZWN1dGUoY29tcG9uZW50OklDb21wb25lbnQsIC4uLmFyZ3M6IElDb21wb25lbnRbXSk7XHJcbn1cclxuIl19
+},'src/System.ts',{"./interfaces":"E:/Dev/ComponentEntitySystem/src/interfaces.ts"}];})(this);
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon Sep 11 2017 13:54:09 GMT+0200 (Romance Daylight Time)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>
