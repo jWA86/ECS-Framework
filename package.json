@@ -24,7 +24,9 @@
     "karma-phantomjs-launcher": "^1.0.4",
     "karma-typescript": "^3.0.5",
     "mocha": "^3.5.0",
-    "typescript": "^2.5.2"
+    "ts-loader": "^2.3.7",
+    "typescript": "^2.5.2",
+    "webpack": "^3.5.6"
   },
   "dependencies": {
     "fastiterationmap": "^1.0.4"
