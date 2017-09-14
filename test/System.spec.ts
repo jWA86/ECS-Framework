@@ -1,8 +1,8 @@
 import "mocha";
 import { expect } from "chai";
-import { IComponent, IComponentFactory } from "../src/interfaces";
+import { IComponent, IComponentFactory, ISystem } from "../src/interfaces";
 import { ComponentFactory, EntityFactory } from "../src/ComponentFactory";
-import { System, ISystem, MultiParallelSystem, MultiNonParallelSystem } from "../src/System";
+import { System, MultiParallelSystem, MultiNonParallelSystem } from "../src/System";
 
 describe("System ", () => {
     class positionComponent implements IComponent {
