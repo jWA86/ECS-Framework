@@ -1,6 +1,6 @@
 {
   "name": "componententitysystem",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Simple Component Entity System",
   "main": "./dist/index.js",
   "types": "./dist/src/entry.d.ts",
