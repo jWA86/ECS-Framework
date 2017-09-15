@@ -2,9 +2,19 @@
   "name": "componententitysystem",
   "version": "1.0.0",
   "description": "Simple Component Entity System",
-  "main": "src/",
+  "main": "./dist/index.js",
+  "types": "./dist/src/entry.d.ts",
   "scripts": {
-    "test": "karma start"
+    "test": "karma start",
+    "build": "webpack"
+  },
+  "keywords": [
+    "entity component system",
+    "ecs"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jWA86/Entity-Component-System-in-js-"
   },
   "author": "jWA86",
   "license": "MIT",

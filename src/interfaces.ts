@@ -1,4 +1,4 @@
-export { ISystem, IComponent, IComponentFactory, IEntityFactory }
+export { ISystem, IComponent, IPool, IComponentFactory, IEntityFactory }
 
 interface ISystem {
     process(factory:IComponentFactory<IComponent>, ...args: any[]);

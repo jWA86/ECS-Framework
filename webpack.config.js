@@ -6,7 +6,7 @@ module.exports = {
     watch: false,
     output: {
         path: path.resolve('./dist'),
-        filename: "ecs.js",
+        filename: "index.js",
         libraryTarget: 'umd',
         library: 'ecs'
     },
@@ -22,6 +22,6 @@ module.exports = {
     resolve: {
         extensions: [ '.ts' ]
     },
-    plugins: [new UglifyJSPlugin({ sourceMap : true }) 
-       ]
+    // plugins: [new UglifyJSPlugin({ sourceMap : true }) 
+    //    ]
 };
