@@ -6,7 +6,7 @@ import { System, MultiParallelSystem, MultiNonParallelSystem } from "../src/Syst
 
 describe("System ", () => {
     class positionComponent implements IComponent {
-        constructor(public entityId: string, public active: boolean, public position = { "x": 0.0, "y": 0.0, "z": 0.0 }) { }
+        constructor(public entityId: number, public active: boolean, public position = { "x": 0.0, "y": 0.0, "z": 0.0 }) { }
     }
     class MoveByOneUnitSystem extends System {
         constructor() {
@@ -30,11 +30,11 @@ describe("System ", () => {
         nbActive = 3;
         nbInactive = 2;
         nbZeroed = positionFactory.size - nbActive - nbInactive;
-        for (let i = 0; i < nbActive; ++i) {
-            positionFactory.create("c" + i, true);
+        for (let i = 1; i < nbActive+1; ++i) {
+            positionFactory.create(i, true);
         }
-        for (let i = nbActive; i < nbInactive + nbActive; ++i) {
-            positionFactory.create("c" + i, false);
+        for (let i = nbActive+1; i < nbInactive + nbActive+1; ++i) {
+            positionFactory.create(i, false);
         }
     });
     it("checking samples used by other tests", () => {
@@ -74,13 +74,13 @@ describe("System ", () => {
     });
     it("should not update zeroed components", () => {
         for (let i = positionFactory.nbActive + positionFactory.nbInactive; i < positionFactory.size; ++i) {
-            expect(positionFactory.values[i].entityId).to.equal('0');
+            expect(positionFactory.values[i].entityId).to.equal(0);
             positionFactory.values[i].active = true;
         }
         let s = new MoveByOneUnitSystem();
         s.process(positionFactory);
         for (let i = positionFactory.nbActive + positionFactory.nbInactive; i < positionFactory.size; ++i) {
-            expect(positionFactory.values[i].entityId).to.equal('0');
+            expect(positionFactory.values[i].entityId).to.equal(0);
             expect(positionFactory.values[i].position.x).to.equal(0.0);
             expect(positionFactory.values[i].position.y).to.equal(0.0);
             expect(positionFactory.values[i].position.z).to.equal(0.0);
@@ -90,7 +90,7 @@ describe("System ", () => {
 });
 describe("System with multiple components types", () => {
     class positionComponent implements IComponent {
-        constructor(public entityId: string, public active: boolean, public position = { "x": 0.0, "y": 0.0, "z": 0.0 }) { }
+        constructor(public entityId: number, public active: boolean, public position = { "x": 0.0, "y": 0.0, "z": 0.0 }) { }
     }
     class velocityComponent implements IComponent {
         constructor(public entityId, public active, public vec = { "x": 0.0, "y": 0.0, "z": 0.0 }) { };
@@ -103,14 +103,14 @@ describe("System with multiple components types", () => {
         positionFactory = new ComponentFactory<positionComponent>(5, positionComponent, { "x": 0.0, "y": 0.0, "z": 0.0 });
         velocityFactory = new ComponentFactory<velocityComponent>(5, velocityComponent, { "x": 0.0, "y": 0.0, "z": 0.0 });
 
-        for (let i = 0; i < positionFactory.size; ++i) {
-            positionFactory.create("c" + i, true );
-            positionFactory.get("c"+i).position = { "x": 1.0, "y": 1.0, "z": 1.0 };
+        for (let i = 1; i < positionFactory.size+1; ++i) {
+            positionFactory.create(i, true );
+            positionFactory.get(i).position = { "x": 1.0, "y": 1.0, "z": 1.0 };
         }
 
-        for (let i = 0; i < velocityFactory.size; ++i) {
-            velocityFactory.create("c" + i, true);
-            velocityFactory.get("c"+i).vec = { "x": 2.0, "y": 0.0, "z": 0.0 };
+        for (let i = 1; i < velocityFactory.size+1; ++i) {
+            velocityFactory.create(i, true);
+            velocityFactory.get(i).vec = { "x": 2.0, "y": 0.0, "z": 0.0 };
         }
     });
 
@@ -125,7 +125,7 @@ describe("System with multiple components types", () => {
             }
         }
         beforeEach(() => {
-            velocityFactory.delete("c4");
+            velocityFactory.delete(5);
             expect(velocityFactory.nbCreated).to.equal(positionFactory.nbCreated - 1);
         });
         it("should iterate on the first factory and update its components with components of the second factory", () => {
@@ -160,8 +160,8 @@ describe("System with multiple components types", () => {
             }
         }
         beforeEach(() => {
-            velocityFactory.create("c4", true );
-            velocityFactory.get("c4").vec = { "x": 2.0, "y": 0.0, "z": 0.0 };
+            velocityFactory.create(4, true );
+            velocityFactory.get(4).vec = { "x": 2.0, "y": 0.0, "z": 0.0 };
             expect(velocityFactory.nbCreated).to.equal(positionFactory.nbCreated);
         });
         it("should provide all the components to the execute fonction", () => {

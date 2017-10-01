@@ -4,16 +4,16 @@ import { FastIterationMap } from "FastIterationMap";
 export { ComponentFactory, EntityFactory }
 
 
-class ComponentFactory<T extends IComponent> extends FastIterationMap<string, T> implements IComponentFactory<T> {
+class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T> implements IComponentFactory<T> {
     protected _iterationLength: number = 0; // use by the system for iteration, avoid iterate over zeroed components
     protected _zeroedRef: T;
     protected _nbActive: number = 0;
     protected _nbInactive: number = 0;
     protected _nbCreated: number = 0;
 
-    constructor(protected _size: number, componentType: { new(entityId: string, active: boolean, ...args: any[]): T }, ...args: any[]) {
+    constructor(protected _size: number, componentType: { new(entityId: number, active: boolean, ...args: any[]): T }, ...args: any[]) {
         super();
-        this._zeroedRef = new componentType("zeroedCompRef", false, ...args);
+        this._zeroedRef = new componentType(0, false, ...args);
         this._values.length = this._size;
         for (let i = 0; i < _size; ++i) {
            this.createZeroedComponentAt(i);
@@ -22,11 +22,11 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<string, T>
 
     protected createZeroedComponentAt(index:number){
         this.recycle(index, this._zeroedRef);
-        this._values[index].entityId = '0';
+        this._values[index].entityId = 0;
         this._values[index].active = false;
     }
 
-    activate(entityId: string, value: boolean) {
+    activate(entityId: number, value: boolean) {
         let c = this.get(entityId);
         if (c.active !== value) {
             c.active = value;
@@ -62,7 +62,7 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<string, T>
         this._iterationLength = 0;
     }
 
-    create( entityId: string, active: boolean, ...args: any[]): T {
+    create( entityId: number, active: boolean, ...args: any[]): T {
         let index: number;
         let toReplaceComp: T;
         // if the key doesn't exist yet 
@@ -111,7 +111,7 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<string, T>
     protected getIndexOfFirstAvailableSpot(): number {
         let l = this._values.length;
         for (let i = 0; i < l; ++i) {
-            if (this._values[i].entityId === '0') {
+            if (this._values[i].entityId === 0) {
                 return i;
             }
         }
@@ -138,7 +138,7 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<string, T>
         }
     }
 
-    delete(entityId: string): boolean {
+    delete(entityId: number): boolean {
         let index = this._keys.get(entityId);
         if (index === undefined) { return false; }
         // update nbActive/Inactive counter
@@ -149,7 +149,7 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<string, T>
         }
         // zeroed the component
         this.mapObject(this._values[index], this._zeroedRef);
-        this._values[index].entityId = '0';
+        this._values[index].entityId = 0;
 
         this._keys.delete(entityId);
 
@@ -211,10 +211,10 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<string, T>
     }
 
     // overwrite fastIterationMap method we don't want to use
-    insertAfter(key: string, value: T, keyRef: string): boolean {
+    insertAfter(key: number, value: T, keyRef: number): boolean {
         return false;
     }
-    insertBefore(key: string, value: T, keyRef: string): boolean {
+    insertBefore(key: number, value: T, keyRef: number): boolean {
         return false;
     }
 }
@@ -225,7 +225,7 @@ class EntityFactory implements IEntityFactory {
         this._factories = new Map();
     }
 
-    activate(entityId: string, value:boolean, factoriesName?:string[]){
+    activate(entityId: number, value:boolean, factoriesName?:string[]){
         
         if(factoriesName) {
             factoriesName.forEach((f)=>{
@@ -255,7 +255,7 @@ class EntityFactory implements IEntityFactory {
         this._factories.set(name, factory);
     }
 
-    getComponent(entityId: string, factoryName: string): IComponent {
+    getComponent(entityId: number, factoryName: string): IComponent {
         let f = this._factories.get(factoryName);
         if(f){
             return f.get(entityId);
@@ -269,7 +269,7 @@ class EntityFactory implements IEntityFactory {
         return this._factories.get(name);
     }
 
-    delete(entityId: string): boolean {
+    delete(entityId: number): boolean {
         let d = true;
         this._factories.forEach((f)=>{
             if(!f.delete(entityId)) {
@@ -280,7 +280,7 @@ class EntityFactory implements IEntityFactory {
         return this._factories.size > 0 && d;
     }
 
-    get(entityId: string): IComponent[] {
+    get(entityId: number): IComponent[] {
         let e = [];
         this._factories.forEach((f) => {
             e.push(f.get(entityId));
@@ -288,12 +288,12 @@ class EntityFactory implements IEntityFactory {
         return e;
     }
 
-    has(entityId:string): boolean {
+    has(entityId: number): boolean {
         let it = this._factories.entries();
         return it.next().value[1].has(entityId);
     }
 
-    create(entityId: string, active: boolean) {
+    create(entityId: number, active: boolean) {
         this._factories.forEach((f) => {
             f.create(entityId, active);
         });
