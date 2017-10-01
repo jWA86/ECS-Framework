@@ -24,6 +24,7 @@ declare class ComponentFactory<T extends IComponent> extends FastIterationMap<nu
     recycle(indexComponentToReplace: number, componentRef: any): void;
     resize(size: number): void;
     readonly iterationLength: number;
+    readonly keys: Map<number, number>;
     readonly nbActive: number;
     readonly nbInactive: number;
     readonly nbCreated: number;

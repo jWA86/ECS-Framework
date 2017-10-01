@@ -194,6 +194,10 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
         return this._iterationLength;
     }
 
+    get keys(): Map<number, number> {
+        return this._keys;
+    }
+
     get nbActive(): number {
         return this._nbActive;
     }

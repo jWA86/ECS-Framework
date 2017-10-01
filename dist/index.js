@@ -303,6 +303,13 @@ var ComponentFactory = /** @class */ (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(ComponentFactory.prototype, "keys", {
+        get: function () {
+            return this._keys;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(ComponentFactory.prototype, "nbActive", {
         get: function () {
             return this._nbActive;
