@@ -4,15 +4,15 @@ interface ISystem {
     execute(...args: any[]): any;
 }
 interface IComponent {
-    entityId: string;
+    entityId: number;
     active: boolean;
 }
 interface IPool {
     activateAll(value: boolean): any;
-    create(entityId: string, active: boolean): any;
-    delete(entityId: string): boolean;
-    get(entityId: string): any;
-    has(entityId: string): boolean;
+    create(entityId: number, active: boolean): any;
+    delete(entityId: number): boolean;
+    get(entityId: number): any;
+    has(entityId: number): boolean;
     iterationLength: number;
     nbActive: number;
     nbCreated: number;
@@ -22,16 +22,16 @@ interface IPool {
     size: number;
 }
 interface IComponentFactory<T extends IComponent> extends IPool {
-    activate(entityId: string, value: boolean): any;
+    activate(entityId: number, value: boolean): any;
     clear(): any;
-    keys: Map<string, number>;
+    keys: Map<number, number>;
     length: number;
-    push(key: string, value: T): any;
-    set(key: string, value: T): any;
+    push(key: number, value: T): any;
+    set(key: number, value: T): any;
     values: T[];
 }
 interface IEntityFactory extends IPool {
     addFactory(name: string, factory: IComponentFactory<IComponent>): any;
-    getComponent(entityId: string, factoryName: string): IComponent;
+    getComponent(entityId: number, factoryName: string): IComponent;
     getFactory(name: string): IComponentFactory<IComponent>;
 }

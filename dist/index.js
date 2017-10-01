@@ -114,7 +114,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var FastIterationMap_1 = __webpack_require__(3);
-var ComponentFactory = (function (_super) {
+var ComponentFactory = /** @class */ (function (_super) {
     __extends(ComponentFactory, _super);
     function ComponentFactory(_size, componentType) {
         var args = [];
@@ -127,7 +127,7 @@ var ComponentFactory = (function (_super) {
         _this._nbActive = 0;
         _this._nbInactive = 0;
         _this._nbCreated = 0;
-        _this._zeroedRef = new (componentType.bind.apply(componentType, [void 0, "zeroedCompRef", false].concat(args)))();
+        _this._zeroedRef = new (componentType.bind.apply(componentType, [void 0, 0, false].concat(args)))();
         _this._values.length = _this._size;
         for (var i = 0; i < _size; ++i) {
             _this.createZeroedComponentAt(i);
@@ -136,7 +136,7 @@ var ComponentFactory = (function (_super) {
     }
     ComponentFactory.prototype.createZeroedComponentAt = function (index) {
         this.recycle(index, this._zeroedRef);
-        this._values[index].entityId = '0';
+        this._values[index].entityId = 0;
         this._values[index].active = false;
     };
     ComponentFactory.prototype.activate = function (entityId, value) {
@@ -225,7 +225,7 @@ var ComponentFactory = (function (_super) {
     ComponentFactory.prototype.getIndexOfFirstAvailableSpot = function () {
         var l = this._values.length;
         for (var i = 0; i < l; ++i) {
-            if (this._values[i].entityId === '0') {
+            if (this._values[i].entityId === 0) {
                 return i;
             }
         }
@@ -262,7 +262,7 @@ var ComponentFactory = (function (_super) {
         }
         // zeroed the component
         this.mapObject(this._values[index], this._zeroedRef);
-        this._values[index].entityId = '0';
+        this._values[index].entityId = 0;
         this._keys.delete(entityId);
         this.decrementCreatedLength(index);
         this._nbCreated -= 1;
@@ -341,7 +341,7 @@ var ComponentFactory = (function (_super) {
     return ComponentFactory;
 }(FastIterationMap_1.FastIterationMap));
 exports.ComponentFactory = ComponentFactory;
-var EntityFactory = (function () {
+var EntityFactory = /** @class */ (function () {
     function EntityFactory(_size) {
         this._size = _size;
         this._factories = new Map();
@@ -697,7 +697,7 @@ exports.FastIterationMap = FastIterationMap;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 // are generics need here ?
-var System = (function () {
+var System = /** @class */ (function () {
     function System() {
     }
     System.prototype.process = function (factory) {
@@ -716,7 +716,7 @@ exports.System = System;
 // system that iterate on pool that have their values array set in parallel, ie: same entityId at same index, same number of components
 // how to make sure they are parallel ? use a parent pool that .
 // call in sync instead of parallel ?
-var MultiParallelSystem = (function () {
+var MultiParallelSystem = /** @class */ (function () {
     function MultiParallelSystem() {
     }
     MultiParallelSystem.prototype.process = function (factory) {
@@ -742,7 +742,7 @@ var MultiParallelSystem = (function () {
 }());
 exports.MultiParallelSystem = MultiParallelSystem;
 // non parallel pool, components are query by id (slower)
-var MultiNonParallelSystem = (function () {
+var MultiNonParallelSystem = /** @class */ (function () {
     function MultiNonParallelSystem() {
     }
     MultiNonParallelSystem.prototype.process = function (factory) {
