@@ -43,7 +43,7 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
 
     activateAll(value: boolean) {
         for (let i = 0; i < this.size; ++i) {
-            this.values[i].active = value;
+            this._values[i].active = value;
         }
         if (value) {
             this._nbActive = this._nbCreated;
@@ -82,12 +82,12 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
                     this._nbInactive += 1;
                 }
                 // replace all propreties value from the zeroed component
-                toReplaceComp = this.values[index];
+                toReplaceComp = this._values[index];
             }
         } else {
             index = this._keys.get(entityId);
             // replace all propreties value from the component to update
-            toReplaceComp = this.values[index];
+            toReplaceComp = this._values[index];
             if (toReplaceComp.active !== active) {
                 if (active) {
                     this._nbActive += 1;
@@ -105,7 +105,7 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
 
         // lastly increment the lastActiveIndex
         this.incrementCreatedLength(index);
-        return this.values[index];
+        return this._values[index];
     }
 
     protected getIndexOfFirstAvailableSpot(): number {
@@ -194,10 +194,6 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
         return this._iterationLength;
     }
 
-    get keys(): Map<number, number> {
-        return this._keys;
-    }
-
     get nbActive(): number {
         return this._nbActive;
     }
@@ -275,7 +271,7 @@ class EntityFactory implements IEntityFactory {
 
     delete(entityId: number): boolean {
         let d = true;
-        this._factories.forEach((f)=>{
+        this._factories.forEach((f) => {
             if(!f.delete(entityId)) {
                 d = false;
             }
