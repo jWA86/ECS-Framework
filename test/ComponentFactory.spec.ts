@@ -37,7 +37,7 @@ describe("Component Factory", () => {
             expect(simpleFactory.values[i].prop3.x).to.equal(0.0);
         }
     });
-    it("zeroed component should not chair references", () => {
+    it("zeroed component should not share references", () => {
         simpleFactory.values[0].prop3.x += 1.0;
         expect(simpleFactory.values[1].prop3.x).to.not.equal(simpleFactory.values[0].prop3.x);
     });
