@@ -8,7 +8,7 @@ export {System, MultiParallelSystem, MultiNonParallelSystem, MultiPoolSystem}
 abstract class System implements ISystem {
     constructor() {}
     process(factory: IComponentFactory<IComponent>) {
-        let l = factory.iterationLength;
+        const l = factory.iterationLength;
         let f = factory.values;
         for (let i = 0; i < l; ++i) {
             if(f[i].active) {

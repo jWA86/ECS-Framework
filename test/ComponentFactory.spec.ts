@@ -250,7 +250,7 @@ describe("Component Factory", () => {
     it("clear should remove everyting from the pool", () => {
         simpleFactory.create(1, true);
         simpleFactory.create(2, false);
-        expect(simpleFactory.size).to.equal(5);        
+        expect(simpleFactory.size).to.equal(5);
         simpleFactory.clear();
         expect(simpleFactory.size).to.equal(0);
     });

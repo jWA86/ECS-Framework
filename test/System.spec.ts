@@ -1,8 +1,8 @@
-import "mocha";
 import { expect } from "chai";
-import { IComponent, IComponentFactory, ISystem } from "../src/interfaces";
+import "mocha";
 import { ComponentFactory, EntityFactory } from "../src/ComponentFactory";
-import { System, MultiParallelSystem, MultiNonParallelSystem, MultiPoolSystem } from "../src/System";
+import { IComponent, IComponentFactory, ISystem } from "../src/interfaces";
+import { MultiNonParallelSystem, MultiParallelSystem, MultiPoolSystem, System  } from "../src/System";
 
 describe("System ", () => {
     class positionComponent implements IComponent {
@@ -278,9 +278,9 @@ describe("changing poolFactories of system at runtime without having to rewrite 
         constructor() { super(); }
 
         execute(posC: IPositionComponent, veloC: IVelocityComponent) {
-            console.log(posC);
-            console.log("---");
-            console.log(veloC);
+            // console.log(posC);
+            // console.log("---");
+            // console.log(veloC);
             posC.position.x *= veloC.velocity.x;
             posC.position.y *= veloC.velocity.y;
             posC.position.z *= veloC.velocity.z;

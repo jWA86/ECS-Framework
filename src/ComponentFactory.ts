@@ -1,8 +1,6 @@
-import { IComponent, IComponentFactory, IEntityFactory } from "./interfaces";
 import { FastIterationMap } from "FastIterationMap";
-
-export { ComponentFactory, EntityFactory }
-
+import { IComponent, IComponentFactory, IEntityFactory } from "./interfaces";
+export { ComponentFactory, EntityFactory };
 
 class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T> implements IComponentFactory<T> {
     protected _iterationLength: number = 0; // use by the system for iteration, avoid iterate over zeroed components
@@ -20,28 +18,21 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
         }
     }
 
-    protected createZeroedComponentAt(index:number){
-        this.recycle(index, this._zeroedRef);
-        this._values[index].entityId = 0;
-        this._values[index].active = false;
-    }
-
-    activate(entityId: number, value: boolean) {
-        let c = this.get(entityId);
+    public activate(entityId: number, value: boolean) {
+        const c = this.get(entityId);
         if (c.active !== value) {
             c.active = value;
             if (value) {
                 this._nbActive += 1;
                 this._nbInactive -= 1;
-            }
-            else {
+            } else {
                 this._nbActive -= 1;
                 this._nbInactive += 1;
             }
         }
     }
 
-    activateAll(value: boolean) {
+    public activateAll(value: boolean) {
         for (let i = 0; i < this.size; ++i) {
             this._values[i].active = value;
         }
@@ -54,7 +45,7 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
         }
     }
 
-    clear(): void {
+    public clear(): void {
         super.clear();
         this._nbActive = 0;
         this._nbInactive = 0;
@@ -62,23 +53,22 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
         this._iterationLength = 0;
     }
 
-    create( entityId: number, active: boolean, ...args: any[]): T {
+    public create( entityId: number, active: boolean, ...args: any[]): T {
         let index: number;
         let toReplaceComp: T;
-        // if the key doesn't exist yet 
+        // if the key doesn't exist yet
         if (!this.has(entityId)) {
             // get the key and index of the first zeroed component in the values array
             index = this.getIndexOfFirstAvailableSpot();
             if (index === -1) {
                 throw new Error("no free slot available, please resize the pool");
             } else {
-                // add the key of our newly created component and 
+                // add the key of our newly created component and
                 this._keys.set(entityId, index);
                 this._nbCreated += 1;
                 if (active) {
                     this._nbActive += 1;
-                }
-                else {
+                } else {
                     this._nbInactive += 1;
                 }
                 // replace all propreties value from the zeroed component
@@ -92,14 +82,12 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
                 if (active) {
                     this._nbActive += 1;
                     this._nbInactive -= 1;
-                }
-                else {
+                } else {
                     this._nbActive -= 1;
                     this._nbInactive += 1;
                 }
             }
         }
-        
         toReplaceComp.entityId = entityId;
         toReplaceComp.active = active;
 
@@ -108,38 +96,8 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
         return this._values[index];
     }
 
-    protected getIndexOfFirstAvailableSpot(): number {
-        let l = this._values.length;
-        for (let i = 0; i < l; ++i) {
-            if (this._values[i].entityId === 0) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    protected mapObject(oldC: T, newC: T) {
-        for (let i in newC) {
-            if (oldC.hasOwnProperty(i)) {
-                oldC[i] = newC[i];
-            }
-        }
-    }
-
-    protected decrementCreatedLength(inputIndex: number) {
-        if (inputIndex >= this._iterationLength - 1) {
-            this._iterationLength -= 1;
-        }
-    }
-
-    protected incrementCreatedLength(inputIndex: number) {
-        if (inputIndex >= this._iterationLength) {
-            this._iterationLength += 1;
-        }
-    }
-
-    delete(entityId: number): boolean {
-        let index = this._keys.get(entityId);
+    public delete(entityId: number): boolean {
+        const index = this._keys.get(entityId);
         if (index === undefined) { return false; }
         // update nbActive/Inactive counter
         if (this._values[index].active) {
@@ -160,34 +118,68 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
         return true;
     }
 
-    recycle(indexComponentToReplace:number, componentRef){
+    public recycle(indexComponentToReplace: number, componentRef) {
         // parsing Date ?
-        let prop = JSON.parse(JSON.stringify(componentRef));
+        const prop = JSON.parse(JSON.stringify(componentRef));
         this._values[indexComponentToReplace] = Object.create(componentRef);
         Object.keys(componentRef).forEach((p) => {
             this._values[indexComponentToReplace][p] = prop[p];
         });
     }
 
-    resize(size: number) {
+    public resize(size: number) {
         let dif = size - this.size;
-        
         if (dif > 0) {
-            let oldL = this._values.length;
+            const oldL = this._values.length;
             this._values.length += dif;
             for (let i = 0; i < dif; ++i) {
-                this.createZeroedComponentAt(oldL+i)
+                this.createZeroedComponentAt(oldL + i);
             }
-        }
-        else if (dif < 0) {
+        } else if (dif < 0) {
             dif = Math.abs(dif);
             for (let i = 0; i < dif; ++i) {
-                let toDelete = this._values[this._values.length - 1];
+                const toDelete = this._values[this._values.length - 1];
                 this._keys.delete(toDelete.entityId);
                 this._values.pop();
             }
         }
         this._size += dif;
+    }
+
+    protected createZeroedComponentAt(index: number) {
+        this.recycle(index, this._zeroedRef);
+        this._values[index].entityId = 0;
+        this._values[index].active = false;
+    }
+
+    protected getIndexOfFirstAvailableSpot(): number {
+        const l = this._values.length;
+        for (let i = 0; i < l; ++i) {
+            if (this._values[i].entityId === 0) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    protected mapObject(oldC: T, newC: T) {
+        for (const i in newC) {
+            if (oldC.hasOwnProperty(i)) {
+                oldC[i] = newC[i];
+            }
+        }
+    }
+
+    protected decrementCreatedLength(inputIndex: number) {
+        if (inputIndex >= this._iterationLength - 1) {
+            this._iterationLength -= 1;
+        }
+    }
+
+    protected incrementCreatedLength(inputIndex: number) {
+        if (inputIndex >= this._iterationLength) {
+            this._iterationLength += 1;
+        }
     }
 
     get iterationLength(): number {
