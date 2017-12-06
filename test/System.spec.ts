@@ -2,7 +2,7 @@ import { expect } from "chai";
 import "mocha";
 import { ComponentFactory, EntityFactory } from "../src/ComponentFactory";
 import { IComponent, IComponentFactory, ISystem } from "../src/interfaces";
-import { MultiNonParallelSystem, MultiParallelSystem, MultiPoolSystem, System  } from "../src/System";
+import { System } from "../src/System";
 
 describe("System ", () => {
     class positionComponent implements IComponent {
@@ -11,6 +11,9 @@ describe("System ", () => {
     class MoveByOneUnitSystem extends System {
         constructor() {
             super();
+        }
+        setFactories(positionFactory:IComponentFactory<positionComponent>){
+            super.setFactories(positionFactory);
         }
         execute(component: positionComponent) {
             component.position.x += 1.0;
@@ -53,7 +56,8 @@ describe("System ", () => {
     it("should update active components", () => {
 
         let s = new MoveByOneUnitSystem();
-        s.process(positionFactory);
+        s.setFactories(positionFactory);
+        s.process();
 
         for (let i = 0; i < positionFactory.nbActive; ++i) {
             expect(positionFactory.values[i].active).to.equal(true);
@@ -64,7 +68,8 @@ describe("System ", () => {
     });
     it("should not update inactive components", () => {
         let s = new MoveByOneUnitSystem();
-        s.process(positionFactory);
+        s.setFactories(positionFactory);
+        s.process();
         for (let i = positionFactory.nbActive; i < positionFactory.nbActive + positionFactory.nbInactive; ++i) {
             expect(positionFactory.values[i].active).to.equal(false);
             expect(positionFactory.values[i].position.x).to.equal(0.0);
@@ -78,7 +83,8 @@ describe("System ", () => {
             positionFactory.values[i].active = true;
         }
         let s = new MoveByOneUnitSystem();
-        s.process(positionFactory);
+        s.setFactories(positionFactory);
+        s.process();
         for (let i = positionFactory.nbActive + positionFactory.nbInactive; i < positionFactory.size; ++i) {
             expect(positionFactory.values[i].entityId).to.equal(0);
             expect(positionFactory.values[i].position.x).to.equal(0.0);
@@ -137,7 +143,7 @@ describe("System with multiple components types", () => {
             constructor(public entityId: number, public active: boolean, public x: number, public y: number, public z: number) { }
         }
 
-        class MoveSystem extends MultiPoolSystem {
+        class MoveSystem extends System {
             constructor() { super(); }
 
             execute(posC: IPositionComponent, veloC: IVelocityComponent) {
@@ -194,7 +200,7 @@ describe("System with multiple components types", () => {
     });
 
     describe("parallel pool system", () => {
-        class MoveSystem extends MultiParallelSystem {
+        class MoveSystem extends System {
             constructor() {
                 super();
             }
@@ -211,7 +217,7 @@ describe("System with multiple components types", () => {
         });
         it("should provide all the components to the execute fonction", () => {
 
-            class argTestSystem extends MultiParallelSystem {
+            class argTestSystem extends System {
                 constructor() {
                     super();
                 }
@@ -221,13 +227,14 @@ describe("System with multiple components types", () => {
                 }
             }
             let ms = new argTestSystem();
-            ms.process(positionFactory, velocityFactory);
+            ms.setFactories(positionFactory, velocityFactory);
+            ms.process();
 
         });
         it("should update the component in pools specified in the system constructor", () => {
             let ms = new MoveSystem();
-
-            ms.process(positionFactory, velocityFactory);
+            ms.setFactories(positionFactory, velocityFactory);
+            ms.process();
 
             for (let i = 0; i < positionFactory.length; ++i) {
                 expect(positionFactory.values[i].position.x).to.equal(2.0);
@@ -239,7 +246,8 @@ describe("System with multiple components types", () => {
             movingEntities.addFactory("position", positionFactory);
             movingEntities.addFactory("velocity", velocityFactory);
 
-            ms.process(movingEntities.getFactory("position"), movingEntities.getFactory("velocity"));
+            ms.setFactories(movingEntities.getFactory("position"), movingEntities.getFactory("velocity"));
+            ms.process();
 
             for (let i = 0; i < positionFactory.nbCreated; ++i) {
                 expect(positionFactory.values[i].position.x).to.equal(2.0);
@@ -275,7 +283,7 @@ describe("changing poolFactories of system at runtime without having to rewrite 
         constructor(public entityId: number, public active: boolean, public velocity: { x: number, y: number, z: number }) { }
     }
 
-    class MoveSystem extends MultiPoolSystem {
+    class MoveSystem extends System {
         constructor() { super(); }
 
         execute(posC: IPositionComponent, veloC: IVelocityComponent) {
@@ -345,5 +353,5 @@ describe("changing poolFactories of system at runtime without having to rewrite 
             expect(positionFactory.values[i].position.x).to.equal(2.0);
         }
     });
-   
+
 });
