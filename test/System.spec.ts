@@ -175,7 +175,8 @@ describe("System with multiple components types", () => {
         it("should iterate on the first factory and update its components with components of the second factory", () => {
             let s = new MoveSystem();
 
-            s.process(positionFactory, velocityFactory);
+            s.setFactories(positionFactory, velocityFactory);
+            s.process();
 
             for (let i = 0; i < positionFactory.size - 1; ++i) {
                 expect(positionFactory.values[i].x).to.equal(2.0);
@@ -185,8 +186,8 @@ describe("System with multiple components types", () => {
             expect(positionFactory.nbActive).to.equal(velocityFactory.nbActive + 1);
 
             let s = new MoveSystem();
-            s.process(positionFactory, velocityFactory);
-
+            s.setFactories(positionFactory, velocityFactory);
+            s.process();
             // last one should not be updated since there is no velocity component associated with.
             expect(positionFactory.values[positionFactory.size - 1].x).to.equal(1.0);
         });
@@ -328,8 +329,8 @@ describe("changing poolFactories of system at runtime without having to rewrite 
     });
     it("should be able to get all param from one components", () => {
         let s = new MoveSystem();
-
-        s.process(movingFactory, movingFactory);
+        s.setFactories(movingFactory, movingFactory);
+        s.process();
 
         for (let i = 0; i < movingFactory.size - 1; ++i) {
             expect(movingFactory.values[i].position.x).to.equal(2.0);
@@ -337,11 +338,12 @@ describe("changing poolFactories of system at runtime without having to rewrite 
     });
     it("should be able to get all params from multiples components", () => {
         let s = new MoveSystem();
-
-        s.process(positionFactory, velocityFactory);
+        s.setFactories(positionFactory, velocityFactory);
+        s.process();
 
         for (let i = 0; i < positionFactory.size - 1; ++i) {
             expect(positionFactory.values[i].position.x).to.equal(2.0);
         }
     });
+   
 });
