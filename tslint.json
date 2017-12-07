@@ -7,9 +7,12 @@
     "rules": {
         "variable-name": [
             true,
-             "ban-keywords",
-              "check-format", "allow-leading-underscore"],
-        "max-classes-per-file":false,
-    "rulesDirectory": []
-    
+            "ban-keywords",
+            "check-format",
+            "allow-leading-underscore"
+        ],
+        "max-classes-per-file": false,
+        "rulesDirectory": [],
+        "no-empty": false
+    }
 }

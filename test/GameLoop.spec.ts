@@ -1,24 +1,28 @@
 import { expect } from "chai";
 import "mocha";
 import { ComponentFactory, EntityFactory } from "../src/ComponentFactory";
-import { GameLoop } from "../src/GameLoop";
-import { IComponent, IComponentFactory } from "../src/interfaces";
+import { FrameEvent, GameLoop } from "../src/GameLoop";
+import { IComponent, IComponentFactory, IFrameEvent } from "../src/interfaces";
 import { System } from "../src/System";
 
 describe("GameLoop should be able to", () => {
+
     it("start execution of the loop ", () => {
         const gl = new GameLoop();
-        gl.start();
+        gl.start(new FrameEvent());
+        expect(gl.isRunning()).to.equal(true);
     });
     it("stop the execution of the loop", () => {
         const gl = new GameLoop();
         gl.start();
         gl.stop();
+        expect(gl.isRunning()).to.equal(false);
         // cancelRequestAnimationFrame ?
     });
     it("provide the current time", () => {
         const gl = new GameLoop();
-        expect(gl.getCurrentTime()).to.approximately(Date.now(), 1000);
+        gl.start();
+        expect(gl.getCurrentTimer().time).to.approximately(Date.now(), 1000);
     });
     it("provide the time of the last iteration", () => {
         // const gl = new GameLoop();
@@ -35,33 +39,33 @@ describe("GameLoop should be able to", () => {
     });
 
     describe("use of Systems ", () => {
-        //dummy system that increment a interger
-
+        // dummy system that increment a interger
         class IntegerComponent {
-            constructor(public entityId: number, public active: boolean, public integer:number) {}
+            constructor(public entityId: number, public active: boolean, public integer: number) {}
         }
         class IncrementSystem extends System {
-            constructor(){ super();}
-            execute(int: IntegerComponent){
-                int.integer +=1;
+            constructor() { super(); }
+            public execute(int: IntegerComponent) {
+                int.integer += 1;
             }
         }
 
         // dummy sytem that multiply an integer by itself
         class SquareSystem extends System {
-            constructor(){ super();}
-            execute(int: IntegerComponent){
-                int.integer *= int.integer;
+            constructor() { super(); }
+            public execute(int: IntegerComponent) {
+
+                int.integer = int.integer * int.integer;
             }
         }
 
         // moving System
         interface IPositionComponent extends IComponent {
-            position: { x: number, y: number, z: number }
+            position: Ivec3;
         }
 
         interface IVelocityComponent extends IComponent {
-            velocity: { x: number, y: number; z: number }
+            velocity: Ivec3;
         }
 
         interface Ivec3 {
@@ -69,6 +73,7 @@ describe("GameLoop should be able to", () => {
             y: number;
             z: number;
         }
+
         class PositionComponent implements IPositionComponent {
             constructor(public entityId: number, public active: boolean, public position: Ivec3) { }
         }
@@ -80,7 +85,7 @@ describe("GameLoop should be able to", () => {
         class MoveSystem extends System {
             constructor() { super(); }
 
-            execute(posC: IPositionComponent, veloC: IVelocityComponent) {
+            public execute(posC: IPositionComponent, veloC: IVelocityComponent) {
                 // console.log(posC);
                 // console.log("---");
                 // console.log(veloC);
@@ -91,7 +96,6 @@ describe("GameLoop should be able to", () => {
             }
         }
         let integerFactory: ComponentFactory<IntegerComponent>;
-       
 
         let positionFactory: ComponentFactory<PositionComponent>;
         let velocityFactory: ComponentFactory<VelocityComponent>;
@@ -99,8 +103,7 @@ describe("GameLoop should be able to", () => {
 
             integerFactory = new ComponentFactory<IntegerComponent>(5, IntegerComponent, 1);
 
-
-            let zeroVec = { x: 0.0, y: 0.0, z: 0.0 };
+            const zeroVec = { x: 0.0, y: 0.0, z: 0.0 };
             positionFactory = new ComponentFactory<PositionComponent>(5, PositionComponent, zeroVec);
             velocityFactory = new ComponentFactory<VelocityComponent>(5, VelocityComponent, zeroVec);
 
@@ -120,7 +123,6 @@ describe("GameLoop should be able to", () => {
                 v.velocity.z = 0.0;
             }
 
-
         });
 
         it("accept a list of System to iterate on", () => {
@@ -139,19 +141,47 @@ describe("GameLoop should be able to", () => {
             }
         });
         it("iterate on systems in the order they are provided", () => {
-            let c1 = integerFactory.create(1, true);
+            const c1 = integerFactory.create(1, true);
             expect(c1.integer).to.equal(1);
 
-            let s1 = new IncrementSystem();
-            let s2 = new SquareSystem();
+            const s1 = new IncrementSystem();
+            s1.setFactories(integerFactory);
+            const s2 = new SquareSystem();
+            s2.setFactories(integerFactory);
 
-            let gl = new GameLoop();
+            const gl = new GameLoop();
             gl.setSystems([s1, s2]);
-            gl.start();
-            
+
+            const inc = c1.integer + 1;
+            const res = inc * inc;
+            gl.mainLoop();
+            expect(integerFactory.get(1).integer).to.equal(res);
+
         });
         it("re-order the sytems", () => {
+            const c1 = integerFactory.create(1, true);
+            expect(c1.integer).to.equal(1);
 
+            const s1 = new IncrementSystem();
+            s1.setFactories(integerFactory);
+            const s2 = new SquareSystem();
+            s2.setFactories(integerFactory);
+
+            const gl = new GameLoop();
+            gl.setSystems([s1, s2]);
+
+            const inc = c1.integer + 1;
+            const res = inc * inc;
+            gl.mainLoop();
+            expect(integerFactory.get(1).integer).to.equal(res);
+
+            // changing the order of operations
+            gl.setSystems([s2, s1]);
+
+            const sq = res * res;
+            const res2 = sq + 1;
+            gl.mainLoop();
+            expect(integerFactory.get(1).integer).to.equal(res2);
         });
         it("pause each system individually", () => {
 

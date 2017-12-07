@@ -1,4 +1,4 @@
-export { ISystem, IComponent, IPool, IComponentFactory, IEntityFactory };
+export { ISystem, IComponent, IPool, IComponentFactory, IEntityFactory, IFrameEvent};
 
 interface IFrameEvent {
     /* The number of times the frame event was fired */
