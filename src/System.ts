@@ -14,7 +14,7 @@ abstract class System implements ISystem {
         this.factories = args;
     }
     // Query the components and execute active ones
-    public process() {
+    public process(args?: any[]) {
         const flist = this.factories;
         const l = flist[0].iterationLength;
         const f = flist[0].values;
@@ -41,10 +41,15 @@ abstract class System implements ISystem {
                     }
                 }
                 if (isFound) {
+                    // add eventual parameters passed to the process function at the end of the execute parameters list
+                    const al = args.length;
+                    for (let a = 0; a < al; ++a) {
+                        arr.push(args[a]);
+                    }
                     this.execute.apply(null, arr);
                 }
             }
         }
     }
-    public abstract execute(component: IComponent, ...args: IComponent[]);
+    public abstract execute(...args: any[]);
 }
