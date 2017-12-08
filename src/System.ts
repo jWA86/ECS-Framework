@@ -42,9 +42,11 @@ abstract class System implements ISystem {
                 }
                 if (isFound) {
                     // add eventual parameters passed to the process function at the end of the execute parameters list
-                    const al = args.length;
-                    for (let a = 0; a < al; ++a) {
-                        arr.push(args[a]);
+                    if (args) {
+                        const al = args.length;
+                        for (let a = 0; a < al; ++a) {
+                            arr.push(args[a]);
+                        }
                     }
                     this.execute.apply(null, arr);
                 }
