@@ -40,6 +40,7 @@
     "webpack": "^3.5.6"
   },
   "dependencies": {
-    "fastiterationmap": "^1.0.4"
+    "fastiterationmap": "^1.0.4",
+    "raf": "^3.4.0"
   }
 }

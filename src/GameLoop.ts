@@ -1,6 +1,7 @@
+import "raf";
 import { IComponent, IComponentFactory, IFrameEvent, ISystem } from "../src/interfaces";
 
-export  { FrameEvent, GameLoop };
+export { FrameEvent, GameLoop };
 
 class FrameEvent {
     public lastFrame: number;
@@ -9,6 +10,7 @@ class FrameEvent {
     public loopCount: number;
     public reverse: boolean;
     public time: number;
+    public frequency: number;
     constructor() {
         this.count = 0;
         this.loopCount = 0;
@@ -20,8 +22,8 @@ class FrameEvent {
 }
 
 class GameLoop {
-    protected requestAnimationFrame: () => number;
-    protected cancelAnimationFrame: (frameId: number) => void;
+    // protected requestAnimationFrame;
+    // protected cancelAnimationFrame;
     protected _running: boolean;
     protected _systems: ISystem[];
     protected _frameId: number;
@@ -30,9 +32,9 @@ class GameLoop {
     protected _processFrequency: number;
     constructor(systems: ISystem[], processFrequency = 30) {
         this.setSystems(systems);
-        this.pollyFillAnimationFrame();
+        // this.pollyFillAnimationFrame();
         this._currentTimer = new FrameEvent();
-        this._processFrequency = processFrequency;
+        this.setFrequency(processFrequency);
         this._running = false;
     }
 
@@ -51,40 +53,54 @@ class GameLoop {
     public start() {
         this._running = true;
         this._currentTimer = new FrameEvent();
-        this.update();
+        this._currentTimer.lastFrame = Date.now();
+        this.loop();
         // this.update(timer);
     }
     public stop() {
         this._running = false;
-        this.cancelAnimationFrame(this._frameId);
+        cancelAnimationFrame(this._frameId);
     }
     /* Set the process frequency in mms */
     public setFrequency(frequency: number) {
         this._processFrequency = frequency;
+        this._currentTimer.frequency = frequency;
     }
-    public update() {
-        this._currentTimer.lastFrame = Date.now();
-        while (this._running) {
-            const delta = Date.now() - this._currentTimer.lastFrame;
-            if (delta >= this._processFrequency) {
-                this._currentTimer.delta = delta;
-                this._currentTimer.time += delta;
-                this.mainLoop(this._currentTimer);
-                this._currentTimer.lastFrame = Date.now();
-                this._currentTimer.count += 1;
-            }
+    public loop() {
+        // this._currentTimer.lastFrame = Date.now();
+        const delta = Date.now() - this._currentTimer.lastFrame;
+        if (delta >= this._processFrequency) {
+            this._currentTimer.delta = delta;
+            this._currentTimer.time += delta;
+            this.update();
+            this._currentTimer.lastFrame = Date.now();
+            this._currentTimer.count += 1;
+        }
+        if (this._running) {
+            requestAnimationFrame(() => this.loop());
         }
     }
     /* Process every Systems */
-    public mainLoop(timer: FrameEvent) {
+    public update() {
         const l = this._systems.length;
         for (let i = 0; i < l; ++i) {
-            this._systems[i].process([timer]);
+            this._systems[i].process([this._currentTimer]);
         }
     }
 
-    protected pollyFillAnimationFrame() {
-        this.requestAnimationFrame = () => 0;
-        this.cancelAnimationFrame = (frameId: number) => { };
-    }
+    // protected pollyFillAnimationFrame() {
+    //     this.requestAnimationFrame = typeof requestAnimationFrame === "function" ? requestAnimationFrame : (() => {
+    //         let lastTimestamp = Date.now();
+    //         return (callback) => {
+    //             const now = Date.now();
+    //             const timeout = Math.max(0, this._processFrequency - (now - lastTimestamp));
+    //             lastTimestamp = now + timeout;
+    //             return setTimeout(() => {
+    //                 callback(now + timeout);
+    //             }, timeout);
+    //         };
+    //     })(),
+
+    //         this.cancelAnimationFrame = typeof cancelAnimationFrame === "function" ? cancelAnimationFrame : clearTimeout;
+    // }
 }
