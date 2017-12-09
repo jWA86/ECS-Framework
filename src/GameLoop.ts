@@ -1,30 +1,39 @@
-import { IFrameEvent, ISystem } from "../src/interfaces";
+import { IComponent, IComponentFactory, IFrameEvent, ISystem } from "../src/interfaces";
 
 export  { FrameEvent, GameLoop };
 
-class FrameEvent implements IFrameEvent {
+class FrameEvent {
+    public lastFrame: number;
     public count: number;
     public delta: number;
     public loopCount: number;
     public reverse: boolean;
-    constructor(public time = Date.now()) {
+    public time: number;
+    constructor() {
         this.count = 0;
         this.loopCount = 0;
         this.delta = 0;
         this.reverse = false;
+        this.lastFrame = 0;
+        this.time = 0;
     }
 }
 
 class GameLoop {
-    protected requestAnimationFrame: Function;
-    protected cancelAnimationFrame: Function;
-    protected _running = false;
+    protected requestAnimationFrame: () => number;
+    protected cancelAnimationFrame: (frameId: number) => void;
+    protected _running: boolean;
     protected _systems: ISystem[];
     protected _frameId: number;
-    protected _currentTimer: IFrameEvent;
-    constructor() {
+    protected _currentTimer: FrameEvent;
+    /* Iteration frequency in mms */
+    protected _processFrequency: number;
+    constructor(systems: ISystem[], processFrequency = 30) {
+        this.setSystems(systems);
         this.pollyFillAnimationFrame();
-        this._currentTimer = new FrameEvent(0);
+        this._currentTimer = new FrameEvent();
+        this._processFrequency = processFrequency;
+        this._running = false;
     }
 
     public isRunning(): boolean {
@@ -33,51 +42,49 @@ class GameLoop {
     public getSystems(): ISystem[] {
         return this._systems;
     }
-    public getCurrentTimer(): IFrameEvent {
+    public getCurrentTimer(): FrameEvent {
         return this._currentTimer;
     }
     public setSystems(systems: ISystem[]) {
         this._systems = systems;
     }
-    public start(timer = new FrameEvent()) {
+    public start() {
         this._running = true;
-        this._currentTimer = timer;
+        this._currentTimer = new FrameEvent();
+        this.update();
         // this.update(timer);
     }
     public stop() {
         this._running = false;
         this.cancelAnimationFrame(this._frameId);
     }
-    public update(timer: IFrameEvent = new FrameEvent()) {
-        var timestep = 1000 / 60;
-        let delta = 0;
-        let lastFrameTimeMs = 0;
-        function mainLoop(timestamp) {
-            // ...
-
-            // Track the accumulated time that hasn't been simulated yet
-            delta += timestamp - lastFrameTimeMs; // note += here
-            lastFrameTimeMs = timestamp;
-
-            // Simulate the total elapsed time in fixed-size chunks
-            while (delta >= timestep) {
-                // update(timestep);
-                delta -= timestep;
+    /* Set the process frequency in mms */
+    public setFrequency(frequency: number) {
+        this._processFrequency = frequency;
+    }
+    public update() {
+        this._currentTimer.lastFrame = Date.now();
+        while (this._running) {
+            const delta = Date.now() - this._currentTimer.lastFrame;
+            if (delta >= this._processFrequency) {
+                this._currentTimer.delta = delta;
+                this._currentTimer.time += delta;
+                this.mainLoop(this._currentTimer);
+                this._currentTimer.lastFrame = Date.now();
+                this._currentTimer.count += 1;
             }
-            // draw();
-            this.requestAnimationFrame(mainLoop);
         }
     }
     /* Process every Systems */
-    public mainLoop() {
+    public mainLoop(timer: FrameEvent) {
         const l = this._systems.length;
         for (let i = 0; i < l; ++i) {
-            this._systems[i].process();
+            this._systems[i].process([timer]);
         }
     }
 
     protected pollyFillAnimationFrame() {
-        this.requestAnimationFrame = () => { };
-        this.cancelAnimationFrame = () => { };
+        this.requestAnimationFrame = () => 0;
+        this.cancelAnimationFrame = (frameId: number) => { };
     }
 }

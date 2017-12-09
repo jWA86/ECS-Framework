@@ -120,6 +120,7 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
 
     public recycle(indexComponentToReplace: number, componentRef) {
         // parsing Date ?
+        // parsing Function ?
         const prop = JSON.parse(JSON.stringify(componentRef));
         this._values[indexComponentToReplace] = Object.create(componentRef);
         Object.keys(componentRef).forEach((p) => {

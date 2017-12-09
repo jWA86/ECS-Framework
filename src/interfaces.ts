@@ -13,7 +13,7 @@ interface IFrameEvent {
 
 interface ISystem {
     setFactories(... args: Array<IComponentFactory<IComponent>>);
-    process();
+    process(args?: any[]);
     execute(... args: any[]);
 }
 

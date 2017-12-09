@@ -13,6 +13,8 @@
         ],
         "max-classes-per-file": false,
         "rulesDirectory": [],
-        "no-empty": false
+        "no-empty": false,
+        "max-line-length": 140,
+        "no-console": false
     }
 }
