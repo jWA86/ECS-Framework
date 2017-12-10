@@ -20,6 +20,7 @@ module.exports = function(config) {
       },
 
       singleRun: false,
-      concurrency: Infinity
+      // concurrency: Infinity
+      concurrency: 4
   });
 };

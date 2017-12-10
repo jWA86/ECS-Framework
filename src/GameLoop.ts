@@ -5,36 +5,30 @@ export { FrameEvent, GameLoop };
 
 class FrameEvent {
     public lastFrame: number;
-    public count: number;
     public delta: number;
-    public loopCount: number;
-    public reverse: boolean;
     public time: number;
-    public frequency: number;
-    constructor() {
-        this.count = 0;
-        this.loopCount = 0;
+    constructor(public frequency: number) {
         this.delta = 0;
-        this.reverse = false;
+        this.lastFrame = 0;
+        this.time = 0;
+    }
+    public reset() {
+        this.delta = 0;
         this.lastFrame = 0;
         this.time = 0;
     }
 }
 
 class GameLoop {
-    // protected requestAnimationFrame;
-    // protected cancelAnimationFrame;
+    public timestamp = this._pollyFillHighResolutionTime();
     protected _running: boolean;
     protected _systems: ISystem[];
+    protected _activeSystems: ISystem[];
     protected _frameId: number;
     protected _currentTimer: FrameEvent;
-    /* Iteration frequency in mms */
-    protected _processFrequency: number;
-    constructor(systems: ISystem[], processFrequency = 30) {
+    constructor(systems: ISystem[], timer = new FrameEvent(1000 / 30)) {
         this.setSystems(systems);
-        // this.pollyFillAnimationFrame();
-        this._currentTimer = new FrameEvent();
-        this.setFrequency(processFrequency);
+        this._currentTimer = timer;
         this._running = false;
     }
 
@@ -47,13 +41,16 @@ class GameLoop {
     public getCurrentTimer(): FrameEvent {
         return this._currentTimer;
     }
+    public setCurretnTimer(timer: FrameEvent) {
+        this._currentTimer = timer;
+    }
     public setSystems(systems: ISystem[]) {
         this._systems = systems;
     }
     public start() {
         this._running = true;
-        this._currentTimer = new FrameEvent();
-        this._currentTimer.lastFrame = Date.now();
+        this._currentTimer.reset();
+        this._currentTimer.lastFrame = this.timestamp.now();
         this.loop();
         // this.update(timer);
     }
@@ -61,23 +58,30 @@ class GameLoop {
         this._running = false;
         cancelAnimationFrame(this._frameId);
     }
+    public resume() {
+        this._running = true;
+        this._currentTimer.lastFrame = this.timestamp.now();
+        this.loop();
+    }
     /* Set the process frequency in mms */
     public setFrequency(frequency: number) {
-        this._processFrequency = frequency;
         this._currentTimer.frequency = frequency;
     }
     public loop() {
-        // this._currentTimer.lastFrame = Date.now();
-        const delta = Date.now() - this._currentTimer.lastFrame;
-        if (delta >= this._processFrequency) {
+        const now = this.timestamp.now();
+        let delta = now - this._currentTimer.lastFrame;
+        this._currentTimer.time += delta;
+        // limit delta max value when browser loose focus and resume ?
+        while (delta >= this._currentTimer.frequency) {
             this._currentTimer.delta = delta;
-            this._currentTimer.time += delta;
             this.update();
-            this._currentTimer.lastFrame = Date.now();
-            this._currentTimer.count += 1;
+            this._currentTimer.lastFrame = now;
+            delta -= this._currentTimer.frequency;
         }
         if (this._running) {
-            requestAnimationFrame(() => this.loop());
+            this._frameId = requestAnimationFrame(() => this.loop());
+        } else {
+            cancelAnimationFrame(this._frameId);
         }
     }
     /* Process every Systems */
@@ -87,20 +91,7 @@ class GameLoop {
             this._systems[i].process([this._currentTimer]);
         }
     }
-
-    // protected pollyFillAnimationFrame() {
-    //     this.requestAnimationFrame = typeof requestAnimationFrame === "function" ? requestAnimationFrame : (() => {
-    //         let lastTimestamp = Date.now();
-    //         return (callback) => {
-    //             const now = Date.now();
-    //             const timeout = Math.max(0, this._processFrequency - (now - lastTimestamp));
-    //             lastTimestamp = now + timeout;
-    //             return setTimeout(() => {
-    //                 callback(now + timeout);
-    //             }, timeout);
-    //         };
-    //     })(),
-
-    //         this.cancelAnimationFrame = typeof cancelAnimationFrame === "function" ? cancelAnimationFrame : clearTimeout;
-    // }
+    protected _pollyFillHighResolutionTime() {
+        return window.performance && window.performance.now ? window.performance : Date;
+    }
 }
