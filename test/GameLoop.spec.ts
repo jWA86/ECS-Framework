@@ -5,15 +5,13 @@ import { FrameEvent, GameLoop } from "../src/GameLoop";
 import { IComponent, IComponentFactory, IFrameEvent } from "../src/interfaces";
 import { System } from "../src/System";
 import { SystemManager } from "../src/SystemManager";
-import { setInterval } from "timers";
+import { clearInterval, setInterval } from "timers";
 
 // Can't seem to test timer value with multiple browser test
 // especially with firefox
 
-
-describe("GameLoop should be able to", function () {
+describe("GameLoop should be able to", function() {
     this.timeout(3000);
-    
     const perf = window.performance && window.performance.now ? window.performance : Date;
     class EmptyComponent implements IComponent {
         constructor(public entityId: number, public active: boolean) { }
@@ -127,11 +125,12 @@ describe("GameLoop should be able to", function () {
         const runFor = 1000;
         const gl = new GameLoop(sM);
         gl.setFrequency(1000 / 30);
-        setInterval(() => {
+        const sI = setInterval(() => {
             const t = gl.getCurrentTimer();
             if (t.time >= runFor) {
                 gl.stop();
                 expect(t.time).to.approximately(runFor, 30);
+                clearInterval(sI);
                 done();
             }
         }, 20);
@@ -148,16 +147,18 @@ describe("GameLoop should be able to", function () {
         gl.setFrequency(1000 / 60);
         const runFor = 500;
         gl.start();
-        setInterval( () => {
+        const sI = setInterval( () => {
             const t1 = gl.getCurrentTimer().time;
             if (t1 >= runFor) {
                 gl.stop();
                 gl.resume();
-                setInterval( () => {
+                const sI2 = setInterval( () => {
                     const t2 = gl.getCurrentTimer().time;
                     if (t2 >= runFor * 2 ) {
                         gl.stop();
                         expect(t2).to.gte(t1);
+                        clearInterval(sI);
+                        clearInterval(sI2);
                         done();
                     }
                 }, 20);
@@ -182,7 +183,7 @@ describe("GameLoop should be able to", function () {
         gl.setFrequency(frequency);
         const runFor = 500;
         gl.start();
-        setInterval(() => {
+        const sI = setInterval(() => {
             const t = gl.getCurrentTimer();
             if (t.time >= runFor) {
                 gl.stop();
@@ -191,6 +192,7 @@ describe("GameLoop should be able to", function () {
                     const diff = arr[i + 1] - arr[i];
                     expect(diff).to.approximately(frequency, 5);
                 }
+                clearInterval(sI);
                 done();
             }
         }, 20);
@@ -221,60 +223,7 @@ describe("GameLoop should be able to", function () {
         // USE SystemManager
         done();
     });
-    it("pause each system individually", () => {
-        // supply an aray containing system and information for beoing proceed, such as frequency of update, order of execution, thread to be executed
-        // or
-        // members variables in system class that hold : frequency, state (playing / pause)
-        //
-        // How to pause system ?
-        // who hold instances of systems ?
-        // - Game Loop
-        // or need an object that hold systems and orders of execution then game loop hold this object ?
-        // this object should hold instance of systems
-        // give an id to each system
-        // give an accessor to each system so we can pause / resume them, change frequency
-        // how to call this object ?
-        // system pool ? is it really a pool ?
-        // System mamanger ?
-        // --------
-        // should system object hold params such a running  frequency ?
-        // or it should be decoupled and only the system manager hold this information ?
-        // who should read this informations ?
-        // the Game Loop
-        // in the loop
-        // if (SystemManager.forEach(s)=>{
-        //  instance hold running state
-        // [instanceSys.running]
-        //  if(s.system.running) {
-        //        s.system.update();
-        // }
-        // systemManager hold state in an array
-        // [{runnning: true, system: instance}]
-        // or if(s.running)
-        //  s.system.update
-        // }
-        // Frequency
-        // System Manager should organize systems by their frequency so the game loop do fewer check in the loop
-        // most use case only use 2 frequency, one for rendering system and one for updating state
-        // GameLoop.loop
-        //          SystemManager.forEach((FrequencyGroup) => {
-        // if(delta > FrequencyGroup.frequency)
-        // FrequencyGroup.systems.forEach((s)=>{
-        // s.update();
-        // })
-        // })
-        // how to update multiple system with varous frequency as much as possible between rendering
-        // while (delta)
-        // when to decrement delta ?
-        // For now we only need 2 type of frequency
-        // one for rendering
-        // another for update
-        // so SystemManager should only organize system by
-        // fixedTimestep or not
-        // and ony have one fixedTimeStep set by the GameLoop
 
-        // 
-    });
     it("update some systems on a fixedTimeStep and other at the requestionAnimationFrame frequency", (done) => {
         // increment an integer in both systems
         // then make sure the fixedTimeStep run more time
@@ -297,18 +246,83 @@ describe("GameLoop should be able to", function () {
         const gl = new GameLoop(sM);
         gl.setFrequency(frequency);
         const runFor = 500;
-        setInterval(() => {
+        gl.start();
+        const sI = setInterval(() => {
             const t = gl.getCurrentTimer();
-            if(t.time >= runFor){
+            if (t.time >= runFor) {
                 gl.stop();
                 const fi = fixedIntFactory.get(1).integer;
                 const nfi = nFixedIntFactory.get(1).integer;
                 expect(fi).to.gt(nfi);
+                clearInterval(sI);
                 done();
             }
         }, 10);
+    });
+    it("pause each system individually", (done) => {
+        // 2 increments systems
+        // one is paused after a moment of execution
+        // run a bit more
+        // stop and compare value of the incremented component
+        // the one in the paused system should be less than the other that continued running
+
+        const fact1 = new ComponentFactory<IntegerComponent>(2, IntegerComponent, 0);
+        const fact2 = new ComponentFactory<IntegerComponent>(2, IntegerComponent, 0);
+        const fact3 = new ComponentFactory<IntegerComponent>(2, IntegerComponent, 0);
+        const fact4 = new ComponentFactory<IntegerComponent>(2, IntegerComponent, 0);
+        fact1.create(1, true);
+        fact2.create(1, true);
+        fact3.create(1, true);
+        fact4.create(1, true);
+        const incS1 = new IncrementSystem();
+        const incS2 = new IncrementSystem();
+        const incS3 = new IncrementSystem();
+        const incS4 = new IncrementSystem();
+
+        incS1.setFactories(fact1);
+        incS2.setFactories(fact2);
+        incS3.setFactories(fact3);
+        incS4.setFactories(fact4);
+
+        const sM = new SystemManager();
+        const pausedFSysId = sM.pushSystem(incS1, true);
+        const sys2Id = sM.pushSystem(incS2, true);
+        const pausedNFSysId = sM.pushSystem(incS3, false);
+        const sys4Id = sM.pushSystem(incS4, false);
+
+        const gl = new GameLoop(sM);
+        const pauseAt = 250;
+        const runFor = 1000;
+
         gl.start();
-        done();
+        let paused = false;
+        const sI = setInterval(() => {
+            const t = gl.getCurrentTimer();
+            if (t.time >= pauseAt && !paused) {
+                // pause some system
+                gl.getSystemManager().get(pausedFSysId).active = false;
+                gl.getSystemManager().get(pausedNFSysId).active = false;
+                paused = true;
+            }
+            if (t.time >= runFor && paused) {
+                gl.stop();
+                const pausedComp = fact1.get(1);
+                const nonPausedComp = fact2.get(1);
+                const pausedNComp = fact3.get(1);
+                const nonPausedNComp = fact4.get(1);
+                expect(gl.getSystemManager().get(pausedFSysId).active).to.equal(false);
+                expect(gl.getSystemManager().get(pausedNFSysId).active).to.equal(false);
+                expect(gl.getSystemManager().get(sys2Id).active).to.equal(true);
+                expect(gl.getSystemManager().get(sys4Id).active).to.equal(true);
+                expect(pausedComp.integer).to.gt(0);
+                expect(pausedNComp.integer).to.gt(0);
+                expect(pausedComp.integer).to.lt(nonPausedComp.integer);
+                expect(pausedNComp.integer).to.lt(nonPausedNComp.integer);
+                clearInterval(sI);
+                done();
+            }
+        }, 20);
+
     });
     it("measure time taken to process each system", () => {
 

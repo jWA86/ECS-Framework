@@ -32,16 +32,21 @@ describe("SystemManager should be able to", () => {
             const secondId = sysManager.pushSystem(new IncrementSystem(), true);
             const thirdId = sysManager.pushSystem(new FeedBackSystem(), true);
             const fourthId = sysManager.pushSystem(new FeedBackSystem(), true);
-
+            const fifthId = sysManager.pushSystem(new FeedBackSystem(), false);
+            const sixId = sysManager.pushSystem(new FeedBackSystem(), false);
             // should be different
             expect(secondId).to.not.equal(firstId);
             expect(thirdId).to.not.equal(firstId);
             expect(fourthId).to.not.equal(thirdId);
+            expect(fifthId).to.not.equal(fourthId);
+            expect(sixId).to.not.equal(fifthId);
             // should be class name + number if more than one instance in the SystemManager
             expect(firstId).to.equal("FeedBackSystem");
             expect(secondId).to.equal("IncrementSystem");
             expect(thirdId).to.equal("FeedBackSystem_1");
             expect(fourthId).to.equal("FeedBackSystem_2");
+            expect(fifthId).to.equal("FeedBackSystem_3");
+            expect(sixId).to.equal("FeedBackSystem_4");
         });
         it("add a system in separate collection based on wether it should be processed at fixed time step or not", () => {
             const sysManager = new SystemManager();

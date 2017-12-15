@@ -3,6 +3,7 @@ import { IComponent, IComponentFactory } from "./interfaces";
 export { System, ISystem };
 
 interface ISystem {
+    active: boolean;
     setFactories(... args: Array<IComponentFactory<IComponent>>);
     process(args?: any[]);
     execute(... args: any[]);
@@ -11,6 +12,7 @@ interface ISystem {
 // A factory for each parameters of the exectute function
 abstract class System implements ISystem {
     public factories: Array<IComponentFactory<IComponent>>;
+    public active: boolean = true;
     constructor() { }
     /**  Set the source of the components that will be processed.
      * One factory per component parameters in the order requested by the executed method.

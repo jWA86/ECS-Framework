@@ -110,8 +110,14 @@ describe("System ", () => {
             expect(positionFactory.values[i].position.z).to.equal(0.0);
         }
     });
-
-    // });
+    it("toggle an active proprety", () => {
+        const s = new MoveByOneUnitSystem();
+        expect(s.active).to.equal(true);
+        s.active = false;
+        expect(s.active).to.equal(false);
+        s.active = true;
+        expect(s.active).to.equal(true);
+    });
     describe("System with multiple components types", () => {
 
         let velocityFactory: ComponentFactory<VelocityComponent>;

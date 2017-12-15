@@ -7,7 +7,7 @@ export { SystemManager };
 
 // renomage necessaire fixed et non fixedTimeStep
 // en realité les 2 sont executés en fixedTimeSteps
-// seulement l'un est executer plusieurs fois si possible 
+// seulement l'un est executer plusieurs fois si possible
 class SystemManager {
     protected fixedTimeStepSystems: FastIterationMap<string, ISystem>;
     protected nonFixedTimeStepSystems: FastIterationMap<string, ISystem>;
@@ -51,6 +51,12 @@ class SystemManager {
         const found: string[] = [];
         // find all instance name
         this.fixedTimeStepSystems.keys.forEach((s, k) => {
+            // if already an instance of this system
+            if (k.indexOf(stringName) === 0) {
+                found.push(k);
+            }
+        });
+        this.nonFixedTimeStepSystems.keys.forEach((s, k) => {
             // if already an instance of this system
             if (k.indexOf(stringName) === 0) {
                 found.push(k);

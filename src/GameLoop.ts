@@ -99,7 +99,9 @@ class GameLoop {
     public updateFixedTS(... args: any[]) {
         const l = this._fixedTSSystems.length;
         for (let i = 0; i < l; ++i) {
-            this._fixedTSSystems[i].process([this._currentTimer, args]);
+            if (this._fixedTSSystems[i].active) {
+                this._fixedTSSystems[i].process([this._currentTimer, args]);
+            }
         }
     }
 
@@ -107,9 +109,12 @@ class GameLoop {
      public updateNonFixedTS(... args: any[]) {
         const l = this._nonFixedTSSystems.length;
         for (let i = 0; i < l; ++i) {
-            this._nonFixedTSSystems[i].process([this._currentTimer, args]);
+            if (this._nonFixedTSSystems[i].active) {
+                this._nonFixedTSSystems[i].process([this._currentTimer, args]);
+            }
         }
     }
+
     protected _pollyFillHighResolutionTime() {
         return window.performance && window.performance.now ? window.performance : Date;
     }
