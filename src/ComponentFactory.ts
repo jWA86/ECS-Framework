@@ -147,6 +147,14 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
         this._size += dif;
     }
 
+    // overwrite fastIterationMap method we don't want to use
+    public insertAfter(key: number, value: T, keyRef: number): boolean {
+        return false;
+    }
+    public insertBefore(key: number, value: T, keyRef: number): boolean {
+        return false;
+    }
+
     protected createZeroedComponentAt(index: number) {
         this.recycle(index, this._zeroedRef);
         this._values[index].entityId = 0;
@@ -202,14 +210,6 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
     get nbFreeSlot(): number {
         return this._size - this._nbActive - this._nbInactive;
     }
-
-    // overwrite fastIterationMap method we don't want to use
-    insertAfter(key: number, value: T, keyRef: number): boolean {
-        return false;
-    }
-    insertBefore(key: number, value: T, keyRef: number): boolean {
-        return false;
-    }
 }
 
 class EntityFactory implements IEntityFactory {
@@ -218,54 +218,51 @@ class EntityFactory implements IEntityFactory {
         this._factories = new Map();
     }
 
-    activate(entityId: number, value:boolean, factoriesName?:string[]){
-        
-        if(factoriesName) {
-            factoriesName.forEach((f)=>{
-                let ff = this.getFactory(f);
-                if(ff) {
+    public activate(entityId: number, value: boolean, factoriesName?: string[]) {
+        if (factoriesName) {
+            factoriesName.forEach((f) => {
+                const ff = this.getFactory(f);
+                if (ff) {
                     ff.activate(entityId, value);
                 }
             });
-        }
-        else {
+        } else {
             this._factories.forEach((f) => {
                 f.activate(entityId, value);
             });
         }
     }
 
-    activateAll(value: boolean) {
-        this._factories.forEach((f)=>{
+    public activateAll(value: boolean) {
+        this._factories.forEach((f) => {
             f.activateAll(value);
         });
     }
 
-    addFactory(name: string, factory: ComponentFactory<IComponent>) {
-        if(factory.size !== this._size) {
+    public addFactory(name: string, factory: ComponentFactory<IComponent>) {
+        if (factory.size !== this._size) {
             factory.resize(this._size);
         }
         this._factories.set(name, factory);
     }
 
-    getComponent(entityId: number, factoryName: string): IComponent {
-        let f = this._factories.get(factoryName);
-        if(f){
+    public getComponent(entityId: number, factoryName: string): IComponent {
+        const f = this._factories.get(factoryName);
+        if (f) {
             return f.get(entityId);
-        }
-        else {
+        } else {
             return undefined;
         }
     }
 
-    getFactory(name:string): ComponentFactory<IComponent> {
+    public getFactory(name: string): ComponentFactory<IComponent> {
         return this._factories.get(name);
     }
 
-    delete(entityId: number): boolean {
+    public delete(entityId: number): boolean {
         let d = true;
         this._factories.forEach((f) => {
-            if(!f.delete(entityId)) {
+            if (!f.delete(entityId)) {
                 d = false;
             }
         });
@@ -273,26 +270,26 @@ class EntityFactory implements IEntityFactory {
         return this._factories.size > 0 && d;
     }
 
-    get(entityId: number): IComponent[] {
-        let e = [];
+    public get(entityId: number): IComponent[] {
+        const e = [];
         this._factories.forEach((f) => {
             e.push(f.get(entityId));
         });
         return e;
     }
 
-    has(entityId: number): boolean {
-        let it = this._factories.entries();
+    public has(entityId: number): boolean {
+        const it = this._factories.entries();
         return it.next().value[1].has(entityId);
     }
 
-    create(entityId: number, active: boolean) {
+    public create(entityId: number, active: boolean) {
         this._factories.forEach((f) => {
             f.create(entityId, active);
         });
     }
 
-    resize(size: number) {
+    public resize(size: number) {
         this._factories.forEach((f) => {
             f.resize(size);
         });
@@ -301,27 +298,27 @@ class EntityFactory implements IEntityFactory {
 
     get iterationLength(): number {
         // return iteratorLength of the first factory;
-        let it = this._factories.entries();
+        const it = this._factories.entries();
         return it.next().value[1].iterationLength;
     }
 
     get nbActive(): number {
-        let it = this._factories.entries();
+        const it = this._factories.entries();
         return it.next().value[1].nbActive;
-    } 
+    }
 
     get nbCreated(): number {
-        let it = this._factories.entries();
+        const it = this._factories.entries();
         return it.next().value[1].nbCreated;
     }
 
     get nbFreeSlot(): number {
-        let it = this._factories.entries();
+        const it = this._factories.entries();
         return it.next().value[1].nbFreeSlot;
     }
 
     get nbInactive(): number {
-        let it = this._factories.entries();
+        const it = this._factories.entries();
         return it.next().value[1].nbInactive;
     }
 
