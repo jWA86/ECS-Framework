@@ -4,17 +4,25 @@ import { ComponentFactory, EntityFactory } from "../src/ComponentFactory";
 import { FrameEvent, GameLoop } from "../src/GameLoop";
 import { IComponent, IComponentFactory, IFrameEvent } from "../src/interfaces";
 import { System } from "../src/System";
+import { SystemManager } from "../src/SystemManager";
+import { setInterval } from "timers";
 
-describe("GameLoop should be able to", () => {
+// Can't seem to test timer value with multiple browser test
+// especially with firefox
+
+
+describe("GameLoop should be able to", function () {
+    this.timeout(3000);
+    
     const perf = window.performance && window.performance.now ? window.performance : Date;
     class EmptyComponent implements IComponent {
         constructor(public entityId: number, public active: boolean) { }
     }
-    // Stop the Game loop after a certain amount of time have passed
+
     class FeedBackSystem extends System {
-        public static callBack: (timer: FrameEvent) => void;
-        public execute(emptyComp: IComponent, timer: FrameEvent) {
-            FeedBackSystem.callBack(timer);
+        public static callBack: (timer: FrameEvent, args: any[]) => void;
+        public execute(emptyComp: IComponent, timer: FrameEvent, ...args: any[]) {
+            FeedBackSystem.callBack(timer, args);
         }
     }
 
@@ -52,13 +60,31 @@ describe("GameLoop should be able to", () => {
         }
     }
 
+    // dummy system that increment a interger
+    class IntegerComponent implements IComponent {
+        constructor(public entityId: number, public active: boolean, public integer: number) { }
+    }
+    class IncrementSystem extends System {
+        constructor() { super(); }
+        public execute(int: IntegerComponent) {
+            int.integer += 1;
+        }
+    }
+
+    // Dummy system that multiply an integer by itself
+    class SquareSystem extends System {
+        constructor() { super(); }
+        public execute(int: IntegerComponent) {
+            int.integer = int.integer * int.integer;
+        }
+    }
+
+    let integerFactory: ComponentFactory<IntegerComponent>;
     let positionFactory = new ComponentFactory<PositionComponent>(10, PositionComponent, zeroVec3);
     let velocityFactory = new ComponentFactory<VelocityComponent>(10, VelocityComponent, zeroVec3);
     let feedBackFactory = new ComponentFactory<EmptyComponent>(5, EmptyComponent);
 
     beforeEach(() => {
-        // performance.clearMarks();
-        // performance.clearMeasures();
         positionFactory = new ComponentFactory<PositionComponent>(10, PositionComponent, zeroVec3);
 
         for (let i = 1; i < 6; ++i) {
@@ -73,9 +99,21 @@ describe("GameLoop should be able to", () => {
 
         feedBackFactory = new ComponentFactory<EmptyComponent>(5, EmptyComponent);
 
+        integerFactory = new ComponentFactory<IntegerComponent>(5, IntegerComponent, 1);
+
+    });
+    it("accept a list of System to iterate on", () => {
+        const sM = new SystemManager();
+        sM.pushSystem(new IncrementSystem(), true);
+        sM.pushSystem(new SquareSystem(), true);
+        const gl = new GameLoop(sM);
+        const res = gl.getSystemManager();
+        expect(res).to.deep.equal(sM);
     });
     it("start and stop execution of the loop ", (done) => {
-        const gl = new GameLoop([]);
+        const sM = new SystemManager();
+        const gl = new GameLoop(sM);
+
         gl.start();
         expect(gl.isRunning()).to.equal(true);
         gl.stop();
@@ -83,19 +121,20 @@ describe("GameLoop should be able to", () => {
         done();
     });
     it("update the time ellapsed since the game loop start", (done) => {
-        const s = new MoveSystem();
-        s.setFactories(positionFactory, velocityFactory);
-        const runFor = 250;
-        const gl = new GameLoop([s]);
-        setTimeout(() => {
-            const res = perf.now() - t1;
-            gl.stop();
-            expect(gl.isRunning()).to.equal(false);
+        // const s = new MoveSystem();
+        // s.setFactories(positionFactory, velocityFactory);
+        const sM = new SystemManager();
+        const runFor = 1000;
+        const gl = new GameLoop(sM);
+        gl.setFrequency(1000 / 30);
+        setInterval(() => {
             const t = gl.getCurrentTimer();
-            expect(t.time).to.gte(res);
-            done();
-        }, runFor);
-        const t1 = perf.now();
+            if (t.time >= runFor) {
+                gl.stop();
+                expect(t.time).to.approximately(runFor, 30);
+                done();
+            }
+        }, 20);
         gl.start();
     });
     it("pause and resume execution of the loop", (done) => {
@@ -105,161 +144,173 @@ describe("GameLoop should be able to", () => {
         // resume
         // stop after 250ms
         // get time and check it's greater than the previous time recorded
-        const gl = new GameLoop([]);
-        const runFor = 250;
-        setTimeout(() => {
-            gl.stop();
+        const gl = new GameLoop(new SystemManager());
+        gl.setFrequency(1000 / 60);
+        const runFor = 500;
+        gl.start();
+        setInterval( () => {
             const t1 = gl.getCurrentTimer().time;
-            expect(t1).to.gt(runFor);
-            setTimeout(() => {
+            if (t1 >= runFor) {
                 gl.stop();
-                const t2 = gl.getCurrentTimer().time;
-                // should run from where it has left
-                expect(t2).to.gt(t1);
-                // console.log(gl.arr);
+                gl.resume();
+                setInterval( () => {
+                    const t2 = gl.getCurrentTimer().time;
+                    if (t2 >= runFor * 2 ) {
+                        gl.stop();
+                        expect(t2).to.gte(t1);
+                        done();
+                    }
+                }, 20);
+            }
+        }, 20);
+        // done();
+    });
+    it("process systems at a fixed time step", (done) => {
+        // component record time of execution
+        // then we compare value to make sure it's executed at a fixed time step
+        const frequency = (1000 / 60);
+        feedBackFactory.create(1, true);
+        const s = new FeedBackSystem();
+        s.setFactories(feedBackFactory);
+        FeedBackSystem["timerArr"] = [];
+        FeedBackSystem.callBack = (timer: FrameEvent) => {
+            FeedBackSystem["timerArr"].push(timer.time);
+        };
+        const sM = new SystemManager();
+        sM.pushSystem(s, false);
+        const gl = new GameLoop(sM);
+        gl.setFrequency(frequency);
+        const runFor = 500;
+        gl.start();
+        setInterval(() => {
+            const t = gl.getCurrentTimer();
+            if (t.time >= runFor) {
+                gl.stop();
+                const arr = FeedBackSystem["timerArr"];
+                for (let i = 1; i < arr.length - 1; ++i) {
+                    const diff = arr[i + 1] - arr[i];
+                    expect(diff).to.approximately(frequency, 5);
+                }
                 done();
-            }, runFor);
-            gl.resume();
-        }, runFor);
+            }
+        }, 20);
+        // done();
+    });
+    it("process systems in the order they are provided", (done) => {
+        // const c1 = integerFactory.create(1, true);
+        // expect(c1.integer).to.equal(1);
+
+        // const s1 = new IncrementSystem();
+        // s1.setFactories(integerFactory);
+        // const s2 = new SquareSystem();
+        // s2.setFactories(integerFactory);
+
+        // const gl = new GameLoop([]);
+        // gl.setFrequency(1000 / 10);
+        // gl.setSystems([s1, s2]);
+
+        // const inc = c1.integer + 1;
+        // const res = inc * inc;
+        // const f = new FrameEvent(1000 / 10);
+        // f.lastFrame = gl.timestamp.now() - 15;
+        // gl.setCurretnTimer(f);
+        // gl.loop();
+        // expect(integerFactory.get(1).integer).to.equal(res);
+        // done();
+
+        // USE SystemManager
+        done();
+    });
+    it("pause each system individually", () => {
+        // supply an aray containing system and information for beoing proceed, such as frequency of update, order of execution, thread to be executed
+        // or
+        // members variables in system class that hold : frequency, state (playing / pause)
+        //
+        // How to pause system ?
+        // who hold instances of systems ?
+        // - Game Loop
+        // or need an object that hold systems and orders of execution then game loop hold this object ?
+        // this object should hold instance of systems
+        // give an id to each system
+        // give an accessor to each system so we can pause / resume them, change frequency
+        // how to call this object ?
+        // system pool ? is it really a pool ?
+        // System mamanger ?
+        // --------
+        // should system object hold params such a running  frequency ?
+        // or it should be decoupled and only the system manager hold this information ?
+        // who should read this informations ?
+        // the Game Loop
+        // in the loop
+        // if (SystemManager.forEach(s)=>{
+        //  instance hold running state
+        // [instanceSys.running]
+        //  if(s.system.running) {
+        //        s.system.update();
+        // }
+        // systemManager hold state in an array
+        // [{runnning: true, system: instance}]
+        // or if(s.running)
+        //  s.system.update
+        // }
+        // Frequency
+        // System Manager should organize systems by their frequency so the game loop do fewer check in the loop
+        // most use case only use 2 frequency, one for rendering system and one for updating state
+        // GameLoop.loop
+        //          SystemManager.forEach((FrequencyGroup) => {
+        // if(delta > FrequencyGroup.frequency)
+        // FrequencyGroup.systems.forEach((s)=>{
+        // s.update();
+        // })
+        // })
+        // how to update multiple system with varous frequency as much as possible between rendering
+        // while (delta)
+        // when to decrement delta ?
+        // For now we only need 2 type of frequency
+        // one for rendering
+        // another for update
+        // so SystemManager should only organize system by
+        // fixedTimestep or not
+        // and ony have one fixedTimeStep set by the GameLoop
+
+        // 
+    });
+    it("update some systems on a fixedTimeStep and other at the requestionAnimationFrame frequency", (done) => {
+        // increment an integer in both systems
+        // then make sure the fixedTimeStep run more time
+        // fixeTimeStep run twice as fast as the requestAnimationFrame
+        const frequency = 1000 / 120;
+
+        const fixedIntFactory = new ComponentFactory<IntegerComponent>(2, IntegerComponent, 0);
+        const nFixedIntFactory = new ComponentFactory<IntegerComponent>(2, IntegerComponent, 0);
+        fixedIntFactory.create(1, true);
+        nFixedIntFactory.create(1, true);
+        const fixedTS = new IncrementSystem();
+        const nFixedTS = new IncrementSystem();
+        fixedTS.setFactories(fixedIntFactory);
+        nFixedTS.setFactories(nFixedIntFactory);
+
+        const sM = new SystemManager();
+        sM.pushSystem(fixedTS, true);
+        sM.pushSystem(nFixedTS, false);
+
+        const gl = new GameLoop(sM);
+        gl.setFrequency(frequency);
+        const runFor = 500;
+        setInterval(() => {
+            const t = gl.getCurrentTimer();
+            if(t.time >= runFor){
+                gl.stop();
+                const fi = fixedIntFactory.get(1).integer;
+                const nfi = nFixedIntFactory.get(1).integer;
+                expect(fi).to.gt(nfi);
+                done();
+            }
+        }, 10);
         gl.start();
         done();
     });
-    it("process system at a consistent frequency", (done) => {
-        const frequency = 1000 / 60;
-        feedBackFactory.create(1, true);
-        const s = new FeedBackSystem();
-        // each time a component is execute check that timer delta is approximately equal the frequency of update
-        FeedBackSystem.callBack = (timer: FrameEvent) => {
-            expect(timer.delta).to.approximately(frequency, 5);
-        };
-        const gl = new GameLoop([]);
-        const runFor = 200;
-        setTimeout(() => {
-            gl.stop();
-            const t = gl.getCurrentTimer();
-            expect(t.time).to.gte(runFor);
-            done();
-        }, runFor);
-        gl.start();
-    });
-    it("change the frequency of execution at runtime", (done) => {
-        let frequency = 1000 / 60;
-        feedBackFactory.create(1, true);
-        const s = new FeedBackSystem();
-        FeedBackSystem.callBack = (timer: FrameEvent) => {
-            expect(timer.delta).to.approximately(frequency, 5);
-        };
-        const gl = new GameLoop([]);
-        const runFor = 200;
+    it("measure time taken to process each system", () => {
 
-        setTimeout(() => {
-            frequency = 1000 / 30;
-            gl.setFrequency(frequency);
-            setTimeout(() => {
-                gl.stop();
-                done();
-            }, runFor);
-        }, runFor);
-        gl.start();
-    });
-
-    describe("use of Systems", () => {
-        // dummy system that increment a interger
-        class IntegerComponent implements IComponent {
-            constructor(public entityId: number, public active: boolean, public integer: number) { }
-        }
-        class IncrementSystem extends System {
-            constructor() { super(); }
-            public execute(int: IntegerComponent) {
-                int.integer += 1;
-            }
-        }
-
-        // Dummy system that multiply an integer by itself
-        class SquareSystem extends System {
-            constructor() { super(); }
-            public execute(int: IntegerComponent) {
-                int.integer = int.integer * int.integer;
-            }
-        }
-
-        let integerFactory: ComponentFactory<IntegerComponent>;
-
-        beforeEach(() => {
-            integerFactory = new ComponentFactory<IntegerComponent>(5, IntegerComponent, 1);
-        });
-        it("accept a list of System to iterate on", () => {
-            const gl = new GameLoop([]);
-            const inputArr = [];
-
-            inputArr.push(new IncrementSystem());
-            inputArr.push(new SquareSystem());
-            gl.setSystems(inputArr);
-
-            const outputArr = gl.getSystems();
-
-            expect(outputArr.length).to.equal(inputArr.length);
-            for (let i = 0; i < outputArr.length; ++i) {
-                expect(outputArr[i]).to.equal(inputArr[i]);
-            }
-        });
-        it("process systems in the order they are provided", (done) => {
-            const c1 = integerFactory.create(1, true);
-            expect(c1.integer).to.equal(1);
-
-            const s1 = new IncrementSystem();
-            s1.setFactories(integerFactory);
-            const s2 = new SquareSystem();
-            s2.setFactories(integerFactory);
-
-            const gl = new GameLoop([]);
-            gl.setSystems([s1, s2]);
-
-            const inc = c1.integer + 1;
-            const res = inc * inc;
-            const f = new FrameEvent(1000 / 30);
-            f.lastFrame = gl.timestamp.now() - 40;
-            gl.setCurretnTimer(f);
-            gl.loop();
-            expect(integerFactory.get(1).integer).to.equal(res);
-            done();
-        });
-        it("re-order sytems", () => {
-            const c1 = integerFactory.create(1, true);
-            expect(c1.integer).to.equal(1);
-
-            const s1 = new IncrementSystem();
-            s1.setFactories(integerFactory);
-            const s2 = new SquareSystem();
-            s2.setFactories(integerFactory);
-
-            const gl = new GameLoop([]);
-            gl.setSystems([s1, s2]);
-
-            const inc = c1.integer + 1;
-            const res = inc * inc;
-            const f = new FrameEvent(1000 / 30);
-            f.lastFrame = gl.timestamp.now() - 40;
-            gl.setCurretnTimer(f);
-            gl.loop();
-            expect(integerFactory.get(1).integer).to.equal(res);
-
-            // changing the order of operations
-            gl.setSystems([s2, s1]);
-
-            const sq = res * res;
-            const res2 = sq + 1;
-            f.lastFrame = gl.timestamp.now() - 40;
-            gl.setCurretnTimer(f);
-            gl.loop();
-            expect(integerFactory.get(1).integer).to.equal(res2);
-        });
-        it("pause each system individually", () => {
-            // just remove a system from the list
-
-        });
-        it("set a frequency of execution for each system", () => {
-
-        });
     });
 });

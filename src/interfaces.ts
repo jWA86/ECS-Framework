@@ -1,3 +1,5 @@
+import { ISystem } from "../src/System";
+
 export { ISystem, IComponent, IPool, IComponentFactory, IEntityFactory, IFrameEvent};
 
 interface IFrameEvent {
@@ -9,12 +11,6 @@ interface IFrameEvent {
     reverse: boolean;
     /* The total amount of time passed since the first frame event in seconds */
     time: number;
-}
-
-interface ISystem {
-    setFactories(... args: Array<IComponentFactory<IComponent>>);
-    process(args?: any[]);
-    execute(... args: any[]);
 }
 
 interface IComponent {

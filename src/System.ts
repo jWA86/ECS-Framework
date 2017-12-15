@@ -1,6 +1,12 @@
-import { IComponent, IComponentFactory, ISystem } from "./interfaces";
+import { IComponent, IComponentFactory } from "./interfaces";
 
-export { System };
+export { System, ISystem };
+
+interface ISystem {
+    setFactories(... args: Array<IComponentFactory<IComponent>>);
+    process(args?: any[]);
+    execute(... args: any[]);
+}
 
 // A factory for each parameters of the exectute function
 abstract class System implements ISystem {

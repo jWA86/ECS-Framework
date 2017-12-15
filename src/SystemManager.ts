@@ -4,6 +4,10 @@ import { ISystem } from "../src/System";
 export { SystemManager };
 // ECS should get interfaces from the file that implements it
 // interfaces.ts is for external project convenience
+
+// renomage necessaire fixed et non fixedTimeStep
+// en realité les 2 sont executés en fixedTimeSteps
+// seulement l'un est executer plusieurs fois si possible 
 class SystemManager {
     protected fixedTimeStepSystems: FastIterationMap<string, ISystem>;
     protected nonFixedTimeStepSystems: FastIterationMap<string, ISystem>;
@@ -11,7 +15,7 @@ class SystemManager {
         this.fixedTimeStepSystems = new FastIterationMap();
         this.nonFixedTimeStepSystems = new FastIterationMap();
     }
-    public addSystem(system: ISystem, fixedTimeStep: boolean): number {
+    public pushSystem(system: ISystem, fixedTimeStep: boolean): string {
         const id = this.generateId(system);
         if (fixedTimeStep) {
             this.fixedTimeStepSystems.push(id, system);
@@ -19,6 +23,12 @@ class SystemManager {
             this.nonFixedTimeStepSystems.push(id, system);
         }
         return id;
+    }
+    public getFixedTSSystems(): ISystem[] {
+        return this.fixedTimeStepSystems.values;
+    }
+    public getNonFixedTSSystems(): ISystem[] {
+        return this.nonFixedTimeStepSystems.values;
     }
     /* Generate an Id with the System class name + a number if more than one instance in the SystemManager.
     /* i.e : System, System_1, System_2
@@ -57,5 +67,8 @@ class SystemManager {
                 return stringName + "_" + max;
             }
         }
+    }
+    protected orderSystem() {
+
     }
 }

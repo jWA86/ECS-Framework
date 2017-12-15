@@ -1,5 +1,6 @@
 import "raf";
 import { IComponent, IComponentFactory, IFrameEvent, ISystem } from "../src/interfaces";
+import { SystemManager } from "./SystemManager";
 
 export { FrameEvent, GameLoop };
 
@@ -22,12 +23,14 @@ class FrameEvent {
 class GameLoop {
     public timestamp = this._pollyFillHighResolutionTime();
     protected _running: boolean;
-    protected _systems: ISystem[];
+    protected _systemManager: SystemManager;
+    protected _fixedTSSystems: ISystem[];
+    protected _nonFixedTSSystems: ISystem[];
     protected _activeSystems: ISystem[];
     protected _frameId: number;
     protected _currentTimer: FrameEvent;
-    constructor(systems: ISystem[], timer = new FrameEvent(1000 / 30)) {
-        this.setSystems(systems);
+    constructor(systemManager: SystemManager, timer = new FrameEvent(1000 / 30)) {
+        this.setSystemManager(systemManager);
         this._currentTimer = timer;
         this._running = false;
     }
@@ -35,8 +38,8 @@ class GameLoop {
     public isRunning(): boolean {
         return this._running;
     }
-    public getSystems(): ISystem[] {
-        return this._systems;
+    public getSystemManager(): SystemManager {
+        return this._systemManager;
     }
     public getCurrentTimer(): FrameEvent {
         return this._currentTimer;
@@ -44,14 +47,16 @@ class GameLoop {
     public setCurretnTimer(timer: FrameEvent) {
         this._currentTimer = timer;
     }
-    public setSystems(systems: ISystem[]) {
-        this._systems = systems;
+    public setSystemManager(systems: SystemManager) {
+        this._systemManager = systems;
+        this._fixedTSSystems = this._systemManager.getFixedTSSystems();
+        this._nonFixedTSSystems = this._systemManager.getNonFixedTSSystems();
     }
-    public start() {
+    public start(...args: any[]) {
         this._running = true;
         this._currentTimer.reset();
         this._currentTimer.lastFrame = this.timestamp.now();
-        this.loop();
+        this.loop(args);
         // this.update(timer);
     }
     public stop() {
@@ -67,28 +72,42 @@ class GameLoop {
     public setFrequency(frequency: number) {
         this._currentTimer.frequency = frequency;
     }
-    public loop() {
+    public loop(...args: any[]) {
         const now = this.timestamp.now();
-        let delta = now - this._currentTimer.lastFrame;
-        this._currentTimer.time += delta;
+
+        const ellapsed = now - this._currentTimer.lastFrame;
+        this._currentTimer.lastFrame = now;
+        //
+        this._currentTimer.delta += ellapsed;
+        this._currentTimer.time += ellapsed;
         // limit delta max value when browser loose focus and resume ?
-        while (delta >= this._currentTimer.frequency) {
-            this._currentTimer.delta = delta;
-            this.update();
-            this._currentTimer.lastFrame = now;
-            delta -= this._currentTimer.frequency;
+        while (this._currentTimer.delta >= this._currentTimer.frequency) {
+            this.updateFixedTS(args);
+            // console.log("delta " + delta);
+            this._currentTimer.delta -= this._currentTimer.frequency;
         }
+
+        this.updateNonFixedTS(args);
+
         if (this._running) {
             this._frameId = requestAnimationFrame(() => this.loop());
         } else {
             cancelAnimationFrame(this._frameId);
         }
     }
-    /* Process every Systems */
-    public update() {
-        const l = this._systems.length;
+    /* Process every Fixed Systems */
+    public updateFixedTS(... args: any[]) {
+        const l = this._fixedTSSystems.length;
         for (let i = 0; i < l; ++i) {
-            this._systems[i].process([this._currentTimer]);
+            this._fixedTSSystems[i].process([this._currentTimer, args]);
+        }
+    }
+
+     /* Process every Non Fixed Systems */
+     public updateNonFixedTS(... args: any[]) {
+        const l = this._nonFixedTSSystems.length;
+        for (let i = 0; i < l; ++i) {
+            this._nonFixedTSSystems[i].process([this._currentTimer, args]);
         }
     }
     protected _pollyFillHighResolutionTime() {
