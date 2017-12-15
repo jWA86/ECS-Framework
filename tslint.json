@@ -15,7 +15,7 @@
         "rulesDirectory": [],
         "no-empty": false,
         "max-line-length": 140,
-        "no-console": false
+        "no-console": false,
         "no-string-literal": false
     }
 }
