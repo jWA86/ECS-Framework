@@ -75,7 +75,17 @@ describe("SystemManager should be able to", () => {
     });
     describe("get", () => {
         it("get a system by its id", () => {
+            const sysManager = new SystemManager();
+            const fSystem = new FeedBackSystem();
+            const nFSystem = new FeedBackSystem();
+            const firstId = sysManager.pushSystem(nFSystem, true);
+            const secondId = sysManager.pushSystem(nFSystem, false);
 
+            const firstSys = sysManager.get(firstId);
+            const secondSys = sysManager.get(secondId);
+            expect(firstSys).to.deep.equal(fSystem);
+            expect(secondSys).to.deep.equal(nFSystem);
+            expect(sysManager.get("nonExistingId")).to.equal(undefined);
         });
     });
 });

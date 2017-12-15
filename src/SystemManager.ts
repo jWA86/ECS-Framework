@@ -30,6 +30,18 @@ class SystemManager {
     public getNonFixedTSSystems(): ISystem[] {
         return this.nonFixedTimeStepSystems.values;
     }
+    /* Get a system by its id.
+    /*  return undefined if not found.
+    */
+    public get(systemId: string): ISystem {
+        if (this.fixedTimeStepSystems.has(systemId)) {
+            return this.fixedTimeStepSystems.get(systemId);
+        } else if (this.nonFixedTimeStepSystems.has(systemId)) {
+            return this.nonFixedTimeStepSystems.get(systemId);
+        }
+        return undefined;
+    }
+
     /* Generate an Id with the System class name + a number if more than one instance in the SystemManager.
     /* i.e : System, System_1, System_2
     */
