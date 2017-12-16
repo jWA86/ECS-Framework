@@ -1,31 +1,31 @@
-import "mocha";
 import { expect } from "chai";
-import { IComponent, IComponentFactory } from "../src/interfaces";
+import "mocha";
 import { ComponentFactory, EntityFactory } from "../src/ComponentFactory";
+import { IComponent, IComponentFactory } from "../src/interfaces";
 
 describe("Component Factory", () => {
-    class concreteComponent implements IComponent {
+    class ConcreteComponent implements IComponent {
         constructor(public entityId: number, public active: boolean) { }
     }
-    class multiPropComponent implements IComponent {
-        constructor(public entityId: number, public active: boolean, public prop1: string, public prop2: number, public prop3: { x:number, y:number }) { }
+    class MultiPropComponent implements IComponent {
+        constructor(public entityId: number, public active: boolean, public prop1: string, public prop2: number, public prop3: { x: number, y: number }) { }
     }
-    
-    let simpleFactory = new ComponentFactory<multiPropComponent>(5, multiPropComponent, "default string", "default string", { x: 0.0, y: 0.0 });
+
+    let simpleFactory = new ComponentFactory<MultiPropComponent>(5, MultiPropComponent, "default string", "default string", { x: 0.0, y: 0.0 });
     beforeEach(() => {
-        simpleFactory = new ComponentFactory<multiPropComponent>(5, multiPropComponent, "default string", "default string", { x: 0.0, y: 0.0 });
+        simpleFactory = new ComponentFactory<MultiPropComponent>(5, MultiPropComponent, "default string", "default string", { x: 0.0, y: 0.0 });
     });
     it("should be able to retrieve a component by entity id", () => {
-        let c = simpleFactory.create(1, true);
-        let c2 = simpleFactory.create(2, true);
-        let fetchedC = simpleFactory.get(c2.entityId);
+        const c = simpleFactory.create(1, true);
+        const c2 = simpleFactory.create(2, true);
+        const fetchedC = simpleFactory.get(c2.entityId);
         expect(fetchedC.entityId).to.equal(c2.entityId);
         // undefined if id not found
-        let fetchedC2 = simpleFactory.get(123456);
+        const fetchedC2 = simpleFactory.get(123456);
         expect(fetchedC2).to.equal(undefined);
     });
     it("should be able to recycle zeroed components to create new one", () => {
-        let mc = simpleFactory.create(1, true);
+        const mc = simpleFactory.create(1, true);
         expect(mc.entityId).to.equal(1);
         expect(mc.prop1).to.equal("default string");
         expect(mc.prop2).to.equal("default string");
@@ -33,7 +33,7 @@ describe("Component Factory", () => {
         expect(mc.prop3.y).to.equal(0.0);
 
         mc.prop3.x = 1.0;
-        for(let i = 1; i < simpleFactory.length; ++i) {
+        for (let i = 1; i < simpleFactory.length; ++i) {
             expect(simpleFactory.values[i].prop3.x).to.equal(0.0);
         }
     });
@@ -42,13 +42,13 @@ describe("Component Factory", () => {
         expect(simpleFactory.values[1].prop3.x).to.not.equal(simpleFactory.values[0].prop3.x);
     });
     it("should be able to create a number of zeroed components at instanciation ", () => {
-        let simpleFactory = new ComponentFactory<IComponent>(5, multiPropComponent);
-        expect(simpleFactory.values.length).to.equal(5);
+        const factory = new ComponentFactory<IComponent>(5, ConcreteComponent );
+        expect(factory.values.length).to.equal(5);
     });
     it("zeored component should have a key starting by 0", () => {
-        let simpleFactory = new ComponentFactory<IComponent>(5, multiPropComponent);
+        const factory = new ComponentFactory<IComponent>(5, ConcreteComponent);
         for (let i = 0; i < 5; ++i) {
-            expect(simpleFactory.values[i].entityId).to.equal(0);
+            expect(factory.values[i].entityId).to.equal(0);
         }
     });
     it("should be able to provid zeroed value for component proreties ", () => {
@@ -66,22 +66,22 @@ describe("Component Factory", () => {
         }
     });
     it("zeroed component should not be referenced in the key map", () => {
-        let simpleFactory = new ComponentFactory<IComponent>(5, multiPropComponent);
-        expect(simpleFactory.values.length).to.equal(5);
-        expect(simpleFactory.keys.size).to.equal(0);
+        const factory = new ComponentFactory<IComponent>(5, ConcreteComponent);
+        expect(factory.values.length).to.equal(5);
+        expect(factory.keys.size).to.equal(0);
 
     });
     it("created components should be created at the first spot available ", () => {
-        simpleFactory.create(1, false, "p1", 2, { "x": 1, "y": 3 });
+        simpleFactory.create(1, false, "p1", 2, { x: 1, y: 3 });
         expect(simpleFactory.size).to.equal(5);
         expect(simpleFactory.values[0].entityId).to.equal(1);
     });
     it("creating 2 components with the same entity Id should create only one component ", () => {
-        let initialSize = simpleFactory.size;
-        let c = simpleFactory.create(1, false, "p1", 2, { "x": 0.0, "y": 0.0 });
-        expect(c.entityId).to.not.be.null;
+        const initialSize = simpleFactory.size;
+        const c = simpleFactory.create(1, false, "p1", 2, { x: 0.0, y: 0.0 });
+        const noUsedVariable = expect(c.entityId).to.not.be.null;
         expect(simpleFactory.values[0].entityId).to.equal(c.entityId);
-        let c2 = simpleFactory.create(1, false, "p2", 3, { "x": 1.0, "y": 1.0 });
+        const c2 = simpleFactory.create(1, false, "p2", 3, { x: 1.0, y: 1.0 });
         expect(c2.entityId).to.equal(c.entityId);
         expect(simpleFactory.values[0].entityId).to.equal(c.entityId);
         expect(simpleFactory.size).to.equal(initialSize);
@@ -89,16 +89,16 @@ describe("Component Factory", () => {
     });
     it("should increment the createdLength only if the components is created at an index greater than createdLength", () => {
         expect(simpleFactory.iterationLength).to.equal(0);
-        simpleFactory.create(1, false, "p1", 2, { "x": 0.0, "y": 0.0 });
+        simpleFactory.create(1, false, "p1", 2, { x: 0.0, y: 0.0 });
         expect(simpleFactory.iterationLength).to.equal(1);
-        simpleFactory.create(2, false, "p1", 2, { "x": 0.0, "y": 0.0 });
+        simpleFactory.create(2, false, "p1", 2, { x: 0.0, y: 0.0 });
         expect(simpleFactory.iterationLength).to.equal(2);
-        simpleFactory.create(1, false, "p1", 3, { "x": 0.0, "y": 0.0 });
+        simpleFactory.create(1, false, "p1", 3, { x: 0.0, y: 0.0 });
         expect(simpleFactory.iterationLength).to.equal(2);
     });
     it("should zeroed the component when we 'remove' ", () => {
-        let initialSize = simpleFactory.size;
-        simpleFactory.create(1, false, "p1", 2, { "x": 0.0, "y": 0.0 });
+        const initialSize = simpleFactory.size;
+        simpleFactory.create(1, false, "p1", 2, { x: 0.0, y: 0.0 });
         expect(simpleFactory.has(1)).to.equal(true);
         // id should be found in order to delete it first
         expect(simpleFactory.delete(1)).to.equal(true);
@@ -110,29 +110,29 @@ describe("Component Factory", () => {
         expect(simpleFactory.has(1)).to.equal(false);
     });
     it("removed components should decrement the createdLength only if it is the last one ", () => {
-        let initialSize = simpleFactory.size;
-        simpleFactory.create(1, false, "p1", 2, { "x": 0.0, "y": 0.0 });
+        const initialSize = simpleFactory.size;
+        simpleFactory.create(1, false, "p1", 2, { x: 0.0, y: 0.0 });
         expect(simpleFactory.iterationLength).to.equal(1);
         expect(simpleFactory.delete(1)).to.equal(true);
         expect(simpleFactory.iterationLength).to.equal(0);
 
-        simpleFactory.create(1, false, "p1", 2, { "x": 0.0, "y": 0.0 });
-        simpleFactory.create(2, false, "p1", 2, { "x": 0.0, "y": 0.0 });
+        simpleFactory.create(1, false, "p1", 2, { x: 0.0, y: 0.0 });
+        simpleFactory.create(2, false, "p1", 2, { x: 0.0, y: 0.0 });
         expect(simpleFactory.iterationLength).to.equal(2);
         expect(simpleFactory.delete(1)).to.equal(true);
         // still equal 2 since the one we removed is not the last one
         expect(simpleFactory.iterationLength).to.equal(2);
     });
     it("should be able to create components with an active proprety and other proreties", () => {
-        let mcFactory = new ComponentFactory<multiPropComponent>(2, multiPropComponent, "default string", "default string", { x: 0.0, y: 0.0 });
-        let mc = mcFactory.create(1, true);
+        const mcFactory = new ComponentFactory<MultiPropComponent>(2, MultiPropComponent, "default string", "default string", { x: 0.0, y: 0.0 });
+        const mc = mcFactory.create(1, true);
         expect(mc.active).to.equal(true);
         expect(mc.entityId).to.equal(1);
         expect(mc.prop1).to.equal("default string");
         expect(mc.prop2).to.equal("default string");
         expect(mc.prop3.x).to.equal(0.0);
         expect(mc.prop3.y).to.equal(0.0);
-        let mc2 = mcFactory.create(1, false);
+        const mc2 = mcFactory.create(1, false);
         expect(mc2.active).to.equal(false);
     });
     it("should be able to active all created components", () => {
@@ -257,21 +257,21 @@ describe("Component Factory", () => {
 
     describe("Parallel Pool", () => {
 
-        class positionComponent implements IComponent {
-            constructor(public entityId: number, public active: boolean, public position = { "x": 0.0, "y": 0.0, "z": 0.0 }) { }
+        class PositionComponent implements IComponent {
+            constructor(public entityId: number, public active: boolean, public position = { x: 0.0, y: 0.0, z: 0.0 }) { }
         }
 
-        class velocityComponent implements IComponent {
-            constructor(public entityId, public active, public vec = { "x": 0.0, "y": 0.0, "z": 0.0 }) { };
+        class VelocityComponent implements IComponent {
+            constructor(public entityId, public active, public vec = { x: 0.0, y: 0.0, z: 0.0 }) { }
         }
 
         let positionFactory;
         let velocityFactory;
         let movingObjectFactory;
-       
+
         beforeEach(() => {
-            positionFactory = new ComponentFactory<positionComponent>(5, positionComponent, { x: 0.0, y: 0.0, z: 0.0 });
-            velocityFactory = new ComponentFactory<velocityComponent>(5, velocityComponent, { x: 0.0, y: 0.0, z: 0.0 });
+            positionFactory = new ComponentFactory<PositionComponent>(5, PositionComponent, { x: 0.0, y: 0.0, z: 0.0 });
+            velocityFactory = new ComponentFactory<VelocityComponent>(5, VelocityComponent, { x: 0.0, y: 0.0, z: 0.0 });
             movingObjectFactory = new EntityFactory(10);
 
             movingObjectFactory.addFactory("position", positionFactory);
@@ -285,7 +285,7 @@ describe("Component Factory", () => {
         });
         it("getFactory() should return the factory corresponding to the name", () => {
             // check the first component to be an instance of what the factory is supposed to hold
-            expect(movingObjectFactory.getFactory("position").values[0]).to.be.an.instanceOf(positionComponent);
+            expect(movingObjectFactory.getFactory("position").values[0]).to.be.an.instanceOf(PositionComponent);
         });
         it("create() should create a component in each child pool with the same entityId", () => {
             movingObjectFactory.create(1, true);
@@ -308,14 +308,14 @@ describe("Component Factory", () => {
             movingObjectFactory.resize(10);
             expect(positionFactory.size).to.equal(10);
             expect(velocityFactory.size).to.equal(10);
-            expect(movingObjectFactory.size).to.equal(10);            
-            
+            expect(movingObjectFactory.size).to.equal(10);
+
             movingObjectFactory.resize(3);
             expect(positionFactory.size).to.equal(3);
             expect(velocityFactory.size).to.equal(3);
             expect(movingObjectFactory.size).to.equal(3);
         });
-        it("iterationLength should be the same for all pool", ()=>{
+        it("iterationLength should be the same for all pool", () => {
             expect(movingObjectFactory.iterationLength).to.equal(0);
             expect(positionFactory.iterationLength).to.equal(0);
             expect(velocityFactory.iterationLength).to.equal(0);
@@ -342,12 +342,12 @@ describe("Component Factory", () => {
             movingObjectFactory.create(1, true);
             expect(movingObjectFactory.getComponent(1, "position")).to.have.property("position");
             expect(movingObjectFactory.getComponent(1, "velocity")).to.have.property("vec");
-            // non existing factory name 
+            // non existing factory name
             expect(movingObjectFactory.getComponent(1, "nonExistingName")).to.equal(undefined);
         });
         it("get() return the entity's components", () => {
             movingObjectFactory.create(1, true);
-            let myC1 = movingObjectFactory.get(1);
+            const myC1 = movingObjectFactory.get(1);
             expect(myC1.length).to.equal(2);
             expect(myC1[0]).to.have.property("position");
             expect(myC1[1]).to.have.property("vec");
@@ -362,7 +362,7 @@ describe("Component Factory", () => {
         it("nbFreeSlot", () => {
             expect(movingObjectFactory.nbFreeSlot).to.equal(movingObjectFactory.size);
             movingObjectFactory.create(1, false);
-            expect(movingObjectFactory.nbFreeSlot).to.equal(movingObjectFactory.size-1);
+            expect(movingObjectFactory.nbFreeSlot).to.equal(movingObjectFactory.size - 1);
         });
         it("nbActive", () => {
             expect(movingObjectFactory.nbActive).to.equal(0);
@@ -384,14 +384,14 @@ describe("Component Factory", () => {
             movingObjectFactory.create(3, false);
 
             movingObjectFactory.activateAll(false);
-            for(let i = 1; i < movingObjectFactory.nbCreated+1; ++i){
+            for (let i = 1; i < movingObjectFactory.nbCreated + 1; ++i) {
                 movingObjectFactory.get(i).forEach((c) => {
                     expect(c.active).to.equal(false);
                 });
             }
 
             movingObjectFactory.activateAll(true);
-            for(let i = 1; i < movingObjectFactory.nbCreated+1; ++i){
+            for (let i = 1; i < movingObjectFactory.nbCreated + 1; ++i) {
                 movingObjectFactory.get(i).forEach((c) => {
                     expect(c.active).to.equal(true);
                 });
@@ -417,14 +417,14 @@ describe("Component Factory", () => {
             movingObjectFactory.create(2, false);
 
             movingObjectFactory.activate(1, false, ["position"]);
-            
+
             expect(movingObjectFactory.getComponent(1, "position").active).to.equal(false);
             expect(movingObjectFactory.getComponent(1, "velocity").active).to.equal(true);
-        
+
             movingObjectFactory.activate(2, true, ["position", "velocity"]);
             expect(movingObjectFactory.getComponent(2, "position").active).to.equal(true);
             expect(movingObjectFactory.getComponent(2, "velocity").active).to.equal(true);
-            
+
         });
     });
 });
