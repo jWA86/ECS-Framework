@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "fastiterationmap": "^1.0.4",
+    "performance-polyfill": "0.0.2",
     "raf": "^3.4.0"
   }
 }
