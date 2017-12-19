@@ -48,7 +48,7 @@ describe("SystemManager should be able to", () => {
             expect(fifthId).to.equal("FeedBackSystem_3");
             expect(sixId).to.equal("FeedBackSystem_4");
         });
-        it("add a system in separate collection based on wether it should be processed at fixed time step or not", () => {
+        it("in separate collection based on wether it should be processed at fixed time step or not", () => {
             const sysManager = new SystemManager();
             const fSystem = new FeedBackSystem();
             const nFSystem = new FeedBackSystem();
@@ -57,11 +57,11 @@ describe("SystemManager should be able to", () => {
             expect(sysManager.getFixedTSSystems().length).to.equal(1);
             expect(sysManager.getNonFixedTSSystems().length).to.equal(1);
             const fs = sysManager.getFixedTSSystems()[0];
-            expect(fs).to.deep.equal(fSystem);
+            expect(fs.system).to.deep.equal(fSystem);
             const nfs = sysManager.getNonFixedTSSystems()[0];
-            expect(nfs).to.deep.equal(nFSystem);
+            expect(nfs.system).to.deep.equal(nFSystem);
         });
-        it("add the system in the order wished", () => {
+        it("set an execution order for each system", () => {
             // const sysManager = new SystemManager();
             // const fourth = new FeedBackSystem();
             // const fourthId = sysManager.pushSystem(fourth, true);
@@ -77,6 +77,15 @@ describe("SystemManager should be able to", () => {
             // expect(sysManager.getFixedTSSystems()[2]).to.deep.equal(third);
             // expect(sysManager.getFixedTSSystems()[3]).to.deep.equal(fourth);
         });
+        it("set system as active by default ", () => {
+            const sysManager = new SystemManager();
+            const fSystem = new FeedBackSystem();
+            const nFSystem = new FeedBackSystem();
+            const firstId = sysManager.pushSystem(nFSystem, true);
+            const secondId = sysManager.pushSystem(nFSystem, false);
+            expect(sysManager.getNonFixedTSSystems()[0].active).to.equal(true);
+            expect(sysManager.getFixedTSSystems()[0].active).to.equal(true);
+        });
     });
     describe("get", () => {
         it("get a system by its id", () => {
@@ -88,8 +97,8 @@ describe("SystemManager should be able to", () => {
 
             const firstSys = sysManager.get(firstId);
             const secondSys = sysManager.get(secondId);
-            expect(firstSys).to.deep.equal(fSystem);
-            expect(secondSys).to.deep.equal(nFSystem);
+            expect(firstSys.system).to.deep.equal(fSystem);
+            expect(secondSys.system).to.deep.equal(nFSystem);
             expect(sysManager.get("nonExistingId")).to.equal(undefined);
         });
     });

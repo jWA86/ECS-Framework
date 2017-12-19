@@ -1,6 +1,6 @@
 import "raf";
 import { IComponent, IComponentFactory, IFrameEvent, ISystem } from "../src/interfaces";
-import { SystemManager } from "./SystemManager";
+import { ISystemWithStates, SystemManager } from "./SystemManager";
 
 export { FrameEvent, GameLoop };
 
@@ -24,9 +24,8 @@ class GameLoop {
     public timestamp = this._pollyFillHighResolutionTime();
     protected _running: boolean;
     protected _systemManager: SystemManager;
-    protected _fixedTSSystems: ISystem[];
-    protected _nonFixedTSSystems: ISystem[];
-    protected _activeSystems: ISystem[];
+    protected _fixedTSSystems: ISystemWithStates[];
+    protected _nonFixedTSSystems: ISystemWithStates[];
     protected _frameId: number;
     protected _currentTimer: FrameEvent;
     constructor(systemManager: SystemManager, timer = new FrameEvent(1000 / 30)) {
@@ -83,7 +82,6 @@ class GameLoop {
         // limit delta max value when browser loose focus and resume ?
         while (this._currentTimer.delta >= this._currentTimer.frequency) {
             this.updateFixedTS(args);
-            // console.log("delta " + delta);
             this._currentTimer.delta -= this._currentTimer.frequency;
         }
 
