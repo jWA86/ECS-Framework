@@ -10,8 +10,12 @@ class TimeMeasure {
     protected _max: number = 0;
     protected _mean: number = 0;
     constructor(id: string) {
+        this.buildMark(id);
+    }
+    public buildMark(id: string) {
         this._id = id;
-        this.buildMark(this._id);
+        this._startingMark = id + "-start";
+        this._endingMark = id + "-end";
     }
     public placeStartMark() {
         this.performance.mark(this._startingMark);
@@ -47,10 +51,7 @@ class TimeMeasure {
         this._max = max;
         this._min = min;
     }
-    protected buildMark(markName: string) {
-        this._startingMark = markName + "-start";
-        this._endingMark = markName + "-end";
-    }
+    
     get data() {
         return this.performance.getEntriesByName(this._id);
     }
