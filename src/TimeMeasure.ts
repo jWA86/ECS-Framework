@@ -51,7 +51,7 @@ class TimeMeasure {
         this._max = max;
         this._min = min;
     }
-    
+
     get data() {
         return this.performance.getEntriesByName(this._id);
     }

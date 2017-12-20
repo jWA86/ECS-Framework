@@ -1,11 +1,11 @@
 import { expect } from "chai";
 import "mocha";
+import { clearInterval, setInterval } from "timers";
 import { ComponentFactory, EntityFactory } from "../src/ComponentFactory";
 import { FrameEvent, GameLoop } from "../src/GameLoop";
 import { IComponent, IComponentFactory, IFrameEvent } from "../src/interfaces";
 import { System } from "../src/System";
 import { SystemManager } from "../src/SystemManager";
-import { clearInterval, setInterval } from "timers";
 
 // Can't seem to test timer value with multiple browser test
 // especially with firefox

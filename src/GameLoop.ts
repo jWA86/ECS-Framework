@@ -1,20 +1,31 @@
 import "raf";
-import { IComponent, IComponentFactory, IFrameEvent, ISystem } from "../src/interfaces";
+import { IComponent, IComponentFactory, ISystem } from "../src/interfaces";
 import { ISystemWithStates, SystemManager } from "./SystemManager";
 
-export { FrameEvent, GameLoop };
+export { FrameEvent, IFrameEvent, GameLoop };
+/* Object that holds time data between frame update */
+interface IFrameEvent {
+    /* time before next render frame */
+    lag: number;
+    /* frequency of update */
+    frequency: number;
+    /* time the last frame was fired */
+    lastFrame: number;
+    /* time passed since the start of the game loop */
+    time: number;
+}
 
-class FrameEvent {
+class FrameEvent implements IFrameEvent {
     public lastFrame: number;
-    public delta: number;
+    public lag: number;
     public time: number;
     constructor(public frequency: number) {
-        this.delta = 0;
+        this.lag = 0;
         this.lastFrame = 0;
         this.time = 0;
     }
     public reset() {
-        this.delta = 0;
+        this.lag = 0;
         this.lastFrame = 0;
         this.time = 0;
     }
@@ -76,13 +87,12 @@ class GameLoop {
 
         const ellapsed = now - this._currentTimer.lastFrame;
         this._currentTimer.lastFrame = now;
-        //
-        this._currentTimer.delta += ellapsed;
+        this._currentTimer.lag += ellapsed;
         this._currentTimer.time += ellapsed;
         // limit delta max value when browser loose focus and resume ?
-        while (this._currentTimer.delta >= this._currentTimer.frequency) {
+        while (this._currentTimer.lag >= this._currentTimer.frequency) {
             this.updateFixedTS(args);
-            this._currentTimer.delta -= this._currentTimer.frequency;
+            this._currentTimer.lag -= this._currentTimer.frequency;
         }
 
         this.updateNonFixedTS(args);

@@ -1,6 +1,61 @@
 import { FastIterationMap } from "FastIterationMap";
-import { IComponent, IComponentFactory, IEntityFactory } from "./interfaces";
-export { ComponentFactory, EntityFactory };
+export { ComponentFactory, EntityFactory, IComponent, IComponentFactory, IEntityFactory, IPool };
+
+/* Components have to implement this interface in order to be processed by systems */
+interface IComponent {
+    entityId: number;
+    active: boolean;
+}
+
+interface IPool {
+    /* return the length to iterate created components and avoid iterate maximum number of zeored components
+    */
+    iterationLength: number;
+    /* nb of created active components */
+    nbActive: number;
+    /* Nb actives and inactives created components */
+    nbCreated: number;
+    /* Nb of zeroed components ( free slot for creating components) */
+    nbFreeSlot: number;
+    /* Nb of created inactive components */
+    nbInactive: number;
+    /* Return the size of the pool */
+    size: number;
+    /* Create a component with the provided values*/
+    create(entityId: number, active: boolean);
+    /* Delete a component by its id if it's in the pool */
+    delete(entityId: number): boolean;
+    /* Get a component by its id */
+    get(entityId: number);
+    /* Does the pool contain a component with this id */
+    has(entityId: number): boolean;
+    /* Resize the pool, either add zeroed components or delete last components (created or zeroed indistinctly) */
+    resize(size: number);
+}
+
+interface IComponentFactory<T extends IComponent> extends IPool {
+    /* Return keys of all created components and their index in the values array */
+    keys: Map<number, number>;
+    /* Same as size */
+    length: number;
+    /* Hold components, use for iteration in Systems. */
+    values: T[];
+    /* Add components but instanciated outside the pool (should probably not be used) */
+    push(key: number, value: T);
+    /* Same as push */
+    set(key: number, value: T);
+    /* Set the ative proprety of a component */
+    activate(entityId: number, value: boolean);
+    /* Empty the pool from zeroed and created components */
+    clear();
+}
+
+interface IEntityFactory extends IPool {
+    addFactory(name: string, factory: IComponentFactory<IComponent>);
+    getComponent(entityId: number, factoryName: string): IComponent;
+    /* get components by providing the entityId and the factory */
+    getFactory(name: string): IComponentFactory<IComponent>;
+}
 
 class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T> implements IComponentFactory<T> {
     protected _iterationLength: number = 0; // use by the system for iteration, avoid iterate over zeroed components
@@ -31,7 +86,7 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
             }
         }
     }
-
+/* Set the active proprety of all component in the pool */
     public activateAll(value: boolean) {
         for (let i = 0; i < this.size; ++i) {
             this._values[i].active = value;

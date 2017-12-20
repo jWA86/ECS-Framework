@@ -1,7 +1,6 @@
 import { FastIterationMap } from "FastIterationMap";
-import { ISystem } from "../src/System";
 import { TimeMeasure } from "../src/TimeMeasure";
-import { IComponent, IComponentFactory } from "./interfaces";
+import { IComponent, IComponentFactory, ISystem } from "./interfaces";
 export { SystemManager, ISystemWithStates };
 
 interface ISystemWithStates {
@@ -71,7 +70,7 @@ class SystemManager {
         this.nonFixedTimeStepSystems = new FastIterationMap();
     }
     /* Add a system to be processed in fixed time step or independently */
-    public pushSystem(system: ISystem, fixedTimeStep: boolean): string {
+    public pushSystem(system: ISystem, fixedTimeStep: boolean = true): string {
         const id = this.generateId(system);
         const sysWState = new SystemWithStates(id, system);
         if (fixedTimeStep) {
