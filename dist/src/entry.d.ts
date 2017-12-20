@@ -1,4 +1,5 @@
-import { ComponentFactory, EntityFactory } from './ComponentFactory';
-import { System, MultiParallelSystem, MultiNonParallelSystem } from './System';
-import { ISystem, IComponent, IPool, IComponentFactory, IEntityFactory } from "./interfaces";
-export { ComponentFactory, EntityFactory, System, MultiNonParallelSystem, MultiParallelSystem, ISystem, IComponent, IPool, IComponentFactory, IEntityFactory };
+import { ComponentFactory, EntityFactory, IComponent, IComponentFactory, IEntityFactory, IPool } from "./ComponentFactory";
+import "./interfaces";
+import { ISystem, System } from "./System";
+import { ISystemWithStates, SystemManager } from "./SystemManager";
+export { ComponentFactory, EntityFactory, IComponent, IComponentFactory, IEntityFactory, IPool, System, ISystem, ISystemWithStates, SystemManager };
