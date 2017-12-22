@@ -25,6 +25,7 @@ interface IComponentFactory<T extends IComponent> extends IPool {
     set(key: number, value: T): any;
     activate(entityId: number, value: boolean): any;
     clear(): any;
+    swap(key1: number, key2: number): any;
 }
 interface IEntityFactory extends IPool {
     addFactory(name: string, factory: IComponentFactory<IComponent>): any;

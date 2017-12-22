@@ -48,6 +48,7 @@ interface IComponentFactory<T extends IComponent> extends IPool {
     activate(entityId: number, value: boolean);
     /* Empty the pool from zeroed and created components */
     clear();
+    swap(key1: number, key2: number);
 }
 
 interface IEntityFactory extends IPool {
