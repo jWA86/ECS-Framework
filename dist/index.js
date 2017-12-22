@@ -86,7 +86,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		var a = factory();
 		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
 	}
-})(this, function() {
+})(typeof self !== 'undefined' ? self : this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -193,22 +193,6 @@ var FastIterationMap = /** @class */ (function () {
     FastIterationMap.prototype.has = function (key) {
         return this._keys.has(key);
     };
-    FastIterationMap.prototype.insertValue = function (key, value, index) {
-        return this._values.splice(index, 0, value);
-    };
-    // from exclusive 
-    // to exclusive
-    FastIterationMap.prototype.offsetIndexInKeys = function (from, offsetVal, to) {
-        var mapIter = this._keys.entries();
-        var l = this._keys.size;
-        to = to || Number.MAX_VALUE;
-        for (var i = 0; i < l; ++i) {
-            var e = mapIter.next().value;
-            if (e[1] > from && e[1] < to) {
-                this._keys.set(e[0], e[1] += offsetVal);
-            }
-        }
-    };
     FastIterationMap.prototype.insertAfter = function (key, value, keyRef) {
         if (this._keys.get(key) !== undefined) {
             return false;
@@ -253,22 +237,6 @@ var FastIterationMap = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    FastIterationMap.prototype.push = function (key, value) {
-        var e = this._keys.get(key);
-        //if the key doesn't exist add the element
-        if (e === undefined) {
-            var l = this._values.push(value);
-            this._keys.set(key, l - 1);
-        }
-        else {
-            //if the key is already there, update the value
-            this._values[e] = value;
-        }
-        return this._values.length;
-    };
-    FastIterationMap.prototype.set = function (key, value) {
-        return this.push(key, value);
-    };
     Object.defineProperty(FastIterationMap.prototype, "size", {
         get: function () {
             return this._values.length;
@@ -283,6 +251,51 @@ var FastIterationMap = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
+    FastIterationMap.prototype.push = function (key, value) {
+        var e = this._keys.get(key);
+        // if the key doesn't exist add the element
+        if (e === undefined) {
+            var l = this._values.push(value);
+            this._keys.set(key, l - 1);
+        }
+        else {
+            // if the key is already there, update the value
+            this._values[e] = value;
+        }
+        return this._values.length;
+    };
+    FastIterationMap.prototype.set = function (key, value) {
+        return this.push(key, value);
+    };
+    FastIterationMap.prototype.swap = function (key1, key2) {
+        var index1 = this._keys.get(key1);
+        var index2 = this._keys.get(key2);
+        if (index1 === undefined || index2 === undefined) {
+            return false;
+        }
+        var tmp = this._values[index1];
+        this._values[index1] = this._values[index2];
+        this._values[index2] = tmp;
+        this._keys.set(key1, index2);
+        this._keys.set(key2, index1);
+        return true;
+    };
+    FastIterationMap.prototype.insertValue = function (key, value, index) {
+        return this._values.splice(index, 0, value);
+    };
+    // from exclusive
+    // to exclusive
+    FastIterationMap.prototype.offsetIndexInKeys = function (from, offsetVal, to) {
+        var mapIter = this._keys.entries();
+        var l = this._keys.size;
+        to = to || Number.MAX_VALUE;
+        for (var i = 0; i < l; ++i) {
+            var e = mapIter.next().value;
+            if (e[1] > from && e[1] < to) {
+                this._keys.set(e[0], e[1] += offsetVal);
+            }
+        }
+    };
     return FastIterationMap;
 }());
 exports.FastIterationMap = FastIterationMap;
