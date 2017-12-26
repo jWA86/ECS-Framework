@@ -5,10 +5,12 @@ import { ISystemWithStates, SystemManager } from "./SystemManager";
 export { FrameEvent, IFrameEvent, GameLoop };
 /* Object that holds time data between frame update */
 interface IFrameEvent {
+    /* time difference since last frame */
+    delta: number;
     /* time before next render frame */
     lag: number;
     /* frequency of update */
-    frequency: number;
+    MS_PER_UPDATE: number;
     /* time the last frame was fired */
     lastFrame: number;
     /* time passed since the start of the game loop */
@@ -16,10 +18,11 @@ interface IFrameEvent {
 }
 
 class FrameEvent implements IFrameEvent {
+    public delta: number;
     public lastFrame: number;
     public lag: number;
     public time: number;
-    constructor(public frequency: number) {
+    constructor(public MS_PER_UPDATE: number) {
         this.lag = 0;
         this.lastFrame = 0;
         this.time = 0;
@@ -80,19 +83,19 @@ class GameLoop {
     }
     /* Set the process frequency in mms */
     public setFrequency(frequency: number) {
-        this._currentTimer.frequency = frequency;
+        this._currentTimer.MS_PER_UPDATE = frequency;
     }
     public loop(...args: any[]) {
         const now = this.timestamp.now();
-
         const ellapsed = now - this._currentTimer.lastFrame;
+        this._currentTimer.delta = ellapsed;
         this._currentTimer.lastFrame = now;
         this._currentTimer.lag += ellapsed;
         this._currentTimer.time += ellapsed;
         // limit delta max value when browser loose focus and resume ?
-        while (this._currentTimer.lag >= this._currentTimer.frequency) {
+        while (this._currentTimer.lag >= this._currentTimer.MS_PER_UPDATE) {
             this.updateFixedTS(args);
-            this._currentTimer.lag -= this._currentTimer.frequency;
+            this._currentTimer.lag -= this._currentTimer.MS_PER_UPDATE;
         }
 
         this.updateNonFixedTS(args);

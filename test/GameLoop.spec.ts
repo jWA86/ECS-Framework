@@ -128,9 +128,43 @@ describe("GameLoop should be able to", function() {
         const sI = setInterval(() => {
             const t = gl.getCurrentTimer();
             if (t.time >= runFor) {
+                clearInterval(sI);
                 gl.stop();
                 expect(t.time).to.approximately(runFor, 30);
+                done();
+            }
+        }, 20);
+        gl.start();
+    });
+    it("provid the time ellaspsed since the last frame call", (done) => {
+        // checking that delta does not vary much
+        const sM = new SystemManager();
+        const fbckSys = new FeedBackSystem();
+        fbckSys.setFactories(feedBackFactory);
+        feedBackFactory.create(1, true);
+        expect(feedBackFactory.nbActive).to.gt(0);
+
+        const deltas = [];
+        FeedBackSystem.callBack = (timer) => {
+            deltas.push(timer.delta);
+        };
+        sM.pushSystem(fbckSys);
+        const runFor = 1000;
+        const gl = new GameLoop(sM);
+        const sI = setInterval(() => {
+            const t = gl.getCurrentTimer();
+            if (t.time >= runFor) {
                 clearInterval(sI);
+                gl.stop();
+                const mean = deltas.reduce((prev, current, index) => {
+                    return prev + current;
+                });
+                let sd = deltas.reduce((prev, current, index) => {
+                    return prev + Math.pow(current - mean, 2);
+                });
+                sd /= (deltas.length - 1);
+                const s = Math.sqrt(sd);
+                expect(s).to.approximately(mean, 20);
                 done();
             }
         }, 20);
@@ -155,10 +189,10 @@ describe("GameLoop should be able to", function() {
                 const sI2 = setInterval( () => {
                     const t2 = gl.getCurrentTimer().time;
                     if (t2 >= runFor * 2 ) {
-                        gl.stop();
-                        expect(t2).to.gte(t1);
                         clearInterval(sI);
                         clearInterval(sI2);
+                        gl.stop();
+                        expect(t2).to.gte(t1);
                         done();
                     }
                 }, 20);
@@ -186,13 +220,13 @@ describe("GameLoop should be able to", function() {
         const sI = setInterval(() => {
             const t = gl.getCurrentTimer();
             if (t.time >= runFor) {
+                clearInterval(sI);
                 gl.stop();
                 const arr = FeedBackSystem["timerArr"];
                 for (let i = 1; i < arr.length - 1; ++i) {
                     const diff = arr[i + 1] - arr[i];
                     expect(diff).to.approximately(frequency, 5);
                 }
-                clearInterval(sI);
                 done();
             }
         }, 20);
@@ -250,11 +284,11 @@ describe("GameLoop should be able to", function() {
         const sI = setInterval(() => {
             const t = gl.getCurrentTimer();
             if (t.time >= runFor) {
+                clearInterval(sI);
                 gl.stop();
                 const fi = fixedIntFactory.get(1).integer;
                 const nfi = nFixedIntFactory.get(1).integer;
                 expect(fi).to.gt(nfi);
-                clearInterval(sI);
                 done();
             }
         }, 10);
@@ -305,6 +339,7 @@ describe("GameLoop should be able to", function() {
                 paused = true;
             }
             if (t.time >= runFor && paused) {
+                clearInterval(sI);
                 gl.stop();
                 const pausedComp = fact1.get(1);
                 const nonPausedComp = fact2.get(1);
@@ -318,7 +353,6 @@ describe("GameLoop should be able to", function() {
                 expect(pausedNComp.integer).to.gt(0);
                 expect(pausedComp.integer).to.lt(nonPausedComp.integer);
                 expect(pausedNComp.integer).to.lt(nonPausedNComp.integer);
-                clearInterval(sI);
                 done();
             }
         }, 20);
@@ -349,12 +383,12 @@ describe("GameLoop should be able to", function() {
         const sI = setInterval(() => {
             const t = gl.getCurrentTimer();
             if (t.time >= runFor) {
+                clearInterval(sI);
                 gl.stop();
 
                 expect(sM.get(sys1Id).perfMeasure.mean).to.be.gt(0);
                 expect(sM.get(sys2Id).perfMeasure.mean).to.be.gt(0);
 
-                clearInterval(sI);
                 done();
             }
         }, 10);
