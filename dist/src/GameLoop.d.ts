@@ -2,17 +2,19 @@ import "raf";
 import { ISystemWithStates, SystemManager } from "./SystemManager";
 export { FrameEvent, IFrameEvent, GameLoop };
 interface IFrameEvent {
+    delta: number;
     lag: number;
-    frequency: number;
+    MS_PER_UPDATE: number;
     lastFrame: number;
     time: number;
 }
 declare class FrameEvent implements IFrameEvent {
-    frequency: number;
+    MS_PER_UPDATE: number;
+    delta: number;
     lastFrame: number;
     lag: number;
     time: number;
-    constructor(frequency: number);
+    constructor(MS_PER_UPDATE: number);
     reset(): void;
 }
 declare class GameLoop {
