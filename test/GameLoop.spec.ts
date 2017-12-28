@@ -181,14 +181,14 @@ describe("GameLoop should be able to", function() {
         gl.setFrequency(1000 / 60);
         const runFor = 500;
         gl.start();
-        const sI = setInterval( () => {
+        const sI = setInterval(() => {
             const t1 = gl.getCurrentTimer().time;
             if (t1 >= runFor) {
                 gl.stop();
                 gl.resume();
-                const sI2 = setInterval( () => {
+                const sI2 = setInterval(() => {
                     const t2 = gl.getCurrentTimer().time;
-                    if (t2 >= runFor * 2 ) {
+                    if (t2 >= runFor * 2) {
                         clearInterval(sI);
                         clearInterval(sI2);
                         gl.stop();
