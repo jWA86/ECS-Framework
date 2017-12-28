@@ -1,5 +1,5 @@
 {
-  "name": "componententitysystem",
+  "name": "ecs-framework",
   "version": "0.4.3",
   "description": "Simple Component Entity System",
   "main": "./dist/index.js",
@@ -14,7 +14,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/jWA86/Entity-Component-System-in-js-"
+    "url": "https://github.com/jWA86/ECS-Framework.git"
   },
   "author": "jWA86",
   "license": "MIT",
