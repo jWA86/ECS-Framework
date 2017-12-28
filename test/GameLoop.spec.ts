@@ -148,7 +148,7 @@ describe("GameLoop should be able to", function() {
         FeedBackSystem.callBack = (timer) => {
             deltas.push(timer.delta);
         };
-        sM.pushSystem(fbckSys);
+        sM.pushSystem(fbckSys, false);
         const runFor = 1000;
         const gl = new GameLoop(sM);
         const sI = setInterval(() => {
