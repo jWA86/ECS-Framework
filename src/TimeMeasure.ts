@@ -2,7 +2,7 @@ export { TimeMeasure };
 import "performance-polyfill";
 
 class TimeMeasure {
-    public performance = this._pollyFillHighResolutionTime();
+    public performance = window.performance;
     protected _id: string;
     protected _startingMark: string;
     protected _endingMark: string;
@@ -63,9 +63,5 @@ class TimeMeasure {
     }
     get max() {
         return this._max;
-    }
-    // temporary, should find / make a polyfill
-    protected _pollyFillHighResolutionTime() {
-        return window.performance;
     }
 }

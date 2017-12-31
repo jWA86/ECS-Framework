@@ -19,5 +19,4 @@ declare class TimeMeasure {
     readonly mean: number;
     readonly min: number;
     readonly max: number;
-    protected _pollyFillHighResolutionTime(): Performance;
 }

@@ -1,8 +1,8 @@
 import { expect } from "chai";
 import "mocha";
+import { clearInterval, setInterval } from "timers";
 import { ComponentFactory, EntityFactory } from "../src/ComponentFactory";
 import { TimeMeasure } from "../src/TimeMeasure";
-import { setInterval, clearInterval } from "timers";
 // The goal of this class is to give quick feedback of time performance while developping systems or composing them
 // it's not supposed to replace a frame profiler
 describe("TimeMeasure should be able to ", () => {

@@ -972,7 +972,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __webpack_require__(8);
 var TimeMeasure = /** @class */ (function () {
     function TimeMeasure(id) {
-        this.performance = this._pollyFillHighResolutionTime();
+        this.performance = window.performance;
         this._min = Number.MAX_VALUE;
         this._max = 0;
         this._mean = 0;
@@ -1045,10 +1045,6 @@ var TimeMeasure = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    // temporary, should find / make a polyfill
-    TimeMeasure.prototype._pollyFillHighResolutionTime = function () {
-        return window.performance;
-    };
     return TimeMeasure;
 }());
 exports.TimeMeasure = TimeMeasure;
