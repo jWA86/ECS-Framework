@@ -1261,7 +1261,7 @@ var System = /** @class */ (function () {
                             arr.push(args[a]);
                         }
                     }
-                    this.execute.apply(null, arr);
+                    this.execute.apply(this, arr);
                 }
             }
         }
