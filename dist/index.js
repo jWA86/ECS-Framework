@@ -322,10 +322,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var ComponentFactory_1 = __webpack_require__(3);
 exports.ComponentFactory = ComponentFactory_1.ComponentFactory;
 exports.EntityFactory = ComponentFactory_1.EntityFactory;
-__webpack_require__(4);
-var System_1 = __webpack_require__(5);
+var GameLoop_1 = __webpack_require__(4);
+exports.GameLoop = GameLoop_1.GameLoop;
+__webpack_require__(9);
+var System_1 = __webpack_require__(10);
 exports.System = System_1.System;
-var SystemManager_1 = __webpack_require__(6);
+var SystemManager_1 = __webpack_require__(11);
 exports.SystemManager = SystemManager_1.SystemManager;
 
 
@@ -712,6 +714,479 @@ exports.EntityFactory = EntityFactory;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+__webpack_require__(5);
+var FrameEvent = /** @class */ (function () {
+    function FrameEvent(MS_PER_UPDATE) {
+        this.MS_PER_UPDATE = MS_PER_UPDATE;
+        this.lag = 0;
+        this.lastFrame = 0;
+        this.time = 0;
+    }
+    FrameEvent.prototype.reset = function () {
+        this.lag = 0;
+        this.lastFrame = 0;
+        this.time = 0;
+    };
+    return FrameEvent;
+}());
+exports.FrameEvent = FrameEvent;
+var GameLoop = /** @class */ (function () {
+    function GameLoop(systemManager, timer) {
+        if (timer === void 0) { timer = new FrameEvent(1000 / 30); }
+        this.timestamp = this._pollyFillHighResolutionTime();
+        this.setSystemManager(systemManager);
+        this._currentTimer = timer;
+        this._running = false;
+    }
+    GameLoop.prototype.isRunning = function () {
+        return this._running;
+    };
+    GameLoop.prototype.getSystemManager = function () {
+        return this._systemManager;
+    };
+    GameLoop.prototype.getCurrentTimer = function () {
+        return this._currentTimer;
+    };
+    GameLoop.prototype.setCurretnTimer = function (timer) {
+        this._currentTimer = timer;
+    };
+    GameLoop.prototype.setSystemManager = function (systems) {
+        this._systemManager = systems;
+        this._fixedTSSystems = this._systemManager.getFixedTSSystems();
+        this._nonFixedTSSystems = this._systemManager.getNonFixedTSSystems();
+    };
+    GameLoop.prototype.start = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        this._running = true;
+        this._currentTimer.reset();
+        this._currentTimer.lastFrame = this.timestamp.now();
+        this.loop(args);
+        // this.update(timer);
+    };
+    GameLoop.prototype.stop = function () {
+        this._running = false;
+        cancelAnimationFrame(this._frameId);
+    };
+    GameLoop.prototype.resume = function () {
+        this._running = true;
+        this._currentTimer.lastFrame = this.timestamp.now();
+        this.loop();
+    };
+    /* Set the process frequency in mms */
+    GameLoop.prototype.setFrequency = function (frequency) {
+        this._currentTimer.MS_PER_UPDATE = frequency;
+    };
+    GameLoop.prototype.loop = function () {
+        var _this = this;
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        var now = this.timestamp.now();
+        var ellapsed = now - this._currentTimer.lastFrame;
+        this._currentTimer.delta = ellapsed;
+        this._currentTimer.lastFrame = now;
+        this._currentTimer.lag += ellapsed;
+        this._currentTimer.time += ellapsed;
+        // limit delta max value when browser loose focus and resume ?
+        while (this._currentTimer.lag >= this._currentTimer.MS_PER_UPDATE) {
+            this.updateFixedTS(args);
+            this._currentTimer.lag -= this._currentTimer.MS_PER_UPDATE;
+        }
+        this.updateNonFixedTS(args);
+        if (this._running) {
+            this._frameId = requestAnimationFrame(function () { return _this.loop(); });
+        }
+        else {
+            cancelAnimationFrame(this._frameId);
+        }
+    };
+    /* Process every Fixed Systems */
+    GameLoop.prototype.updateFixedTS = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        var l = this._fixedTSSystems.length;
+        for (var i = 0; i < l; ++i) {
+            if (this._fixedTSSystems[i].active) {
+                this._fixedTSSystems[i].process([this._currentTimer, args]);
+            }
+        }
+    };
+    /* Process every Non Fixed Systems */
+    GameLoop.prototype.updateNonFixedTS = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        var l = this._nonFixedTSSystems.length;
+        for (var i = 0; i < l; ++i) {
+            if (this._nonFixedTSSystems[i].active) {
+                this._nonFixedTSSystems[i].process([this._currentTimer, args]);
+            }
+        }
+    };
+    GameLoop.prototype._pollyFillHighResolutionTime = function () {
+        return window.performance && window.performance.now ? window.performance : Date;
+    };
+    return GameLoop;
+}());
+exports.GameLoop = GameLoop;
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global) {var now = __webpack_require__(7)
+  , root = typeof window === 'undefined' ? global : window
+  , vendors = ['moz', 'webkit']
+  , suffix = 'AnimationFrame'
+  , raf = root['request' + suffix]
+  , caf = root['cancel' + suffix] || root['cancelRequest' + suffix]
+
+for(var i = 0; !raf && i < vendors.length; i++) {
+  raf = root[vendors[i] + 'Request' + suffix]
+  caf = root[vendors[i] + 'Cancel' + suffix]
+      || root[vendors[i] + 'CancelRequest' + suffix]
+}
+
+// Some versions of FF have rAF but not cAF
+if(!raf || !caf) {
+  var last = 0
+    , id = 0
+    , queue = []
+    , frameDuration = 1000 / 60
+
+  raf = function(callback) {
+    if(queue.length === 0) {
+      var _now = now()
+        , next = Math.max(0, frameDuration - (_now - last))
+      last = next + _now
+      setTimeout(function() {
+        var cp = queue.slice(0)
+        // Clear queue here to prevent
+        // callbacks from appending listeners
+        // to the current frame's queue
+        queue.length = 0
+        for(var i = 0; i < cp.length; i++) {
+          if(!cp[i].cancelled) {
+            try{
+              cp[i].callback(last)
+            } catch(e) {
+              setTimeout(function() { throw e }, 0)
+            }
+          }
+        }
+      }, Math.round(next))
+    }
+    queue.push({
+      handle: ++id,
+      callback: callback,
+      cancelled: false
+    })
+    return id
+  }
+
+  caf = function(handle) {
+    for(var i = 0; i < queue.length; i++) {
+      if(queue[i].handle === handle) {
+        queue[i].cancelled = true
+      }
+    }
+  }
+}
+
+module.exports = function(fn) {
+  // Wrap in a new function to prevent
+  // `cancel` potentially being assigned
+  // to the native rAF function
+  return raf.call(root, fn)
+}
+module.exports.cancel = function() {
+  caf.apply(root, arguments)
+}
+module.exports.polyfill = function(object) {
+  if (!object) {
+    object = root;
+  }
+  object.requestAnimationFrame = raf
+  object.cancelAnimationFrame = caf
+}
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(process) {// Generated by CoffeeScript 1.12.2
+(function() {
+  var getNanoSeconds, hrtime, loadTime, moduleLoadTime, nodeLoadTime, upTime;
+
+  if ((typeof performance !== "undefined" && performance !== null) && performance.now) {
+    module.exports = function() {
+      return performance.now();
+    };
+  } else if ((typeof process !== "undefined" && process !== null) && process.hrtime) {
+    module.exports = function() {
+      return (getNanoSeconds() - nodeLoadTime) / 1e6;
+    };
+    hrtime = process.hrtime;
+    getNanoSeconds = function() {
+      var hr;
+      hr = hrtime();
+      return hr[0] * 1e9 + hr[1];
+    };
+    moduleLoadTime = getNanoSeconds();
+    upTime = process.uptime() * 1e9;
+    nodeLoadTime = moduleLoadTime - upTime;
+  } else if (Date.now) {
+    module.exports = function() {
+      return Date.now() - loadTime;
+    };
+    loadTime = Date.now();
+  } else {
+    module.exports = function() {
+      return new Date().getTime() - loadTime;
+    };
+    loadTime = new Date().getTime();
+  }
+
+}).call(this);
+
+//# sourceMappingURL=performance-now.js.map
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports) {
+
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
 // interface IFrameEvent {
 //     /* The number of times the frame event was fired */
 //     count: number;
@@ -725,7 +1200,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 
 /***/ }),
-/* 5 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -797,14 +1272,14 @@ exports.System = System;
 
 
 /***/ }),
-/* 6 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var FastIterationMap_1 = __webpack_require__(0);
-var TimeMeasure_1 = __webpack_require__(7);
+var TimeMeasure_1 = __webpack_require__(12);
 var SystemWithStates = /** @class */ (function () {
     function SystemWithStates(id, system) {
         this.active = true;
@@ -963,13 +1438,13 @@ exports.SystemManager = SystemManager;
 
 
 /***/ }),
-/* 7 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-__webpack_require__(8);
+__webpack_require__(13);
 var TimeMeasure = /** @class */ (function () {
     function TimeMeasure(id) {
         this.performance = window.performance;
@@ -1051,7 +1526,7 @@ exports.TimeMeasure = TimeMeasure;
 
 
 /***/ }),
-/* 8 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**

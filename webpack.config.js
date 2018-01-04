@@ -20,7 +20,7 @@ module.exports = {
         ]
     },
     resolve: {
-        extensions: [ '.ts' ]
+        extensions: [ '.ts']
     },
     // plugins: [new UglifyJSPlugin({ sourceMap : true }) 
     //    ]

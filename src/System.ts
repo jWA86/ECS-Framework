@@ -56,7 +56,7 @@ abstract class System implements ISystem {
                             arr.push(args[a]);
                         }
                     }
-                    this.execute.apply(null, arr);
+                    this.execute.apply(this, arr);
                 }
             }
         }
