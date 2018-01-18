@@ -69,8 +69,8 @@ class SystemManager {
         this.fixedTimeStepSystems = new FastIterationMap();
         this.nonFixedTimeStepSystems = new FastIterationMap();
     }
-    /* Add a system to be processed in fixed time step or independently */
-    public pushSystem(system: ISystem, fixedTimeStep: boolean = true): string {
+    /* Add a system to be processed in fixed time step or at render speed*/
+    public pushSystem(system: ISystem, fixedTimeStep: boolean = false): string {
         const id = this.generateId(system);
         const sysWState = new SystemWithStates(id, system);
         if (fixedTimeStep) {
