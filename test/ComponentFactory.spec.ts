@@ -101,7 +101,7 @@ describe("Component Factory", () => {
         simpleFactory.create(1, false, "p1", 2, { x: 0.0, y: 0.0 });
         expect(simpleFactory.has(1)).to.equal(true);
         // id should be found in order to delete it first
-        expect(simpleFactory.delete(1)).to.equal(true);
+        expect(simpleFactory.free(1)).to.equal(true);
         // size of the pool should not be changed since we zeroed the component instead of removing it from the pool
         expect(simpleFactory.size).to.equal(initialSize);
         // we created only one component so it was at the first index of the values array, it is now zeroed
@@ -113,13 +113,13 @@ describe("Component Factory", () => {
         const initialSize = simpleFactory.size;
         simpleFactory.create(1, false, "p1", 2, { x: 0.0, y: 0.0 });
         expect(simpleFactory.iterationLength).to.equal(1);
-        expect(simpleFactory.delete(1)).to.equal(true);
+        expect(simpleFactory.free(1)).to.equal(true);
         expect(simpleFactory.iterationLength).to.equal(0);
 
         simpleFactory.create(1, false, "p1", 2, { x: 0.0, y: 0.0 });
         simpleFactory.create(2, false, "p1", 2, { x: 0.0, y: 0.0 });
         expect(simpleFactory.iterationLength).to.equal(2);
-        expect(simpleFactory.delete(1)).to.equal(true);
+        expect(simpleFactory.free(1)).to.equal(true);
         // still equal 2 since the one we removed is not the last one
         expect(simpleFactory.iterationLength).to.equal(2);
     });
@@ -158,9 +158,9 @@ describe("Component Factory", () => {
         simpleFactory.create(2, true);
         expect(simpleFactory.nbCreated).to.equal(2);
 
-        simpleFactory.delete(2);
+        simpleFactory.free(2);
         expect(simpleFactory.nbCreated).to.equal(1);
-        simpleFactory.delete(1);
+        simpleFactory.free(1);
         expect(simpleFactory.nbCreated).to.equal(0);
     });
     it("should keep track of the number of active components", () => {
@@ -179,9 +179,9 @@ describe("Component Factory", () => {
         simpleFactory.create(4, true);
         expect(simpleFactory.nbActive).to.equal(2);
 
-        simpleFactory.delete(2);
+        simpleFactory.free(2);
         expect(simpleFactory.nbActive).to.equal(2);
-        simpleFactory.delete(1);
+        simpleFactory.free(1);
         expect(simpleFactory.nbActive).to.equal(1);
 
         simpleFactory.activate(4, false);
@@ -207,9 +207,9 @@ describe("Component Factory", () => {
         simpleFactory.create(4, false);
         expect(simpleFactory.nbInactive).to.equal(2);
 
-        simpleFactory.delete(2);
+        simpleFactory.free(2);
         expect(simpleFactory.nbInactive).to.equal(2);
-        simpleFactory.delete(3);
+        simpleFactory.free(3);
         expect(simpleFactory.nbInactive).to.equal(1);
 
         simpleFactory.activate(4, true);
@@ -292,15 +292,15 @@ describe("Component Factory", () => {
             expect(movingObjectFactory.getFactory("position").get(1).entityId).to.equal(1);
             expect(movingObjectFactory.getFactory("velocity").get(1).entityId).to.equal(1);
         });
-        it("delete() should remove the components in every child pool", () => {
+        it("free() should remove the components in every child pool", () => {
             movingObjectFactory.create(1, true);
 
-            expect(movingObjectFactory.delete(1)).to.equal(true);
+            expect(movingObjectFactory.free(1)).to.equal(true);
             expect(positionFactory.has(1)).to.equal(false);
             expect(velocityFactory.has(1)).to.equal(false);
         });
-        it("delete() unexisting component should return false", () => {
-            expect(movingObjectFactory.delete(1)).to.equal(false);
+        it("free() unexisting component should return false", () => {
+            expect(movingObjectFactory.free(1)).to.equal(false);
             expect(positionFactory.has(1)).to.equal(false);
             expect(velocityFactory.has(1)).to.equal(false);
         });
@@ -356,7 +356,7 @@ describe("Component Factory", () => {
             expect(movingObjectFactory.nbCreated).to.equal(0);
             movingObjectFactory.create(1, false);
             expect(movingObjectFactory.nbCreated).to.equal(1);
-            movingObjectFactory.delete(1);
+            movingObjectFactory.free(1);
             expect(movingObjectFactory.nbCreated).to.equal(0);
         });
         it("nbFreeSlot", () => {

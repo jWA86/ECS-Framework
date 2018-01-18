@@ -12,7 +12,7 @@ interface IPool {
     nbInactive: number;
     size: number;
     create(entityId: number, active: boolean): any;
-    delete(entityId: number): boolean;
+    free(entityId: number): boolean;
     get(entityId: number): any;
     has(entityId: number): boolean;
     resize(size: number): any;
@@ -46,7 +46,7 @@ declare class ComponentFactory<T extends IComponent> extends FastIterationMap<nu
     activateAll(value: boolean): void;
     clear(): void;
     create(entityId: number, active: boolean, ...args: any[]): T;
-    delete(entityId: number): boolean;
+    free(entityId: number): boolean;
     recycle(indexComponentToReplace: number, componentRef: any): void;
     resize(size: number): void;
     insertAfter(key: number, value: T, keyRef: number): boolean;
@@ -71,7 +71,7 @@ declare class EntityFactory implements IEntityFactory {
     addFactory(name: string, factory: ComponentFactory<IComponent>): void;
     getComponent(entityId: number, factoryName: string): IComponent;
     getFactory(name: string): ComponentFactory<IComponent>;
-    delete(entityId: number): boolean;
+    free(entityId: number): boolean;
     get(entityId: number): IComponent[];
     has(entityId: number): boolean;
     create(entityId: number, active: boolean): void;

@@ -453,7 +453,10 @@ var ComponentFactory = /** @class */ (function (_super) {
         this.incrementCreatedLength(index);
         return this._values[index];
     };
-    ComponentFactory.prototype.delete = function (entityId) {
+    /* Set entityId back to 0 and desactivate the component
+    * note : when the component is reuse it still has the old values
+    */
+    ComponentFactory.prototype.free = function (entityId) {
         var index = this._keys.get(entityId);
         if (index === undefined) {
             return false;
@@ -466,7 +469,8 @@ var ComponentFactory = /** @class */ (function (_super) {
             this._nbInactive -= 1;
         }
         // zeroed the component
-        this.mapObject(this._values[index], this._zeroedRef);
+        // note : removed while a solution is found to deep clone an object
+        // this.mapObject(this._values[index], this._zeroedRef);
         this._values[index].entityId = 0;
         this._keys.delete(entityId);
         this.decrementCreatedLength(index);
@@ -622,10 +626,10 @@ var EntityFactory = /** @class */ (function () {
     EntityFactory.prototype.getFactory = function (name) {
         return this._factories.get(name);
     };
-    EntityFactory.prototype.delete = function (entityId) {
+    EntityFactory.prototype.free = function (entityId) {
         var d = true;
         this._factories.forEach(function (f) {
-            if (!f.delete(entityId)) {
+            if (!f.free(entityId)) {
                 d = false;
             }
         });
@@ -1349,9 +1353,9 @@ var SystemManager = /** @class */ (function () {
         this.fixedTimeStepSystems = new FastIterationMap_1.FastIterationMap();
         this.nonFixedTimeStepSystems = new FastIterationMap_1.FastIterationMap();
     }
-    /* Add a system to be processed in fixed time step or independently */
+    /* Add a system to be processed in fixed time step or at render speed*/
     SystemManager.prototype.pushSystem = function (system, fixedTimeStep) {
-        if (fixedTimeStep === void 0) { fixedTimeStep = true; }
+        if (fixedTimeStep === void 0) { fixedTimeStep = false; }
         var id = this.generateId(system);
         var sysWState = new SystemWithStates(id, system);
         if (fixedTimeStep) {

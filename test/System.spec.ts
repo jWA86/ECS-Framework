@@ -171,7 +171,7 @@ describe("System ", () => {
                     v.velocity.y = 0.0;
                     v.velocity.z = 0.0;
                 }
-                velocityFactory.delete(5);
+                velocityFactory.free(5);
                 expect(velocityFactory.nbCreated).to.equal(positionFactory.nbCreated - 1);
             });
 

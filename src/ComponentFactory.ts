@@ -23,8 +23,8 @@ interface IPool {
     size: number;
     /* Create a component with the provided values*/
     create(entityId: number, active: boolean);
-    /* Delete a component by its id if it's in the pool */
-    delete(entityId: number): boolean;
+    /* free a component by its id if it's in the pool */
+    free(entityId: number): boolean;
     /* Get a component by its id */
     get(entityId: number);
     /* Does the pool contain a component with this id */
@@ -151,8 +151,10 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
         this.incrementCreatedLength(index);
         return this._values[index];
     }
-
-    public delete(entityId: number): boolean {
+    /* Set entityId back to 0 and desactivate the component
+    * note : when the component is reuse it still has the old values
+    */
+    public free(entityId: number): boolean {
         const index = this._keys.get(entityId);
         if (index === undefined) { return false; }
         // update nbActive/Inactive counter
@@ -162,7 +164,8 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
             this._nbInactive -= 1;
         }
         // zeroed the component
-        this.mapObject(this._values[index], this._zeroedRef);
+        // note : removed while a solution is found to deep clone an object
+        // this.mapObject(this._values[index], this._zeroedRef);
         this._values[index].entityId = 0;
 
         this._keys.delete(entityId);
@@ -315,10 +318,10 @@ class EntityFactory implements IEntityFactory {
         return this._factories.get(name);
     }
 
-    public delete(entityId: number): boolean {
+    public free(entityId: number): boolean {
         let d = true;
         this._factories.forEach((f) => {
-            if (!f.delete(entityId)) {
+            if (!f.free(entityId)) {
                 d = false;
             }
         });
