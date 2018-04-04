@@ -123,6 +123,9 @@ describe("Component Factory", () => {
         // still equal 2 since the one we removed is not the last one
         expect(simpleFactory.iterationLength).to.equal(2);
     });
+    it("reused component should have default parameters value", () => {
+
+    });
     it("should be able to create components with an active proprety and other proreties", () => {
         const mcFactory = new ComponentFactory<MultiPropComponent>(2, MultiPropComponent, "default string", "default string", { x: 0.0, y: 0.0 });
         const mc = mcFactory.create(1, true);

@@ -1,8 +1,8 @@
-import "raf";
 import { IComponent, IComponentFactory, ISystem } from "../src/interfaces";
-import { ISystemWithStates, SystemManager } from "./SystemManager";
-
+import { TIMESTAMP } from "./pollyFill";
+import { SystemManager } from "./SystemManager";
 export { FrameEvent, IFrameEvent, GameLoop };
+
 /* Object that holds time data between frame update */
 interface IFrameEvent {
     /* time difference since last frame */
@@ -35,11 +35,10 @@ class FrameEvent implements IFrameEvent {
 }
 
 class GameLoop {
-    public timestamp = this._pollyFillHighResolutionTime();
     protected _running: boolean;
     protected _systemManager: SystemManager;
-    protected _fixedTSSystems: ISystemWithStates[];
-    protected _nonFixedTSSystems: ISystemWithStates[];
+    protected _fixedTSSystems: ISystem[];
+    protected _nonFixedTSSystems: ISystem[];
     protected _frameId: number;
     protected _currentTimer: FrameEvent;
     constructor(systemManager: SystemManager, timer = new FrameEvent(1000 / 30)) {
@@ -68,7 +67,7 @@ class GameLoop {
     public start(...args: any[]) {
         this._running = true;
         this._currentTimer.reset();
-        this._currentTimer.lastFrame = this.timestamp.now();
+        this._currentTimer.lastFrame = TIMESTAMP.now();
         this.loop(args);
         // this.update(timer);
     }
@@ -78,7 +77,7 @@ class GameLoop {
     }
     public resume() {
         this._running = true;
-        this._currentTimer.lastFrame = this.timestamp.now();
+        this._currentTimer.lastFrame = TIMESTAMP.now();
         this.loop();
     }
     /* Set the process frequency in mms */
@@ -86,7 +85,7 @@ class GameLoop {
         this._currentTimer.MS_PER_UPDATE = frequency;
     }
     public loop(...args: any[]) {
-        const now = this.timestamp.now();
+        const now = TIMESTAMP.now();
         const ellapsed = now - this._currentTimer.lastFrame;
         this._currentTimer.delta = ellapsed;
         this._currentTimer.lastFrame = now;
@@ -124,9 +123,5 @@ class GameLoop {
                 this._nonFixedTSSystems[i].process([this._currentTimer, args]);
             }
         }
-    }
-
-    protected _pollyFillHighResolutionTime() {
-        return window.performance && window.performance.now ? window.performance : Date;
     }
 }

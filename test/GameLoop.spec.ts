@@ -358,39 +358,39 @@ describe("GameLoop should be able to", function() {
         }, 20);
 
     });
-    it("measure time taken to process each system", (done) => {
-        const fact1 = new ComponentFactory<IntegerComponent>(2, IntegerComponent, 0);
-        const fact2 = new ComponentFactory<IntegerComponent>(2, IntegerComponent, 0);
+    // it("measure time taken to process each system", (done) => {
+    //     const fact1 = new ComponentFactory<IntegerComponent>(2, IntegerComponent, 0);
+    //     const fact2 = new ComponentFactory<IntegerComponent>(2, IntegerComponent, 0);
 
-        fact1.create(1, true);
-        fact2.create(1, true);
+    //     fact1.create(1, true);
+    //     fact2.create(1, true);
 
-        const incS1 = new IncrementSystem();
-        const incS2 = new IncrementSystem();
+    //     const incS1 = new IncrementSystem();
+    //     const incS2 = new IncrementSystem();
 
-        incS1.setFactories(fact1);
-        incS2.setFactories(fact2);
+    //     incS1.setFactories(fact1);
+    //     incS2.setFactories(fact2);
 
-        const sM = new SystemManager();
-        const sys1Id = sM.pushSystem(incS1, true);
-        const sys2Id = sM.pushSystem(incS2, false);
+    //     const sM = new SystemManager();
+    //     const sys1Id = sM.pushSystem(incS1, true);
+    //     const sys2Id = sM.pushSystem(incS2, false);
 
-        const gl = new GameLoop(sM);
-        const runFor = 1000;
-        sM.get(sys1Id).measureTime = true;
-        sM.get(sys2Id).measureTime = true;
-        gl.start();
-        const sI = setInterval(() => {
-            const t = gl.getCurrentTimer();
-            if (t.time >= runFor) {
-                clearInterval(sI);
-                gl.stop();
+    //     const gl = new GameLoop(sM);
+    //     const runFor = 1000;
+    //     sM.get(sys1Id).measureTime = true;
+    //     sM.get(sys2Id).measureTime = true;
+    //     gl.start();
+    //     const sI = setInterval(() => {
+    //         const t = gl.getCurrentTimer();
+    //         if (t.time >= runFor) {
+    //             clearInterval(sI);
+    //             gl.stop();
 
-                expect(sM.get(sys1Id).perfMeasure.mean).to.be.gt(0);
-                expect(sM.get(sys2Id).perfMeasure.mean).to.be.gt(0);
+    //             expect(sM.get(sys1Id).perfMeasure.mean).to.be.gt(0);
+    //             expect(sM.get(sys2Id).perfMeasure.mean).to.be.gt(0);
 
-                done();
-            }
-        }, 10);
-    });
+    //             done();
+    //         }
+    //     }, 10);
+    // });
 });

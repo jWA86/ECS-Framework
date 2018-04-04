@@ -57,9 +57,9 @@ describe("SystemManager should be able to", () => {
             expect(sysManager.getFixedTSSystems().length).to.equal(1);
             expect(sysManager.getNonFixedTSSystems().length).to.equal(1);
             const fs = sysManager.getFixedTSSystems()[0];
-            expect(fs.system).to.deep.equal(fSystem);
+            expect(fs).to.deep.equal(fSystem);
             const nfs = sysManager.getNonFixedTSSystems()[0];
-            expect(nfs.system).to.deep.equal(nFSystem);
+            expect(nfs).to.deep.equal(nFSystem);
         });
         it("set an execution order for each system", () => {
             // const sysManager = new SystemManager();
@@ -78,6 +78,21 @@ describe("SystemManager should be able to", () => {
             // expect(sysManager.getFixedTSSystems()[3]).to.deep.equal(fourth);
         });
     });
+    describe("remove", () => {
+        it("should remove the system from the SystemManager by providing the system id", () => {
+            const sysManager = new SystemManager();
+            const fSystem = new FeedBackSystem();
+            const nFSystem = new FeedBackSystem();
+            const firstId = sysManager.pushSystem(nFSystem, true);
+            const secondId = sysManager.pushSystem(nFSystem, false);
+            expect(sysManager.getFixedTSSystems().length).to.equal(1);
+            expect(sysManager.getNonFixedTSSystems().length).to.equal(1);
+            sysManager.remove(firstId);
+            sysManager.remove(secondId);
+            expect(sysManager.getFixedTSSystems().length).to.equal(0);
+            expect(sysManager.getNonFixedTSSystems().length).to.equal(0);
+        });
+    });
     describe("get", () => {
         it("a system by its id", () => {
             const sysManager = new SystemManager();
@@ -88,8 +103,8 @@ describe("SystemManager should be able to", () => {
 
             const firstSys = sysManager.get(firstId);
             const secondSys = sysManager.get(secondId);
-            expect(firstSys.system).to.deep.equal(fSystem);
-            expect(secondSys.system).to.deep.equal(nFSystem);
+            expect(firstSys).to.deep.equal(fSystem);
+            expect(secondSys).to.deep.equal(nFSystem);
             expect(sysManager.get("nonExistingId")).to.equal(undefined);
         });
     });
@@ -103,20 +118,20 @@ describe("SystemManager should be able to", () => {
             expect(sysManager.getNonFixedTSSystems()[0].active).to.equal(true);
             expect(sysManager.getFixedTSSystems()[0].active).to.equal(true);
         });
-        it("toggle time measurement", () => {
-            const sysManager = new SystemManager();
-            const fSystem = new IncrementSystem();
-            const nFSystem = new IncrementSystem();
-            fSystem.setFactories(new ComponentFactory<IntegerComponent>(5, IntegerComponent, 0));
-            nFSystem.setFactories(new ComponentFactory<IntegerComponent>(5, IntegerComponent, 0));
-            const firstId = sysManager.pushSystem(nFSystem, true);
-            const secondId = sysManager.pushSystem(nFSystem, false);
-            sysManager.get(firstId).measureTime = true;
-            sysManager.get(secondId).measureTime = true;
-            sysManager.getFixedTSSystems()[0].process();
-            sysManager.getNonFixedTSSystems()[0].process();
-            expect(sysManager.get(firstId).perfMeasure.mean).to.be.gt(0);
-            expect(sysManager.get(secondId).perfMeasure.mean).to.be.gte(0);
-        });
+        // it("toggle time measurement", () => {
+        //     const sysManager = new SystemManager();
+        //     const fSystem = new IncrementSystem();
+        //     const nFSystem = new IncrementSystem();
+        //     fSystem.setFactories(new ComponentFactory<IntegerComponent>(5, IntegerComponent, 0));
+        //     nFSystem.setFactories(new ComponentFactory<IntegerComponent>(5, IntegerComponent, 0));
+        //     const firstId = sysManager.pushSystem(nFSystem, true);
+        //     const secondId = sysManager.pushSystem(nFSystem, false);
+        //     sysManager.get(firstId).measureTime = true;
+        //     sysManager.get(secondId).measureTime = true;
+        //     sysManager.getFixedTSSystems()[0].process();
+        //     sysManager.getNonFixedTSSystems()[0].process();
+        //     expect(sysManager.get(firstId).perfMeasure.mean).to.be.gt(0);
+        //     expect(sysManager.get(secondId).perfMeasure.mean).to.be.gte(0);
+        // });
     });
 });
