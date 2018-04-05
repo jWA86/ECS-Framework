@@ -101,7 +101,8 @@ class TimeMeasureSystemStartMark extends TimeMeasureSystem {
      * Place the starting mark
      */
     public process() {
-        TimeMeasureSystem.performance.mark(this.startMark);
+        // TimeMeasureSystem.performance.mark(this.startMark);
+        window.performance.mark(this.startMark);
     }
     /**
      * Not used

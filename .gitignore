@@ -6,3 +6,4 @@ benchmark/observation.txt
 observations/
 benchmark/others/
 coverage/
+.DS_Store

@@ -2,66 +2,8 @@ import { FastIterationMap } from "FastIterationMap";
 import { IComponent, IComponentFactory, ISystem } from "./interfaces";
 export { SystemManager  };
 
-// interface ISystemWithStates {
-//     id: string;
-//     active: boolean;
-//     measureTime: boolean;
-//     system: ISystem;
-//     perfMeasure: TimeMeasure;
-//     setFactories(...args: Array<IComponentFactory<IComponent>>);
-//     process(args?: any[]);
-// }
-
-// class SystemWithStates implements ISystemWithStates {
-//     public active: boolean = true;
-//     public perfMeasure: TimeMeasure;
-//     public process: (args?: any[]) => void;
-//     protected _system: ISystem;
-//     protected _id: string;
-//     protected _measureTime: boolean = false;
-//     constructor(id: string, system: ISystem) {
-//         this._id = id;
-//         this.perfMeasure = new TimeMeasure(id);
-//         this.system = system;
-//         this.process = this.processDefault;
-//     }
-//     public setFactories(...args: Array<IComponentFactory<IComponent>>) {
-//         this._system.setFactories(...args);
-//     }
-//     protected processWithTimeMeasure(args?: any[]) {
-//         this.perfMeasure.placeStartMark();
-//         this._system.process(args);
-//         this.perfMeasure.placeEndingMark();
-//         // measure and compute then clear data so we don't use memory since it's run in infinit loop
-//         this.perfMeasure.measure();
-//         this.perfMeasure.computeData();
-//         this.perfMeasure.clearData();
-//     }
-//     protected processDefault(args?: any[]) {
-//         this._system.process(args);
-//     }
-//     get id(): string {
-//         return this._id;
-//     }
-//     get system(): ISystem {
-//         return this._system;
-//     }
-//     set system(system: ISystem) {
-//         this._system = system;
-//         this.perfMeasure.buildMark(this._id);
-//     }
-//     set measureTime(val: boolean) {
-//         this._measureTime = val;
-//         if (val) {
-//             this.process = this.processWithTimeMeasure;
-//         } else {
-//             this.process = this.processDefault;
-//         }
-//     }
-// }
-// renomage necessaire fixed et non fixedTimeStep
-// en realité les 2 sont executés en fixedTimeSteps
-// seulement l'un est executer plusieurs fois si possible
+// fixedTimeStep = update at requestionAnimation frequency
+// nonFixedTimeStep = update as much as possible between frame
 class SystemManager {
     protected fixedTimeStepSystems: FastIterationMap<string, ISystem>;
     protected nonFixedTimeStepSystems: FastIterationMap<string, ISystem>;
