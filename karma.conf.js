@@ -12,7 +12,7 @@ module.exports = function(config) {
       },
       reporters: ["progress", "karma-typescript", "coverage"],
 
-      browsers: ["Chrome", "Firefox", "IE", "PhantomJS"],
+      browsers: ["Chrome", "Firefox", "IE", "Safari"],
       
       karmaTypescriptConfig: {
         compilerOptions: {
@@ -27,7 +27,6 @@ module.exports = function(config) {
       },
 
       singleRun: false,
-      // concurrency: Infinity
-      concurrency: 4
+      concurrency: 1
   });
 };
