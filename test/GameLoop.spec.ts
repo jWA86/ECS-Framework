@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import "mocha";
+// import { replaceRaf } from "raf-stub";
 import { clearInterval, setInterval } from "timers";
 import { ComponentFactory, EntityFactory } from "../src/ComponentFactory";
 import { FrameEvent, GameLoop } from "../src/GameLoop";
@@ -7,9 +8,40 @@ import { IComponent, IComponentFactory, IFrameEvent } from "../src/interfaces";
 import { System } from "../src/System";
 import { SystemManager } from "../src/SystemManager";
 
-// Can't seem to test timer value with multiple browser test
-// especially with firefox
+// problem with requestionAnimationFrame is randomly fired
+// so sometimes test passed sometimes not ...
 
+describe("pre-requirement", () => {
+    it("requestionAnimationFrame should work", (done) => {
+        expect(requestAnimationFrame).to.not.be.equal(undefined);
+        // pause after 500ms
+        // then check that loop has been called more than once
+        let frameId = 0;
+        let firedCount = 0;
+
+        function loop() {
+            firedCount += 1;
+            frameId = requestAnimationFrame(loop);
+        }
+
+        loop();
+
+        setTimeout(() => {
+            cancelAnimationFrame(frameId);
+            if (firedCount > 1) {
+                done();
+            } else {
+                done(Error("WARNING ! RequestAnimationFrame not working) "));
+            }
+        }, 1000);
+
+    });
+    it("window.performance", () => {
+        expect(performance).to.not.equal(undefined);
+        expect(performance.now()).to.be.greaterThan(0);
+        expect(performance.mark).to.not.equal(undefined);
+    });
+});
 describe("GameLoop should be able to", function() {
     this.timeout(3000);
     const perf = window.performance && window.performance.now ? window.performance : Date;
@@ -125,14 +157,11 @@ describe("GameLoop should be able to", function() {
         const runFor = 1000;
         const gl = new GameLoop(sM);
         gl.setFrequency(1000 / 30);
-        const sI = setInterval(() => {
+        setTimeout(() => {
+            gl.stop();
             const t = gl.getCurrentTimer();
-            if (t.time >= runFor) {
-                clearInterval(sI);
-                gl.stop();
-                expect(t.time).to.approximately(runFor, 30);
-                done();
-            }
+            expect(t.time).to.approximately(runFor, 30);
+            done();
         }, 20);
         gl.start();
     });
@@ -151,22 +180,19 @@ describe("GameLoop should be able to", function() {
         sM.pushSystem(fbckSys, false);
         const runFor = 1000;
         const gl = new GameLoop(sM);
-        const sI = setInterval(() => {
+        setTimeout(() => {
+            gl.stop();
             const t = gl.getCurrentTimer();
-            if (t.time >= runFor) {
-                clearInterval(sI);
-                gl.stop();
-                const mean = deltas.reduce((prev, current, index) => {
-                    return prev + current;
-                });
-                let sd = deltas.reduce((prev, current, index) => {
-                    return prev + Math.pow(current - mean, 2);
-                });
-                sd /= (deltas.length - 1);
-                const s = Math.sqrt(sd);
-                expect(s).to.approximately(mean, 20);
-                done();
-            }
+            const mean = deltas.reduce((prev, current, index) => {
+                return prev + current;
+            });
+            let sd = deltas.reduce((prev, current, index) => {
+                return prev + Math.pow(current - mean, 2);
+            });
+            sd /= (deltas.length - 1);
+            const s = Math.sqrt(sd);
+            expect(s).to.approximately(mean, 20);
+            done();
         }, 20);
         gl.start();
     });
@@ -181,24 +207,17 @@ describe("GameLoop should be able to", function() {
         gl.setFrequency(1000 / 60);
         const runFor = 500;
         gl.start();
-        const sI = setInterval(() => {
+        setTimeout(() => {
+            gl.stop();
             const t1 = gl.getCurrentTimer().time;
-            if (t1 >= runFor) {
+            gl.resume();
+            setTimeout(() => {
                 gl.stop();
-                gl.resume();
-                const sI2 = setInterval(() => {
-                    const t2 = gl.getCurrentTimer().time;
-                    if (t2 >= runFor * 2) {
-                        clearInterval(sI);
-                        clearInterval(sI2);
-                        gl.stop();
-                        expect(t2).to.gte(t1);
-                        done();
-                    }
-                }, 20);
-            }
+                const t2 = gl.getCurrentTimer().time;
+                expect(t2).to.gte(t1);
+                done();
+            }, 20);
         }, 20);
-        // done();
     });
     it("process systems at a fixed time step", (done) => {
         // component record time of execution
@@ -217,47 +236,18 @@ describe("GameLoop should be able to", function() {
         gl.setFrequency(frequency);
         const runFor = 500;
         gl.start();
-        const sI = setInterval(() => {
+        setTimeout(() => {
+            gl.stop();
             const t = gl.getCurrentTimer();
-            if (t.time >= runFor) {
-                clearInterval(sI);
-                gl.stop();
-                const arr = FeedBackSystem["timerArr"];
-                for (let i = 1; i < arr.length - 1; ++i) {
-                    const diff = arr[i + 1] - arr[i];
-                    expect(diff).to.approximately(frequency, 5);
-                }
-                done();
+            const arr = FeedBackSystem["timerArr"];
+            for (let i = 1; i < arr.length - 1; ++i) {
+                const diff = arr[i + 1] - arr[i];
+                expect(diff).to.approximately(frequency, 5);
             }
+            done();
         }, 20);
         // done();
     });
-    it("process systems in the order they are provided", (done) => {
-        // const c1 = integerFactory.create(1, true);
-        // expect(c1.integer).to.equal(1);
-
-        // const s1 = new IncrementSystem();
-        // s1.setFactories(integerFactory);
-        // const s2 = new SquareSystem();
-        // s2.setFactories(integerFactory);
-
-        // const gl = new GameLoop([]);
-        // gl.setFrequency(1000 / 10);
-        // gl.setSystems([s1, s2]);
-
-        // const inc = c1.integer + 1;
-        // const res = inc * inc;
-        // const f = new FrameEvent(1000 / 10);
-        // f.lastFrame = gl.timestamp.now() - 15;
-        // gl.setCurretnTimer(f);
-        // gl.loop();
-        // expect(integerFactory.get(1).integer).to.equal(res);
-        // done();
-
-        // USE SystemManager
-        done();
-    });
-
     it("update some systems on a fixedTimeStep and other at the requestionAnimationFrame frequency", (done) => {
         // increment an integer in both systems
         // then make sure the fixedTimeStep run more time
@@ -281,16 +271,14 @@ describe("GameLoop should be able to", function() {
         gl.setFrequency(frequency);
         const runFor = 500;
         gl.start();
-        const sI = setInterval(() => {
+        setTimeout(() => {
+            gl.stop();
             const t = gl.getCurrentTimer();
-            if (t.time >= runFor) {
-                clearInterval(sI);
-                gl.stop();
-                const fi = fixedIntFactory.get(1).integer;
-                const nfi = nFixedIntFactory.get(1).integer;
-                expect(fi).to.gt(nfi);
-                done();
-            }
+            const fi = fixedIntFactory.get(1).integer;
+            const nfi = nFixedIntFactory.get(1).integer;
+            expect(fi).to.gt(nfi);
+            done();
+
         }, 10);
     });
     it("pause each system individually", (done) => {
@@ -330,7 +318,7 @@ describe("GameLoop should be able to", function() {
 
         gl.start();
         let paused = false;
-        const sI = setInterval(() => {
+        const interval = setInterval(() => {
             const t = gl.getCurrentTimer();
             if (t.time >= pauseAt && !paused) {
                 // pause some system
@@ -339,7 +327,6 @@ describe("GameLoop should be able to", function() {
                 paused = true;
             }
             if (t.time >= runFor && paused) {
-                clearInterval(sI);
                 gl.stop();
                 const pausedComp = fact1.get(1);
                 const nonPausedComp = fact2.get(1);
@@ -353,44 +340,10 @@ describe("GameLoop should be able to", function() {
                 expect(pausedNComp.integer).to.gt(0);
                 expect(pausedComp.integer).to.lt(nonPausedComp.integer);
                 expect(pausedNComp.integer).to.lt(nonPausedNComp.integer);
+                clearInterval(interval);
                 done();
             }
         }, 20);
 
     });
-    // it("measure time taken to process each system", (done) => {
-    //     const fact1 = new ComponentFactory<IntegerComponent>(2, IntegerComponent, 0);
-    //     const fact2 = new ComponentFactory<IntegerComponent>(2, IntegerComponent, 0);
-
-    //     fact1.create(1, true);
-    //     fact2.create(1, true);
-
-    //     const incS1 = new IncrementSystem();
-    //     const incS2 = new IncrementSystem();
-
-    //     incS1.setFactories(fact1);
-    //     incS2.setFactories(fact2);
-
-    //     const sM = new SystemManager();
-    //     const sys1Id = sM.pushSystem(incS1, true);
-    //     const sys2Id = sM.pushSystem(incS2, false);
-
-    //     const gl = new GameLoop(sM);
-    //     const runFor = 1000;
-    //     sM.get(sys1Id).measureTime = true;
-    //     sM.get(sys2Id).measureTime = true;
-    //     gl.start();
-    //     const sI = setInterval(() => {
-    //         const t = gl.getCurrentTimer();
-    //         if (t.time >= runFor) {
-    //             clearInterval(sI);
-    //             gl.stop();
-
-    //             expect(sM.get(sys1Id).perfMeasure.mean).to.be.gt(0);
-    //             expect(sM.get(sys2Id).perfMeasure.mean).to.be.gt(0);
-
-    //             done();
-    //         }
-    //     }, 10);
-    // });
 });
