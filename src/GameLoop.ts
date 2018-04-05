@@ -91,6 +91,7 @@ class GameLoop {
         this._currentTimer.lastFrame = now;
         this._currentTimer.lag += ellapsed;
         this._currentTimer.time += ellapsed;
+
         // limit delta max value when browser loose focus and resume ?
         while (this._currentTimer.lag >= this._currentTimer.MS_PER_UPDATE) {
             this.updateFixedTS(args);
@@ -100,7 +101,7 @@ class GameLoop {
         this.updateNonFixedTS(args);
 
         if (this._running) {
-            this._frameId = requestAnimationFrame(() => this.loop());
+            this._frameId = requestAnimationFrame(() => this.loop(args));
         } else {
             cancelAnimationFrame(this._frameId);
         }
