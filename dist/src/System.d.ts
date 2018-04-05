@@ -1,11 +1,13 @@
 import { IComponent, IComponentFactory } from "./interfaces";
 export { System, ISystem };
 interface ISystem {
+    active: boolean;
     setFactories(...args: Array<IComponentFactory<IComponent>>): any;
     process(args?: any[]): any;
     execute(...args: any[]): any;
 }
 declare abstract class System implements ISystem {
+    active: boolean;
     factories: Array<IComponentFactory<IComponent>>;
     constructor();
     /**  Set the source of the components that will be processed.

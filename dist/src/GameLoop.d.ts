@@ -1,5 +1,5 @@
-import "raf";
-import { ISystemWithStates, SystemManager } from "./SystemManager";
+import { ISystem } from "../src/interfaces";
+import { SystemManager } from "./SystemManager";
 export { FrameEvent, IFrameEvent, GameLoop };
 interface IFrameEvent {
     delta: number;
@@ -18,11 +18,10 @@ declare class FrameEvent implements IFrameEvent {
     reset(): void;
 }
 declare class GameLoop {
-    timestamp: Performance | DateConstructor;
     protected _running: boolean;
     protected _systemManager: SystemManager;
-    protected _fixedTSSystems: ISystemWithStates[];
-    protected _nonFixedTSSystems: ISystemWithStates[];
+    protected _fixedTSSystems: ISystem[];
+    protected _nonFixedTSSystems: ISystem[];
     protected _frameId: number;
     protected _currentTimer: FrameEvent;
     constructor(systemManager: SystemManager, timer?: FrameEvent);
@@ -38,5 +37,4 @@ declare class GameLoop {
     loop(...args: any[]): void;
     updateFixedTS(...args: any[]): void;
     updateNonFixedTS(...args: any[]): void;
-    protected _pollyFillHighResolutionTime(): Performance | DateConstructor;
 }
