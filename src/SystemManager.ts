@@ -43,6 +43,30 @@ class SystemManager {
         }
     }
 
+    public insertAfter(systemRefId: string, systemToInsert: ISystem): string {
+        let id = "";
+        if (this.fixedTimeStepSystems.has(systemRefId)) {
+            id = this.generateId(systemToInsert);
+            this.fixedTimeStepSystems.insertAfter(id, systemToInsert, systemRefId);
+        } else if (this.nonFixedTimeStepSystems.has(systemRefId)) {
+            id = this.generateId(systemToInsert);
+            this.nonFixedTimeStepSystems.insertAfter(id, systemToInsert, systemRefId);
+        }
+        return id;
+    }
+
+    public insertBefore(systemRefId: string, systemToInsert: ISystem): string {
+        let id = "";
+        if (this.fixedTimeStepSystems.has(systemRefId)) {
+            id = this.generateId(systemToInsert);
+            this.fixedTimeStepSystems.insertBefore(id, systemToInsert, systemRefId);
+        } else if (this.nonFixedTimeStepSystems.has(systemRefId)) {
+            id = this.generateId(systemToInsert);
+            this.nonFixedTimeStepSystems.insertBefore(id, systemToInsert, systemRefId);
+        }
+        return id;
+    }
+
     public remove(systemId: string): boolean {
         if (!this.fixedTimeStepSystems.delete(systemId)) {
             if (!this.nonFixedTimeStepSystems.delete(systemId)) {

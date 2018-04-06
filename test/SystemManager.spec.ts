@@ -5,6 +5,7 @@ import { FrameEvent, GameLoop } from "../src/GameLoop";
 import { IComponent, IComponentFactory, IFrameEvent } from "../src/interfaces";
 import { System } from "../src/System";
 import { SystemManager } from "../src/SystemManager";
+import { INSPECT_MAX_BYTES } from "buffer";
 
 describe("SystemManager should be able to", () => {
     // dummy system that increment a interger
@@ -61,21 +62,46 @@ describe("SystemManager should be able to", () => {
             const nfs = sysManager.getNonFixedTSSystems()[0];
             expect(nfs).to.deep.equal(nFSystem);
         });
-        it("set an execution order for each system", () => {
-            // const sysManager = new SystemManager();
-            // const fourth = new FeedBackSystem();
-            // const fourthId = sysManager.pushSystem(fourth, true);
-            // const first = new FeedBackSystem();
-            // const fId = sysManager.pushSystem(first, true);
-            // const third = new FeedBackSystem();
-            // const tId = sysManager.pushSystem(third, true);
-            // const second = new FeedBackSystem();
-            // const sId = sysManager.pushSystem(second, true);
+        it("insert a system before an other system ", () => {
+            const sysManager = new SystemManager();
+            const fSystem = new FeedBackSystem();
+            const nFSystem = new FeedBackSystem();
+            const firstId = sysManager.pushSystem(nFSystem, true);
+            const secondId = sysManager.pushSystem(nFSystem, false);
 
-            // expect(sysManager.getFixedTSSystems()[0]).to.deep.equal(first);
-            // expect(sysManager.getFixedTSSystems()[1]).to.deep.equal(second);
-            // expect(sysManager.getFixedTSSystems()[2]).to.deep.equal(third);
-            // expect(sysManager.getFixedTSSystems()[3]).to.deep.equal(fourth);
+            sysManager.insertBefore(firstId,  new IncrementSystem());
+            sysManager.insertBefore(secondId,  new IncrementSystem());
+            expect(sysManager.getFixedTSSystems()[0]).to.be.instanceof(IncrementSystem);
+            expect(sysManager.getNonFixedTSSystems()[0]).to.be.instanceof(IncrementSystem);
+        });
+        it("insert a system after an other system ", () => {
+            const sysManager = new SystemManager();
+            const fSystem = new FeedBackSystem();
+            const nFSystem = new FeedBackSystem();
+            const firstId = sysManager.pushSystem(nFSystem, true);
+            const secondId = sysManager.pushSystem(nFSystem, false);
+
+            sysManager.insertAfter(firstId,  new IncrementSystem());
+            sysManager.insertAfter(secondId,  new IncrementSystem());
+            expect(sysManager.getFixedTSSystems()[1]).to.be.instanceof(IncrementSystem);
+            expect(sysManager.getNonFixedTSSystems()[1]).to.be.instanceof(IncrementSystem);
+        });
+        it("insert a system around an other system ", () => {
+            const sysManager = new SystemManager();
+            const fSystem = new FeedBackSystem();
+            const nFSystem = new FeedBackSystem();
+            const firstId = sysManager.pushSystem(nFSystem, true);
+            const secondId = sysManager.pushSystem(nFSystem, true);
+
+            sysManager.insertAround(firstId, new IncrementSystem(), new IncrementSystem());
+            sysManager.insertAround(secondId,  new IncrementSystem(), new IncrementSystem());
+            expect(sysManager.getFixedTSSystems()[0]).to.be.instanceof(IncrementSystem);
+            expect(sysManager.getFixedTSSystems()[1]).to.be.instanceof(FeedBackSystem);
+            expect(sysManager.getFixedTSSystems()[2]).to.be.instanceof(IncrementSystem);
+
+            expect(sysManager.getFixedTSSystems()[0]).to.be.instanceof(IncrementSystem);
+            expect(sysManager.getFixedTSSystems()[1]).to.be.instanceof(FeedBackSystem);
+            expect(sysManager.getFixedTSSystems()[2]).to.be.instanceof(IncrementSystem);
         });
     });
     describe("remove", () => {
@@ -118,20 +144,5 @@ describe("SystemManager should be able to", () => {
             expect(sysManager.getNonFixedTSSystems()[0].active).to.equal(true);
             expect(sysManager.getFixedTSSystems()[0].active).to.equal(true);
         });
-        // it("toggle time measurement", () => {
-        //     const sysManager = new SystemManager();
-        //     const fSystem = new IncrementSystem();
-        //     const nFSystem = new IncrementSystem();
-        //     fSystem.setFactories(new ComponentFactory<IntegerComponent>(5, IntegerComponent, 0));
-        //     nFSystem.setFactories(new ComponentFactory<IntegerComponent>(5, IntegerComponent, 0));
-        //     const firstId = sysManager.pushSystem(nFSystem, true);
-        //     const secondId = sysManager.pushSystem(nFSystem, false);
-        //     sysManager.get(firstId).measureTime = true;
-        //     sysManager.get(secondId).measureTime = true;
-        //     sysManager.getFixedTSSystems()[0].process();
-        //     sysManager.getNonFixedTSSystems()[0].process();
-        //     expect(sysManager.get(firstId).perfMeasure.mean).to.be.gt(0);
-        //     expect(sysManager.get(secondId).perfMeasure.mean).to.be.gte(0);
-        // });
     });
 });
