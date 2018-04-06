@@ -5,7 +5,6 @@ import { FrameEvent, GameLoop } from "../src/GameLoop";
 import { IComponent, IComponentFactory, IFrameEvent } from "../src/interfaces";
 import { System } from "../src/System";
 import { SystemManager } from "../src/SystemManager";
-import { INSPECT_MAX_BYTES } from "buffer";
 
 describe("SystemManager should be able to", () => {
     // dummy system that increment a interger
