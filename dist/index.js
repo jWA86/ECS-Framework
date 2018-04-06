@@ -1056,6 +1056,30 @@ var SystemManager = /** @class */ (function () {
             }
         }
     };
+    SystemManager.prototype.insertAfter = function (systemRefId, systemToInsert) {
+        var id = "";
+        if (this.fixedTimeStepSystems.has(systemRefId)) {
+            id = this.generateId(systemToInsert);
+            this.fixedTimeStepSystems.insertAfter(id, systemToInsert, systemRefId);
+        }
+        else if (this.nonFixedTimeStepSystems.has(systemRefId)) {
+            id = this.generateId(systemToInsert);
+            this.nonFixedTimeStepSystems.insertAfter(id, systemToInsert, systemRefId);
+        }
+        return id;
+    };
+    SystemManager.prototype.insertBefore = function (systemRefId, systemToInsert) {
+        var id = "";
+        if (this.fixedTimeStepSystems.has(systemRefId)) {
+            id = this.generateId(systemToInsert);
+            this.fixedTimeStepSystems.insertBefore(id, systemToInsert, systemRefId);
+        }
+        else if (this.nonFixedTimeStepSystems.has(systemRefId)) {
+            id = this.generateId(systemToInsert);
+            this.nonFixedTimeStepSystems.insertBefore(id, systemToInsert, systemRefId);
+        }
+        return id;
+    };
     SystemManager.prototype.remove = function (systemId) {
         if (!this.fixedTimeStepSystems.delete(systemId)) {
             if (!this.nonFixedTimeStepSystems.delete(systemId)) {

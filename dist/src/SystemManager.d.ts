@@ -7,6 +7,8 @@ declare class SystemManager {
     constructor();
     pushSystem(system: ISystem, fixedTimeStep?: boolean): string;
     insertAround(systemMiddleId: string, systemBefore: ISystem, systemAfter: ISystem): [string, string];
+    insertAfter(systemRefId: string, systemToInsert: ISystem): string;
+    insertBefore(systemRefId: string, systemToInsert: ISystem): string;
     remove(systemId: string): boolean;
     getFixedTSSystems(): ISystem[];
     getNonFixedTSSystems(): ISystem[];
