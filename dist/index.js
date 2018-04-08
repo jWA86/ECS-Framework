@@ -203,7 +203,7 @@ var ComponentFactory = /** @class */ (function (_super) {
         toReplaceComp.entityId = entityId;
         toReplaceComp.active = active;
         // lastly increment the lastActiveIndex
-        this.incrementCreatedLength(index);
+        this.updateIterationLengthWhenAddingComponent(index);
         return this._values[index];
     };
     /* Set entityId back to 0 and desactivate the component
@@ -226,7 +226,7 @@ var ComponentFactory = /** @class */ (function (_super) {
         // this.mapObject(this._values[index], this._zeroedRef);
         this._values[index].entityId = 0;
         this._keys.delete(entityId);
-        this.decrementCreatedLength(index);
+        this.updateIterationLengthWhenRemovingComponent(index);
         this._nbCreated -= 1;
         return true;
     };
@@ -287,12 +287,12 @@ var ComponentFactory = /** @class */ (function (_super) {
             }
         }
     };
-    ComponentFactory.prototype.decrementCreatedLength = function (inputIndex) {
+    ComponentFactory.prototype.updateIterationLengthWhenRemovingComponent = function (inputIndex) {
         if (inputIndex >= this._iterationLength - 1) {
             this._iterationLength -= 1;
         }
     };
-    ComponentFactory.prototype.incrementCreatedLength = function (inputIndex) {
+    ComponentFactory.prototype.updateIterationLengthWhenAddingComponent = function (inputIndex) {
         if (inputIndex >= this._iterationLength) {
             this._iterationLength += 1;
         }
@@ -335,133 +335,6 @@ var ComponentFactory = /** @class */ (function (_super) {
     return ComponentFactory;
 }(FastIterationMap_1.FastIterationMap));
 exports.ComponentFactory = ComponentFactory;
-var EntityFactory = /** @class */ (function () {
-    function EntityFactory(_size) {
-        this._size = _size;
-        this._factories = new Map();
-    }
-    EntityFactory.prototype.activate = function (entityId, value, factoriesName) {
-        var _this = this;
-        if (factoriesName) {
-            factoriesName.forEach(function (f) {
-                var ff = _this.getFactory(f);
-                if (ff) {
-                    ff.activate(entityId, value);
-                }
-            });
-        }
-        else {
-            this._factories.forEach(function (f) {
-                f.activate(entityId, value);
-            });
-        }
-    };
-    EntityFactory.prototype.activateAll = function (value) {
-        this._factories.forEach(function (f) {
-            f.activateAll(value);
-        });
-    };
-    EntityFactory.prototype.addFactory = function (name, factory) {
-        if (factory.size !== this._size) {
-            factory.resize(this._size);
-        }
-        this._factories.set(name, factory);
-    };
-    EntityFactory.prototype.getComponent = function (entityId, factoryName) {
-        var f = this._factories.get(factoryName);
-        if (f) {
-            return f.get(entityId);
-        }
-        else {
-            return undefined;
-        }
-    };
-    EntityFactory.prototype.getFactory = function (name) {
-        return this._factories.get(name);
-    };
-    EntityFactory.prototype.free = function (entityId) {
-        var d = true;
-        this._factories.forEach(function (f) {
-            if (!f.free(entityId)) {
-                d = false;
-            }
-        });
-        // false if no factories
-        return this._factories.size > 0 && d;
-    };
-    EntityFactory.prototype.get = function (entityId) {
-        var e = [];
-        this._factories.forEach(function (f) {
-            e.push(f.get(entityId));
-        });
-        return e;
-    };
-    EntityFactory.prototype.has = function (entityId) {
-        var it = this._factories.entries();
-        return it.next().value[1].has(entityId);
-    };
-    EntityFactory.prototype.create = function (entityId, active) {
-        this._factories.forEach(function (f) {
-            f.create(entityId, active);
-        });
-    };
-    EntityFactory.prototype.resize = function (size) {
-        this._factories.forEach(function (f) {
-            f.resize(size);
-        });
-        this._size = size;
-    };
-    Object.defineProperty(EntityFactory.prototype, "iterationLength", {
-        get: function () {
-            // return iteratorLength of the first factory;
-            var it = this._factories.entries();
-            return it.next().value[1].iterationLength;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(EntityFactory.prototype, "nbActive", {
-        get: function () {
-            var it = this._factories.entries();
-            return it.next().value[1].nbActive;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(EntityFactory.prototype, "nbCreated", {
-        get: function () {
-            var it = this._factories.entries();
-            return it.next().value[1].nbCreated;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(EntityFactory.prototype, "nbFreeSlot", {
-        get: function () {
-            var it = this._factories.entries();
-            return it.next().value[1].nbFreeSlot;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(EntityFactory.prototype, "nbInactive", {
-        get: function () {
-            var it = this._factories.entries();
-            return it.next().value[1].nbInactive;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(EntityFactory.prototype, "size", {
-        get: function () {
-            return this._size;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    return EntityFactory;
-}());
-exports.EntityFactory = EntityFactory;
 
 
 /***/ }),
@@ -844,7 +717,6 @@ module.exports = __webpack_require__(6);
 Object.defineProperty(exports, "__esModule", { value: true });
 var ComponentFactory_1 = __webpack_require__(1);
 exports.ComponentFactory = ComponentFactory_1.ComponentFactory;
-exports.EntityFactory = ComponentFactory_1.EntityFactory;
 var GameLoop_1 = __webpack_require__(7);
 exports.GameLoop = GameLoop_1.GameLoop;
 __webpack_require__(8);
@@ -862,6 +734,8 @@ exports.TimeMeasureSystem = TimeMeasureUtil_1.TimeMeasureSystem;
 exports.TimeMeasureSystemEndMark = TimeMeasureUtil_1.TimeMeasureSystemEndMark;
 exports.TimeMeasureSystemStartMark = TimeMeasureUtil_1.TimeMeasureSystemStartMark;
 exports.TimeMeasureUtil = TimeMeasureUtil_1.TimeMeasureUtil;
+var EntityFactory_1 = __webpack_require__(11);
+exports.EntityFactory = EntityFactory_1.EntityFactory;
 
 
 /***/ }),
@@ -998,16 +872,6 @@ exports.GameLoop = GameLoop;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-// interface IFrameEvent {
-//     /* The number of times the frame event was fired */
-//     count: number;
-//     /* The time passed in seconds since the last frame event */
-//     delta: number;
-//     loopCount: number;
-//     reverse: boolean;
-//     /* The total amount of time passed since the first frame event in seconds */
-//     time: number;
-// }
 
 
 /***/ }),
@@ -1039,21 +903,27 @@ var SystemManager = /** @class */ (function () {
         return id;
     };
     SystemManager.prototype.insertAround = function (systemMiddleId, systemBefore, systemAfter) {
+        var id1 = "";
+        var id2 = "";
+        id1 = this.generateId(systemBefore);
+        id2 = this.generateId(systemAfter);
+        // case the 2 sytems to insert are of the same class
+        // generateId will be the same
+        if (id1 === id2) {
+            // add a random number to the id of id2
+            // should be ok ...
+            id2 = id2 + "_" + Math.floor(Math.random() * 10000);
+        }
         if (this.fixedTimeStepSystems.has(systemMiddleId)) {
-            var id1 = this.generateId(systemBefore);
-            var id2 = this.generateId(systemAfter);
             this.fixedTimeStepSystems.insertAround(systemMiddleId, id1, systemBefore, id2, systemAfter);
             return [id1, id2];
         }
         else if (this.nonFixedTimeStepSystems.has(systemMiddleId)) {
-            var id1 = this.generateId(systemBefore);
-            var id2 = this.generateId(systemAfter);
-            if (this.nonFixedTimeStepSystems.insertAround(systemMiddleId, id1, systemBefore, id2, systemAfter)) {
-                return [id1, id2];
-            }
-            else {
-                return ["", ""];
-            }
+            this.nonFixedTimeStepSystems.insertAround(systemMiddleId, id1, systemBefore, id2, systemAfter);
+            return [id1, id2];
+        }
+        else {
+            return ["", ""];
         }
     };
     SystemManager.prototype.insertAfter = function (systemRefId, systemToInsert) {
@@ -1350,6 +1220,142 @@ var TimeMeasureSystemEndMark = /** @class */ (function (_super) {
     return TimeMeasureSystemEndMark;
 }(TimeMeasureSystem));
 exports.TimeMeasureSystemEndMark = TimeMeasureSystemEndMark;
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var EntityFactory = /** @class */ (function () {
+    function EntityFactory(_size) {
+        this._size = _size;
+        this._factories = new Map();
+    }
+    EntityFactory.prototype.activate = function (entityId, value, factoriesName) {
+        var _this = this;
+        if (factoriesName) {
+            factoriesName.forEach(function (f) {
+                var ff = _this.getFactory(f);
+                if (ff) {
+                    ff.activate(entityId, value);
+                }
+            });
+        }
+        else {
+            this._factories.forEach(function (f) {
+                f.activate(entityId, value);
+            });
+        }
+    };
+    EntityFactory.prototype.activateAll = function (value) {
+        this._factories.forEach(function (f) {
+            f.activateAll(value);
+        });
+    };
+    EntityFactory.prototype.addFactory = function (name, factory) {
+        if (factory.size !== this._size) {
+            factory.resize(this._size);
+        }
+        this._factories.set(name, factory);
+    };
+    EntityFactory.prototype.getComponent = function (entityId, factoryName) {
+        var f = this._factories.get(factoryName);
+        if (f) {
+            return f.get(entityId);
+        }
+        else {
+            return undefined;
+        }
+    };
+    EntityFactory.prototype.getFactory = function (name) {
+        return this._factories.get(name);
+    };
+    EntityFactory.prototype.free = function (entityId) {
+        var d = true;
+        this._factories.forEach(function (f) {
+            if (!f.free(entityId)) {
+                d = false;
+            }
+        });
+        // false if no factories
+        return this._factories.size > 0 && d;
+    };
+    EntityFactory.prototype.get = function (entityId) {
+        var e = [];
+        this._factories.forEach(function (f) {
+            e.push(f.get(entityId));
+        });
+        return e;
+    };
+    EntityFactory.prototype.has = function (entityId) {
+        var it = this._factories.entries();
+        return it.next().value[1].has(entityId);
+    };
+    EntityFactory.prototype.create = function (entityId, active) {
+        this._factories.forEach(function (f) {
+            f.create(entityId, active);
+        });
+    };
+    EntityFactory.prototype.resize = function (size) {
+        this._factories.forEach(function (f) {
+            f.resize(size);
+        });
+        this._size = size;
+    };
+    Object.defineProperty(EntityFactory.prototype, "iterationLength", {
+        get: function () {
+            // return iteratorLength of the first factory;
+            var it = this._factories.entries();
+            return it.next().value[1].iterationLength;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(EntityFactory.prototype, "nbActive", {
+        get: function () {
+            var it = this._factories.entries();
+            return it.next().value[1].nbActive;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(EntityFactory.prototype, "nbCreated", {
+        get: function () {
+            var it = this._factories.entries();
+            return it.next().value[1].nbCreated;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(EntityFactory.prototype, "nbFreeSlot", {
+        get: function () {
+            var it = this._factories.entries();
+            return it.next().value[1].nbFreeSlot;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(EntityFactory.prototype, "nbInactive", {
+        get: function () {
+            var it = this._factories.entries();
+            return it.next().value[1].nbInactive;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(EntityFactory.prototype, "size", {
+        get: function () {
+            return this._size;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return EntityFactory;
+}());
+exports.EntityFactory = EntityFactory;
 
 
 /***/ })
