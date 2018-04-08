@@ -42,10 +42,22 @@ declare class ComponentFactory<T extends IComponent> extends FastIterationMap<nu
     clear(): void;
     create(entityId: number, active: boolean, ...args: any[]): T;
     free(entityId: number): boolean;
+    /**
+     * Alias for free()
+     * @param entityId
+     */
+    delete(entityId: number): boolean;
     recycle(indexComponentToReplace: number, componentRef: any): void;
     resize(size: number): void;
     insertAfter(key: number, value: T, keyRef: number): boolean;
     insertBefore(key: number, value: T, keyRef: number): boolean;
+    /**
+     * Delete range of components from a component key and its successors in reverse order so iterationLength doesn't need to be re-computed if range comprise the last created element.
+     * @param fromKey key of the first component to start freeing
+     * @param nbComponents number of components to free
+     */
+    freeRangeComponents(fromKey: number, nbComponents: number): boolean;
+    updateIterationLength(): void;
     protected createZeroedComponentAt(index: number): void;
     protected getIndexOfFirstAvailableSpot(): number;
     protected mapObject(oldC: T, newC: T): void;

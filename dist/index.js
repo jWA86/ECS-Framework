@@ -230,6 +230,13 @@ var ComponentFactory = /** @class */ (function (_super) {
         this._nbCreated -= 1;
         return true;
     };
+    /**
+     * Alias for free()
+     * @param entityId
+     */
+    ComponentFactory.prototype.delete = function (entityId) {
+        return this.free(entityId);
+    };
     ComponentFactory.prototype.recycle = function (indexComponentToReplace, componentRef) {
         var _this = this;
         // parsing Date ?
@@ -265,6 +272,35 @@ var ComponentFactory = /** @class */ (function (_super) {
     };
     ComponentFactory.prototype.insertBefore = function (key, value, keyRef) {
         return false;
+    };
+    /**
+     * Delete range of components from a component key and its successors in reverse order so iterationLength doesn't need to be re-computed if range comprise the last created element.
+     * @param fromKey key of the first component to start freeing
+     * @param nbComponents number of components to free
+     */
+    ComponentFactory.prototype.freeRangeComponents = function (fromKey, nbComponents) {
+        var startingIndex = this._keys.get(fromKey);
+        if (startingIndex === undefined) {
+            return false;
+        }
+        var endingIndex = startingIndex + nbComponents;
+        if (endingIndex > this._iterationLength) {
+            endingIndex = this._iterationLength - 1;
+        }
+        for (var i = endingIndex; i >= startingIndex; --i) {
+            this.free(this._values[i].entityId);
+        }
+    };
+    ComponentFactory.prototype.updateIterationLength = function () {
+        var lastCreatedIndex = 0;
+        var l = this._values.length;
+        for (var i = 0; i < l; ++i) {
+            // zeroed components have an entityId of 0
+            if (this._values[i].entityId !== 0) {
+                lastCreatedIndex = i;
+            }
+        }
+        this._iterationLength = lastCreatedIndex + 1;
     };
     ComponentFactory.prototype.createZeroedComponentAt = function (index) {
         this.recycle(index, this._zeroedRef);
