@@ -172,6 +172,13 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
 
         return true;
     }
+    /**
+     * Alias for free()
+     * @param entityId
+     */
+    public delete(entityId: number): boolean {
+        return this.free(entityId);
+    }
 
     public recycle(indexComponentToReplace: number, componentRef) {
         // parsing Date ?
@@ -208,6 +215,35 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
     }
     public insertBefore(key: number, value: T, keyRef: number): boolean {
         return false;
+    }
+
+    /**
+     * Delete range of components from a component key and its successors in reverse order so iterationLength doesn't need to be re-computed if range comprise the last created element.
+     * @param fromKey key of the first component to start freeing
+     * @param nbComponents number of components to free
+     */
+    public freeRangeComponents(fromKey: number, nbComponents: number ): boolean {
+        const startingIndex = this._keys.get(fromKey);
+        if (startingIndex === undefined) { return false; }
+        let endingIndex = startingIndex + nbComponents;
+        if (endingIndex > this._iterationLength) {
+            endingIndex = this._iterationLength - 1;
+        }
+        for (let i = endingIndex; i >= startingIndex ; --i) {
+            this.free(this._values[i].entityId);
+        }
+    }
+
+    public updateIterationLength() {
+        let lastCreatedIndex = 0;
+        const l = this._values.length;
+        for (let i = 0; i < l; ++i) {
+            // zeroed components have an entityId of 0
+            if (this._values[i].entityId !== 0) {
+                lastCreatedIndex = i;
+            }
+        }
+        this._iterationLength = lastCreatedIndex + 1;
     }
 
     protected createZeroedComponentAt(index: number) {

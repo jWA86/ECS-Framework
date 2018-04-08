@@ -257,4 +257,24 @@ describe("Component Factory", () => {
         simpleFactory.clear();
         expect(simpleFactory.size).to.equal(0);
     });
+    it("updateIterationLength should set the iterationLength to the index of the last created (non zeroed) component", () => {
+        simpleFactory.create(1, true);
+        simpleFactory.create(2, false);
+        simpleFactory.create(3, true);
+        simpleFactory.create(4, true);
+        expect(simpleFactory.iterationLength).to.equal(4);
+        simpleFactory.free(3);
+        simpleFactory.free(4);
+        expect(simpleFactory.iterationLength).to.equal(3);
+        simpleFactory.updateIterationLength();
+        expect(simpleFactory.iterationLength).to.equal(2);
+    });
+    it("free range of components should avoid having to call updateIterationLength if the range reach the end", () => {
+        simpleFactory.create(1, true);
+        simpleFactory.create(2, false);
+        simpleFactory.create(3, true);
+        simpleFactory.create(4, true);
+        simpleFactory.freeRangeComponents(2, 4);
+        expect(simpleFactory.iterationLength).to.equal(1);
+    });
 });
