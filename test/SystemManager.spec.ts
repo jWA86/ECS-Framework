@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import "mocha";
-import { ComponentFactory, EntityFactory } from "../src/ComponentFactory";
+import { ComponentFactory} from "../src/ComponentFactory";
 import { FrameEvent, GameLoop } from "../src/GameLoop";
 import { IComponent, IComponentFactory, IFrameEvent } from "../src/interfaces";
 import { System } from "../src/System";

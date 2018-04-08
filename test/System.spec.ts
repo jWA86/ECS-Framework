@@ -1,6 +1,7 @@
 import { expect } from "chai";
 import "mocha";
-import { ComponentFactory, EntityFactory } from "../src/ComponentFactory";
+import { ComponentFactory } from "../src/ComponentFactory";
+import { EntityFactory } from "../src/EntityFactory";
 import { IComponent, IComponentFactory, ISystem } from "../src/interfaces";
 import { System } from "../src/System";
 

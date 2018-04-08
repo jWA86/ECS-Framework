@@ -1,5 +1,5 @@
 import { FastIterationMap } from "FastIterationMap";
-export { ComponentFactory, EntityFactory, IComponent, IComponentFactory, IEntityFactory, IPool };
+export { ComponentFactory, IComponent, IComponentFactory, IPool };
 
 /* Components have to implement this interface in order to be processed by systems */
 interface IComponent {
@@ -8,7 +8,8 @@ interface IComponent {
 }
 
 interface IPool {
-    /* return the length to iterate created components and avoid iterate maximum number of zeored components
+    /* the length to iterate on created components,
+    * use to avoid iterating on a maximum number of zeored components which are at the queue of the pool
     */
     iterationLength: number;
     /* nb of created active components */
@@ -51,13 +52,6 @@ interface IComponentFactory<T extends IComponent> extends IPool {
     swap(key1: number, key2: number);
 }
 
-interface IEntityFactory extends IPool {
-    addFactory(name: string, factory: IComponentFactory<IComponent>);
-    getComponent(entityId: number, factoryName: string): IComponent;
-    /* get components by providing the entityId and the factory */
-    getFactory(name: string): IComponentFactory<IComponent>;
-}
-
 class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T> implements IComponentFactory<T> {
     protected _iterationLength: number = 0; // use by the system for iteration, avoid iterate over zeroed components
     protected _zeroedRef: T;
@@ -70,7 +64,7 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
         this._zeroedRef = new componentType(0, false, ...args);
         this._values.length = this._size;
         for (let i = 0; i < _size; ++i) {
-           this.createZeroedComponentAt(i);
+            this.createZeroedComponentAt(i);
         }
     }
 
@@ -87,7 +81,8 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
             }
         }
     }
-/* Set the active proprety of all component in the pool */
+
+    /* Set the active proprety of all component in the pool */
     public activateAll(value: boolean) {
         for (let i = 0; i < this.size; ++i) {
             this._values[i].active = value;
@@ -109,7 +104,7 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
         this._iterationLength = 0;
     }
 
-    public create( entityId: number, active: boolean, ...args: any[]): T {
+    public create(entityId: number, active: boolean, ...args: any[]): T {
         let index: number;
         let toReplaceComp: T;
         // if the key doesn't exist yet
@@ -148,9 +143,10 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
         toReplaceComp.active = active;
 
         // lastly increment the lastActiveIndex
-        this.incrementCreatedLength(index);
+        this.updateIterationLengthWhenAddingComponent(index);
         return this._values[index];
     }
+
     /* Set entityId back to 0 and desactivate the component
     * note : when the component is reuse it still has the old values
     */
@@ -170,7 +166,7 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
 
         this._keys.delete(entityId);
 
-        this.decrementCreatedLength(index);
+        this.updateIterationLengthWhenRemovingComponent(index);
 
         this._nbCreated -= 1;
 
@@ -227,7 +223,7 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
                 return i;
             }
         }
-        return -1;
+        return - 1;
     }
 
     protected mapObject(oldC: T, newC: T) {
@@ -238,13 +234,13 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
         }
     }
 
-    protected decrementCreatedLength(inputIndex: number) {
+    protected updateIterationLengthWhenRemovingComponent(inputIndex: number) {
         if (inputIndex >= this._iterationLength - 1) {
             this._iterationLength -= 1;
         }
     }
 
-    protected incrementCreatedLength(inputIndex: number) {
+    protected updateIterationLengthWhenAddingComponent(inputIndex: number) {
         if (inputIndex >= this._iterationLength) {
             this._iterationLength += 1;
         }
@@ -268,120 +264,5 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
 
     get nbFreeSlot(): number {
         return this._size - this._nbActive - this._nbInactive;
-    }
-}
-
-class EntityFactory implements IEntityFactory {
-    protected _factories: Map<string, ComponentFactory<IComponent>>;
-    constructor(protected _size: number) {
-        this._factories = new Map();
-    }
-
-    public activate(entityId: number, value: boolean, factoriesName?: string[]) {
-        if (factoriesName) {
-            factoriesName.forEach((f) => {
-                const ff = this.getFactory(f);
-                if (ff) {
-                    ff.activate(entityId, value);
-                }
-            });
-        } else {
-            this._factories.forEach((f) => {
-                f.activate(entityId, value);
-            });
-        }
-    }
-
-    public activateAll(value: boolean) {
-        this._factories.forEach((f) => {
-            f.activateAll(value);
-        });
-    }
-
-    public addFactory(name: string, factory: ComponentFactory<IComponent>) {
-        if (factory.size !== this._size) {
-            factory.resize(this._size);
-        }
-        this._factories.set(name, factory);
-    }
-
-    public getComponent(entityId: number, factoryName: string): IComponent {
-        const f = this._factories.get(factoryName);
-        if (f) {
-            return f.get(entityId);
-        } else {
-            return undefined;
-        }
-    }
-
-    public getFactory(name: string): ComponentFactory<IComponent> {
-        return this._factories.get(name);
-    }
-
-    public free(entityId: number): boolean {
-        let d = true;
-        this._factories.forEach((f) => {
-            if (!f.free(entityId)) {
-                d = false;
-            }
-        });
-        // false if no factories
-        return this._factories.size > 0 && d;
-    }
-
-    public get(entityId: number): IComponent[] {
-        const e = [];
-        this._factories.forEach((f) => {
-            e.push(f.get(entityId));
-        });
-        return e;
-    }
-
-    public has(entityId: number): boolean {
-        const it = this._factories.entries();
-        return it.next().value[1].has(entityId);
-    }
-
-    public create(entityId: number, active: boolean) {
-        this._factories.forEach((f) => {
-            f.create(entityId, active);
-        });
-    }
-
-    public resize(size: number) {
-        this._factories.forEach((f) => {
-            f.resize(size);
-        });
-        this._size = size;
-    }
-
-    get iterationLength(): number {
-        // return iteratorLength of the first factory;
-        const it = this._factories.entries();
-        return it.next().value[1].iterationLength;
-    }
-
-    get nbActive(): number {
-        const it = this._factories.entries();
-        return it.next().value[1].nbActive;
-    }
-
-    get nbCreated(): number {
-        const it = this._factories.entries();
-        return it.next().value[1].nbCreated;
-    }
-
-    get nbFreeSlot(): number {
-        const it = this._factories.entries();
-        return it.next().value[1].nbFreeSlot;
-    }
-
-    get nbInactive(): number {
-        const it = this._factories.entries();
-        return it.next().value[1].nbInactive;
-    }
-
-    get size(): number {
-        return this._size;
     }
 }
