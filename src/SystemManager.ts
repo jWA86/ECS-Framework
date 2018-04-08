@@ -24,22 +24,26 @@ class SystemManager {
     }
 
     public insertAround(systemMiddleId: string, systemBefore: ISystem, systemAfter: ISystem): [string, string] {
+        let id1 = "";
+        let id2 = "";
+        id1 = this.generateId(systemBefore);
+        id2 = this.generateId(systemAfter);
+        // case the 2 sytems to insert are of the same class
+        // generateId will be the same
+        if (id1 === id2) {
+            // add a random number to the id of id2
+            // should be ok ...
+            id2 = id2 + "_" + Math.floor(Math.random() * 10000);
+        }
         if (this.fixedTimeStepSystems.has(systemMiddleId)) {
-
-            const id1 = this.generateId(systemBefore);
-            const id2 = this.generateId(systemAfter);
 
             this.fixedTimeStepSystems.insertAround(systemMiddleId, id1, systemBefore, id2, systemAfter);
             return [id1, id2];
         } else if (this.nonFixedTimeStepSystems.has(systemMiddleId)) {
-            const id1 = this.generateId(systemBefore);
-            const id2 = this.generateId(systemAfter);
-
-            if (this.nonFixedTimeStepSystems.insertAround(systemMiddleId, id1, systemBefore, id2, systemAfter)) {
-                return [id1, id2];
-            } else {
-                return ["", ""];
-            }
+            this.nonFixedTimeStepSystems.insertAround(systemMiddleId, id1, systemBefore, id2, systemAfter);
+            return [id1, id2];
+        } else {
+            return ["", ""];
         }
     }
 

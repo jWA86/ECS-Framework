@@ -87,20 +87,24 @@ describe("SystemManager should be able to", () => {
         });
         it("insert a system around an other system ", () => {
             const sysManager = new SystemManager();
-            const fSystem = new FeedBackSystem();
+            const fFSystem = new FeedBackSystem();
             const nFSystem = new FeedBackSystem();
-            const firstId = sysManager.pushSystem(nFSystem, true);
-            const secondId = sysManager.pushSystem(nFSystem, true);
+            const firstId = sysManager.pushSystem(fFSystem, true);
+            const secondId = sysManager.pushSystem(nFSystem, false);
 
             sysManager.insertAround(firstId, new IncrementSystem(), new IncrementSystem());
             sysManager.insertAround(secondId,  new IncrementSystem(), new IncrementSystem());
-            expect(sysManager.getFixedTSSystems()[0]).to.be.instanceof(IncrementSystem);
-            expect(sysManager.getFixedTSSystems()[1]).to.be.instanceof(FeedBackSystem);
-            expect(sysManager.getFixedTSSystems()[2]).to.be.instanceof(IncrementSystem);
+            console.log(sysManager.getFixedTSSystems());
+            console.log(sysManager.getNonFixedTSSystems());
 
             expect(sysManager.getFixedTSSystems()[0]).to.be.instanceof(IncrementSystem);
             expect(sysManager.getFixedTSSystems()[1]).to.be.instanceof(FeedBackSystem);
+            console.log("here");
             expect(sysManager.getFixedTSSystems()[2]).to.be.instanceof(IncrementSystem);
+
+            expect(sysManager.getNonFixedTSSystems()[0]).to.be.instanceof(IncrementSystem);
+            expect(sysManager.getNonFixedTSSystems()[1]).to.be.instanceof(FeedBackSystem);
+            expect(sysManager.getNonFixedTSSystems()[2]).to.be.instanceof(IncrementSystem);
         });
     });
     describe("remove", () => {
