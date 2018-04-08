@@ -94,12 +94,9 @@ describe("SystemManager should be able to", () => {
 
             sysManager.insertAround(firstId, new IncrementSystem(), new IncrementSystem());
             sysManager.insertAround(secondId,  new IncrementSystem(), new IncrementSystem());
-            console.log(sysManager.getFixedTSSystems());
-            console.log(sysManager.getNonFixedTSSystems());
 
             expect(sysManager.getFixedTSSystems()[0]).to.be.instanceof(IncrementSystem);
             expect(sysManager.getFixedTSSystems()[1]).to.be.instanceof(FeedBackSystem);
-            console.log("here");
             expect(sysManager.getFixedTSSystems()[2]).to.be.instanceof(IncrementSystem);
 
             expect(sysManager.getNonFixedTSSystems()[0]).to.be.instanceof(IncrementSystem);
