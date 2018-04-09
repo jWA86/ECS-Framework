@@ -10,10 +10,46 @@ describe("Component Factory", () => {
     class MultiPropComponent implements IComponent {
         constructor(public entityId: number, public active: boolean, public prop1: string, public prop2: number, public prop3: { x: number, y: number }) { }
     }
+    class ComponentWithObjects implements IComponent {
+        constructor(public entityId: number, public active: boolean, public prop1: string, public lObj: IlitteralObj, public instantiatedObj: InstantiatedObj, public nestedObj: NestedObj, public date: Date, public array1, public arrayOfObject: NestedObj[]) { }
+    }
 
-    let simpleFactory = new ComponentFactory<MultiPropComponent>(5, MultiPropComponent, "default string", "default string", { x: 0.0, y: 0.0 });
+    interface IlitteralObj {
+        x: number;
+        y: number;
+        f: () => number;
+    }
+    class InstantiatedObj {
+        constructor(public x: number, public y: number) { }
+        public f = () => {
+            return this.x + this.y;
+        }
+    }
+    class NestedObj {
+        constructor(public obj1: InstantiatedObj) {
+        }
+        public f = () => {
+            return this.obj1.x + this.obj1.y;
+        }
+    }
+
+    const defaultX = 1;
+    const defaultY = 2;
+
+    let simpleFactory: ComponentFactory<MultiPropComponent>;
+
+    let objectFactory: ComponentFactory<ComponentWithObjects>;
+
     beforeEach(() => {
         simpleFactory = new ComponentFactory<MultiPropComponent>(5, MultiPropComponent, "default string", "default string", { x: 0.0, y: 0.0 });
+
+        const defaultLO1 = {x: defaultX, y: defaultY, f: () => this.x + this.y };
+        const defaultNO1 = new NestedObj(new InstantiatedObj(defaultX, defaultY));
+        const defaultProp1 = "stringProp1";
+        const defaultArr = [defaultX, defaultY];
+        const defaultNOArr = [defaultLO1, defaultLO1];
+
+        objectFactory = new ComponentFactory<ComponentWithObjects>(10,  ComponentWithObjects, defaultProp1, defaultLO1, defaultNO1, defaultArr, defaultNOArr);
     });
     it("should be able to retrieve a component by entity id", () => {
         const c = simpleFactory.create(1, true);
@@ -276,5 +312,56 @@ describe("Component Factory", () => {
         simpleFactory.create(4, true);
         simpleFactory.freeRangeComponents(2, 4);
         expect(simpleFactory.iterationLength).to.equal(1);
+    });
+    it("createFrom(entityId) should create and return a deep copy of the component (recursive copy)", () => {
+        const x = 3;
+        const y = 4;
+        expect(defaultX).to.not.equal(x);
+        expect(defaultY).to.not.equal(y);
+
+        const comp1 = objectFactory.create(1, true);
+        comp1.prop1 = "comp1 string";
+        comp1.array1 = [x, y];
+        comp1.date = new Date();
+        comp1.lObj = { "x": x, "y": y, f: function() { return this.x + this.y; }};
+        comp1.instantiatedObj = new InstantiatedObj(x, y);
+        comp1.nestedObj = new NestedObj(new InstantiatedObj(x, y));
+        comp1.arrayOfObject = [ new NestedObj(new InstantiatedObj(x, y)), new NestedObj(new InstantiatedObj(x, y)) ];
+
+        const newCompId = 2;
+        const c2 = objectFactory.createFromComponent(newCompId, comp1);
+        expect(c2.entityId).to.equal(newCompId);
+        const comp2 = objectFactory.get(newCompId);
+        expect(comp2).to.not.equal(undefined);
+
+        expect(objectFactory.get(1)).to.not.equal(comp2);
+
+        expect(comp2.prop1).to.equal(comp1.prop1);
+
+        expect(comp2.array1.length).to.equal(2);
+        expect(comp2.array1[0]).to.equal(x);
+        expect(comp2.array1[1]).to.equal(y);
+
+        expect(comp2.date).to.equal(comp1.date);
+
+        expect(comp2.lObj.x).to.equal(x);
+        expect(comp2.lObj.y).to.equal(y);
+        expect(comp2.lObj.f()).to.equal(x + y);
+
+        expect(comp2.instantiatedObj.x).to.equal(x);
+        expect(comp2.instantiatedObj.y).to.equal(y);
+        expect(comp2.instantiatedObj.f()).to.equal(x + y);
+
+        expect(comp2.nestedObj.obj1.x).to.equal(x);
+        expect(comp2.nestedObj.obj1.y).to.equal(y);
+        expect(comp2.nestedObj.obj1.f()).to.equal(x + y);
+        expect(comp2.nestedObj.f()).to.equal(x + y);
+
+        expect(comp2.arrayOfObject.length).to.equal(2);
+        expect(comp2.arrayOfObject[1].f()).to.equal(x + y);
+        expect(comp2.arrayOfObject[1].obj1.x).to.equal(x);
+        expect(comp2.arrayOfObject[1].obj1.y).to.equal(y);
+        expect(comp2.arrayOfObject[1].obj1.f()).to.equal(x + y);
+
     });
 });

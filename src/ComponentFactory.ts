@@ -22,7 +22,7 @@ interface IPool {
     nbInactive: number;
     /* Return the size of the pool */
     size: number;
-    /* Create a component with the provided values*/
+    /* Create a component with the provided values */
     create(entityId: number, active: boolean);
     /* free a component by its id if it's in the pool */
     free(entityId: number): boolean;
@@ -41,6 +41,8 @@ interface IComponentFactory<T extends IComponent> extends IPool {
     length: number;
     /* Hold components, use for iteration in Systems. */
     values: T[];
+    /* create a component from the values of another component */
+    createFromComponent(entityId: number, comp: T);
     /* Add components but instanciated outside the pool (should probably not be used) */
     push(key: number, value: T);
     /* Same as push */
@@ -244,6 +246,15 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
             }
         }
         this._iterationLength = lastCreatedIndex + 1;
+    }
+
+    public createFromComponent(entityId: number, comp: T): T {
+        if (this._keys.has(entityId)) { throw Error("entityId already exists in the pool"); }
+        let newComp = this.create(entityId, true);
+        newComp = Object.assign({}, comp);
+        newComp.entityId = entityId;
+        this._values[this._keys.get(entityId)] = newComp;
+        return newComp;
     }
 
     protected createZeroedComponentAt(index: number) {
