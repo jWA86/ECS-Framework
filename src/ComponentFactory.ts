@@ -285,7 +285,6 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
         }
     }
 
-
     get activeLength(): number {
         return this._activeLength;
     }

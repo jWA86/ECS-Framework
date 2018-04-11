@@ -104,18 +104,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var FastIterationMap_1 = __webpack_require__(2);
 var ComponentFactory = /** @class */ (function (_super) {
     __extends(ComponentFactory, _super);
-    function ComponentFactory(_size, componentType) {
-        var args = [];
-        for (var _i = 2; _i < arguments.length; _i++) {
-            args[_i - 2] = arguments[_i];
-        }
+    function ComponentFactory(_size, componentWithDefaultValue) {
         var _this = _super.call(this) || this;
         _this._size = _size;
-        _this._iterationLength = 0; // use by the system for iteration, avoid iterate over zeroed components
+        _this._activeLength = 0; // use by the system for iteration, avoid iterate over zeroed components
         _this._nbActive = 0;
         _this._nbInactive = 0;
         _this._nbCreated = 0;
-        _this._zeroedRef = new (componentType.bind.apply(componentType, [void 0, 0, false].concat(args)))();
+        _this._zeroedRef = Object.assign({}, componentWithDefaultValue);
+        _this._zeroedRef.entityId = 0;
+        _this._zeroedRef.active = false;
         _this._values.length = _this._size;
         for (var i = 0; i < _size; ++i) {
             _this.createZeroedComponentAt(i);
@@ -155,55 +153,41 @@ var ComponentFactory = /** @class */ (function (_super) {
         this._nbActive = 0;
         this._nbInactive = 0;
         this._nbCreated = 0;
-        this._iterationLength = 0;
+        this._activeLength = 0;
     };
-    ComponentFactory.prototype.create = function (entityId, active) {
-        var args = [];
-        for (var _i = 2; _i < arguments.length; _i++) {
-            args[_i - 2] = arguments[_i];
-        }
+    ComponentFactory.prototype.create = function (entityId, active, insertFirstAvailableSpot) {
+        if (insertFirstAvailableSpot === void 0) { insertFirstAvailableSpot = false; }
         var index;
-        var toReplaceComp;
-        // if the key doesn't exist yet
-        if (!this.has(entityId)) {
+        if (entityId === 0) {
+            throw Error("0 is a reserved id");
+        }
+        if (this.has(entityId)) {
+            throw Error("a component with this entityId already exists");
+        }
+        if (insertFirstAvailableSpot) {
             // get the key and index of the first zeroed component in the values array
             index = this.getIndexOfFirstAvailableSpot();
-            if (index === -1) {
-                throw new Error("no free slot available, please resize the pool");
-            }
-            else {
-                // add the key of our newly created component and
-                this._keys.set(entityId, index);
-                this._nbCreated += 1;
-                if (active) {
-                    this._nbActive += 1;
-                }
-                else {
-                    this._nbInactive += 1;
-                }
-                // replace all propreties value from the zeroed component
-                toReplaceComp = this._values[index];
-            }
         }
         else {
-            index = this._keys.get(entityId);
-            // replace all propreties value from the component to update
-            toReplaceComp = this._values[index];
-            if (toReplaceComp.active !== active) {
-                if (active) {
-                    this._nbActive += 1;
-                    this._nbInactive -= 1;
-                }
-                else {
-                    this._nbActive -= 1;
-                    this._nbInactive += 1;
-                }
-            }
+            index = this._activeLength;
         }
-        toReplaceComp.entityId = entityId;
-        toReplaceComp.active = active;
-        // lastly increment the lastActiveIndex
-        this.updateIterationLengthWhenAddingComponent(index);
+        if (index >= this._size) {
+            throw Error("no free slot available, please resize the pool");
+        }
+        else {
+            // add the key of our newly created component and
+            this._keys.set(entityId, index);
+            this._nbCreated += 1;
+            if (active) {
+                this._nbActive += 1;
+            }
+            else {
+                this._nbInactive += 1;
+            }
+            this._values[index].entityId = entityId;
+            this._values[index].active = active;
+        }
+        this.updateActiveLength(index, true);
         return this._values[index];
     };
     /* Set entityId back to 0 and desactivate the component
@@ -221,12 +205,10 @@ var ComponentFactory = /** @class */ (function (_super) {
         else {
             this._nbInactive -= 1;
         }
-        // zeroed the component
-        // note : removed while a solution is found to deep clone an object
-        // this.mapObject(this._values[index], this._zeroedRef);
+        this.createZeroedComponentAt(index);
         this._values[index].entityId = 0;
         this._keys.delete(entityId);
-        this.updateIterationLengthWhenRemovingComponent(index);
+        this.updateActiveLength(index, false);
         this._nbCreated -= 1;
         return true;
     };
@@ -237,34 +219,25 @@ var ComponentFactory = /** @class */ (function (_super) {
     ComponentFactory.prototype.delete = function (entityId) {
         return this.free(entityId);
     };
-    ComponentFactory.prototype.recycle = function (indexComponentToReplace, componentRef) {
-        var _this = this;
-        // parsing Date ?
-        // parsing Function ?
-        var prop = JSON.parse(JSON.stringify(componentRef));
-        this._values[indexComponentToReplace] = Object.create(componentRef);
-        Object.keys(componentRef).forEach(function (p) {
-            _this._values[indexComponentToReplace][p] = prop[p];
-        });
-    };
     ComponentFactory.prototype.resize = function (size) {
-        var dif = size - this.size;
-        if (dif > 0) {
+        size = Math.floor(size);
+        var diff = size - this.size;
+        if (diff > 0) {
             var oldL = this._values.length;
-            this._values.length += dif;
-            for (var i = 0; i < dif; ++i) {
-                this.createZeroedComponentAt(oldL + i);
+            this._values.length += diff;
+            for (var i = oldL; i < diff + oldL; ++i) {
+                this.createZeroedComponentAt(i);
             }
         }
-        else if (dif < 0) {
-            dif = Math.abs(dif);
-            for (var i = 0; i < dif; ++i) {
+        else if (diff < 0) {
+            diff = Math.abs(diff);
+            for (var i = 0; i < diff; ++i) {
                 var toDelete = this._values[this._values.length - 1];
                 this._keys.delete(toDelete.entityId);
                 this._values.pop();
             }
         }
-        this._size += dif;
+        this._size += diff;
     };
     // overwrite fastIterationMap method we don't want to use
     ComponentFactory.prototype.insertAfter = function (key, value, keyRef) {
@@ -274,7 +247,7 @@ var ComponentFactory = /** @class */ (function (_super) {
         return false;
     };
     /**
-     * Delete range of components from a component key and its successors in reverse order so iterationLength doesn't need to be re-computed if range comprise the last created element.
+     * Delete range of components from a component key and its successors in reverse order so activeLength doesn't need to be re-computed if range comprise the last created element.
      * @param fromKey key of the first component to start freeing
      * @param nbComponents number of components to free
      */
@@ -284,14 +257,14 @@ var ComponentFactory = /** @class */ (function (_super) {
             return false;
         }
         var endingIndex = startingIndex + nbComponents;
-        if (endingIndex > this._iterationLength) {
-            endingIndex = this._iterationLength - 1;
+        if (endingIndex > this._activeLength) {
+            endingIndex = this._activeLength - 1;
         }
         for (var i = endingIndex; i >= startingIndex; --i) {
             this.free(this._values[i].entityId);
         }
     };
-    ComponentFactory.prototype.updateIterationLength = function () {
+    ComponentFactory.prototype.computeActiveLength = function () {
         var lastCreatedIndex = 0;
         var l = this._values.length;
         for (var i = 0; i < l; ++i) {
@@ -300,12 +273,31 @@ var ComponentFactory = /** @class */ (function (_super) {
                 lastCreatedIndex = i;
             }
         }
-        this._iterationLength = lastCreatedIndex + 1;
+        this._activeLength = lastCreatedIndex + 1;
+    };
+    ComponentFactory.prototype.createFromComponent = function (entityId, comp) {
+        var _this = this;
+        if (this._keys.has(entityId)) {
+            throw Error("entityId already exists in the pool");
+        }
+        var newComp = this.create(entityId, true);
+        var index = this._keys.get(newComp.entityId);
+        var prop = JSON.parse(JSON.stringify(comp));
+        Object.keys(this._zeroedRef).forEach(function (p) {
+            if (_this._values[index].hasOwnProperty(p)) {
+                _this._values[index][p] = prop[p];
+            }
+        });
+        this._values[index].entityId = entityId;
+        return this._values[index];
     };
     ComponentFactory.prototype.createZeroedComponentAt = function (index) {
-        this.recycle(index, this._zeroedRef);
-        this._values[index].entityId = 0;
-        this._values[index].active = false;
+        var _this = this;
+        var prop = JSON.parse(JSON.stringify(this._zeroedRef));
+        this._values[index] = Object.create(this._zeroedRef);
+        Object.keys(this._zeroedRef).forEach(function (p) {
+            _this._values[index][p] = prop[p];
+        });
     };
     ComponentFactory.prototype.getIndexOfFirstAvailableSpot = function () {
         var l = this._values.length;
@@ -316,26 +308,28 @@ var ComponentFactory = /** @class */ (function (_super) {
         }
         return -1;
     };
-    ComponentFactory.prototype.mapObject = function (oldC, newC) {
-        for (var i in newC) {
-            if (oldC.hasOwnProperty(i)) {
-                oldC[i] = newC[i];
+    ComponentFactory.prototype.mapValues = function (destination, source) {
+        for (var i in source) {
+            if (destination.hasOwnProperty(i)) {
+                destination[i] = source[i];
             }
         }
     };
-    ComponentFactory.prototype.updateIterationLengthWhenRemovingComponent = function (inputIndex) {
-        if (inputIndex >= this._iterationLength - 1) {
-            this._iterationLength -= 1;
+    ComponentFactory.prototype.updateActiveLength = function (inputIndex, adding) {
+        if (!adding) {
+            if (inputIndex >= this._activeLength - 1) {
+                this._activeLength -= 1;
+            }
+        }
+        else {
+            if (inputIndex >= this._activeLength) {
+                this._activeLength += 1;
+            }
         }
     };
-    ComponentFactory.prototype.updateIterationLengthWhenAddingComponent = function (inputIndex) {
-        if (inputIndex >= this._iterationLength) {
-            this._iterationLength += 1;
-        }
-    };
-    Object.defineProperty(ComponentFactory.prototype, "iterationLength", {
+    Object.defineProperty(ComponentFactory.prototype, "activeLength", {
         get: function () {
-            return this._iterationLength;
+            return this._activeLength;
         },
         enumerable: true,
         configurable: true
@@ -680,7 +674,7 @@ var System = /** @class */ (function () {
     // Query the components and execute active ones
     System.prototype.process = function (args) {
         var flist = this.factories;
-        var l = flist[0].iterationLength;
+        var l = flist[0].activeLength;
         var f = flist[0].values;
         for (var i = 0; i < l; ++i) {
             // get the component from the first factory that serve as a reference
@@ -1062,8 +1056,6 @@ var SystemManager = /** @class */ (function () {
         });
         return res;
     };
-    SystemManager.prototype.orderSystem = function () {
-    };
     return SystemManager;
 }());
 exports.SystemManager = SystemManager;
@@ -1124,7 +1116,7 @@ var TimeMeasureUtil = /** @class */ (function () {
     function TimeMeasureUtil(sysManager, timeMeasurePool) {
         this.sysManager = sysManager;
         this.measures = new Map();
-        this.timeMeasurePool = timeMeasurePool || new ComponentFactory_1.ComponentFactory(DefaultConfig_1.TM_POOL_SIZE, TimeMeasureComponent, "", 0, 0, 0, 0, 0);
+        this.timeMeasurePool = timeMeasurePool || new ComponentFactory_1.ComponentFactory(DefaultConfig_1.TM_POOL_SIZE, new TimeMeasureComponent(0, false, "", 0, 0, 0, 0, 0));
     }
     TimeMeasureUtil.prototype.install = function (systemIdToMeasure) {
         // use the system id to measure as the measure id + a random number in case of multiple installation of a TimeMeasure on the same System (no use unless to measure the TM overhead)
@@ -1341,11 +1333,11 @@ var EntityFactory = /** @class */ (function () {
         });
         this._size = size;
     };
-    Object.defineProperty(EntityFactory.prototype, "iterationLength", {
+    Object.defineProperty(EntityFactory.prototype, "activeLength", {
         get: function () {
             // return iteratorLength of the first factory;
             var it = this._factories.entries();
-            return it.next().value[1].iterationLength;
+            return it.next().value[1].activeLength;
         },
         enumerable: true,
         configurable: true

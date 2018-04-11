@@ -5,7 +5,7 @@ interface IComponent {
     active: boolean;
 }
 interface IPool {
-    iterationLength: number;
+    activeLength: number;
     nbActive: number;
     nbCreated: number;
     nbFreeSlot: number;
@@ -21,6 +21,7 @@ interface IComponentFactory<T extends IComponent> extends IPool {
     keys: Map<number, number>;
     length: number;
     values: T[];
+    createFromComponent(entityId: number, comp: T): any;
     push(key: number, value: T): any;
     set(key: number, value: T): any;
     activate(entityId: number, value: boolean): any;
@@ -29,41 +30,38 @@ interface IComponentFactory<T extends IComponent> extends IPool {
 }
 declare class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T> implements IComponentFactory<T> {
     protected _size: number;
-    protected _iterationLength: number;
-    protected _zeroedRef: T;
+    protected _activeLength: number;
+    protected readonly _zeroedRef: T;
     protected _nbActive: number;
     protected _nbInactive: number;
     protected _nbCreated: number;
-    constructor(_size: number, componentType: {
-        new (entityId: number, active: boolean, ...args: any[]): T;
-    }, ...args: any[]);
+    constructor(_size: number, componentWithDefaultValue: T);
     activate(entityId: number, value: boolean): void;
     activateAll(value: boolean): void;
     clear(): void;
-    create(entityId: number, active: boolean, ...args: any[]): T;
+    create(entityId: number, active: boolean, insertFirstAvailableSpot?: boolean): T;
     free(entityId: number): boolean;
     /**
      * Alias for free()
      * @param entityId
      */
     delete(entityId: number): boolean;
-    recycle(indexComponentToReplace: number, componentRef: any): void;
     resize(size: number): void;
     insertAfter(key: number, value: T, keyRef: number): boolean;
     insertBefore(key: number, value: T, keyRef: number): boolean;
     /**
-     * Delete range of components from a component key and its successors in reverse order so iterationLength doesn't need to be re-computed if range comprise the last created element.
+     * Delete range of components from a component key and its successors in reverse order so activeLength doesn't need to be re-computed if range comprise the last created element.
      * @param fromKey key of the first component to start freeing
      * @param nbComponents number of components to free
      */
     freeRangeComponents(fromKey: number, nbComponents: number): boolean;
-    updateIterationLength(): void;
-    protected createZeroedComponentAt(index: number): void;
+    computeActiveLength(): void;
+    createFromComponent(entityId: number, comp: T): T;
+    protected createZeroedComponentAt(index: any): void;
     protected getIndexOfFirstAvailableSpot(): number;
-    protected mapObject(oldC: T, newC: T): void;
-    protected updateIterationLengthWhenRemovingComponent(inputIndex: number): void;
-    protected updateIterationLengthWhenAddingComponent(inputIndex: number): void;
-    readonly iterationLength: number;
+    protected mapValues(destination: T, source: T): void;
+    protected updateActiveLength(inputIndex: number, adding: boolean): void;
+    readonly activeLength: number;
     readonly nbActive: number;
     readonly nbInactive: number;
     readonly nbCreated: number;

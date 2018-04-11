@@ -15,5 +15,4 @@ declare class SystemManager {
     get(systemId: string): ISystem;
     protected generateId(system: ISystem): string;
     protected getListOfSystemId(className: string): string[];
-    protected orderSystem(): void;
 }

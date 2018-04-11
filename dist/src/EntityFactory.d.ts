@@ -19,7 +19,7 @@ declare class EntityFactory implements IEntityFactory {
     has(entityId: number): boolean;
     create(entityId: number, active: boolean): void;
     resize(size: number): void;
-    readonly iterationLength: number;
+    readonly activeLength: number;
     readonly nbActive: number;
     readonly nbCreated: number;
     readonly nbFreeSlot: number;
