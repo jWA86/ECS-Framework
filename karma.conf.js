@@ -25,6 +25,8 @@ module.exports = function(config) {
         type : 'html',
         dir : 'coverage/'
       },
+      
+      // logLevel: config.LOG_DEBUG,
 
       singleRun: false,
       concurrency: Infinity

@@ -1,6 +1,5 @@
 import { FastIterationMap } from "FastIterationMap";
 export { ComponentFactory, IComponent, IComponentFactory, IPool };
-
 /* Components have to implement this interface in order to be processed by systems */
 interface IComponent {
     entityId: number;
@@ -11,7 +10,7 @@ interface IPool {
     /* the length to iterate on created components,
     * use to avoid iterating on a maximum number of zeored components which are at the queue of the pool
     */
-    iterationLength: number;
+    activeLength: number;
     /* nb of created active components */
     nbActive: number;
     /* Nb actives and inactives created components */
@@ -41,7 +40,7 @@ interface IComponentFactory<T extends IComponent> extends IPool {
     length: number;
     /* Hold components, use for iteration in Systems. */
     values: T[];
-    /* create a component from the values of another component */
+    /* Create a component from the values of another component */
     createFromComponent(entityId: number, comp: T);
     /* Add components but instanciated outside the pool (should probably not be used) */
     push(key: number, value: T);
@@ -51,19 +50,23 @@ interface IComponentFactory<T extends IComponent> extends IPool {
     activate(entityId: number, value: boolean);
     /* Empty the pool from zeroed and created components */
     clear();
+    /* swap positions of two components in the values array */
     swap(key1: number, key2: number);
 }
 
 class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T> implements IComponentFactory<T> {
-    protected _iterationLength: number = 0; // use by the system for iteration, avoid iterate over zeroed components
-    protected _zeroedRef: T;
+    protected _activeLength: number = 0; // use by the system for iteration, avoid iterate over zeroed components
+    protected readonly _zeroedRef: T;
     protected _nbActive: number = 0;
     protected _nbInactive: number = 0;
     protected _nbCreated: number = 0;
 
-    constructor(protected _size: number, componentType: { new(entityId: number, active: boolean, ...args: any[]): T }, ...args: any[]) {
+    constructor(protected _size: number, componentWithDefaultValue: T) {
         super();
-        this._zeroedRef = new componentType(0, false, ...args);
+        this._zeroedRef = Object.assign({}, componentWithDefaultValue);
+        this._zeroedRef.entityId = 0;
+        this._zeroedRef.active = false;
+
         this._values.length = this._size;
         for (let i = 0; i < _size; ++i) {
             this.createZeroedComponentAt(i);
@@ -103,49 +106,36 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
         this._nbActive = 0;
         this._nbInactive = 0;
         this._nbCreated = 0;
-        this._iterationLength = 0;
+        this._activeLength = 0;
     }
 
-    public create(entityId: number, active: boolean, ...args: any[]): T {
+    public create(entityId: number, active: boolean, insertFirstAvailableSpot = false): T {
         let index: number;
-        let toReplaceComp: T;
-        // if the key doesn't exist yet
-        if (!this.has(entityId)) {
+        if (entityId === 0) { throw Error("0 is a reserved id"); }
+        if (this.has(entityId)) { throw Error("a component with this entityId already exists"); }
+        if (insertFirstAvailableSpot) {
             // get the key and index of the first zeroed component in the values array
             index = this.getIndexOfFirstAvailableSpot();
-            if (index === -1) {
-                throw new Error("no free slot available, please resize the pool");
-            } else {
-                // add the key of our newly created component and
-                this._keys.set(entityId, index);
-                this._nbCreated += 1;
-                if (active) {
-                    this._nbActive += 1;
-                } else {
-                    this._nbInactive += 1;
-                }
-                // replace all propreties value from the zeroed component
-                toReplaceComp = this._values[index];
-            }
         } else {
-            index = this._keys.get(entityId);
-            // replace all propreties value from the component to update
-            toReplaceComp = this._values[index];
-            if (toReplaceComp.active !== active) {
-                if (active) {
-                    this._nbActive += 1;
-                    this._nbInactive -= 1;
-                } else {
-                    this._nbActive -= 1;
-                    this._nbInactive += 1;
-                }
-            }
+            index = this._activeLength;
         }
-        toReplaceComp.entityId = entityId;
-        toReplaceComp.active = active;
+        if (index >= this._size) {
+            throw Error("no free slot available, please resize the pool");
+        } else {
+            // add the key of our newly created component and
+            this._keys.set(entityId, index);
+            this._nbCreated += 1;
+            if (active) {
+                this._nbActive += 1;
+            } else {
+                this._nbInactive += 1;
+            }
 
-        // lastly increment the lastActiveIndex
-        this.updateIterationLengthWhenAddingComponent(index);
+            this._values[index].entityId = entityId;
+            this._values[index].active = active;
+        }
+
+        this.updateActiveLength(index, true);
         return this._values[index];
     }
 
@@ -161,14 +151,14 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
         } else {
             this._nbInactive -= 1;
         }
-        // zeroed the component
-        // note : removed while a solution is found to deep clone an object
-        // this.mapObject(this._values[index], this._zeroedRef);
+
+        this.createZeroedComponentAt(index);
+
         this._values[index].entityId = 0;
 
         this._keys.delete(entityId);
 
-        this.updateIterationLengthWhenRemovingComponent(index);
+        this.updateActiveLength(index, false);
 
         this._nbCreated -= 1;
 
@@ -182,33 +172,24 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
         return this.free(entityId);
     }
 
-    public recycle(indexComponentToReplace: number, componentRef) {
-        // parsing Date ?
-        // parsing Function ?
-        const prop = JSON.parse(JSON.stringify(componentRef));
-        this._values[indexComponentToReplace] = Object.create(componentRef);
-        Object.keys(componentRef).forEach((p) => {
-            this._values[indexComponentToReplace][p] = prop[p];
-        });
-    }
-
     public resize(size: number) {
-        let dif = size - this.size;
-        if (dif > 0) {
+        size = Math.floor(size);
+        let diff = size - this.size;
+        if (diff > 0) {
             const oldL = this._values.length;
-            this._values.length += dif;
-            for (let i = 0; i < dif; ++i) {
-                this.createZeroedComponentAt(oldL + i);
+            this._values.length += diff;
+            for (let i = oldL; i < diff + oldL; ++i) {
+                this.createZeroedComponentAt(i);
             }
-        } else if (dif < 0) {
-            dif = Math.abs(dif);
-            for (let i = 0; i < dif; ++i) {
+        } else if (diff < 0) {
+            diff = Math.abs(diff);
+            for (let i = 0; i < diff; ++i) {
                 const toDelete = this._values[this._values.length - 1];
                 this._keys.delete(toDelete.entityId);
                 this._values.pop();
             }
         }
-        this._size += dif;
+        this._size += diff;
     }
 
     // overwrite fastIterationMap method we don't want to use
@@ -220,23 +201,23 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
     }
 
     /**
-     * Delete range of components from a component key and its successors in reverse order so iterationLength doesn't need to be re-computed if range comprise the last created element.
+     * Delete range of components from a component key and its successors in reverse order so activeLength doesn't need to be re-computed if range comprise the last created element.
      * @param fromKey key of the first component to start freeing
      * @param nbComponents number of components to free
      */
-    public freeRangeComponents(fromKey: number, nbComponents: number ): boolean {
+    public freeRangeComponents(fromKey: number, nbComponents: number): boolean {
         const startingIndex = this._keys.get(fromKey);
         if (startingIndex === undefined) { return false; }
         let endingIndex = startingIndex + nbComponents;
-        if (endingIndex > this._iterationLength) {
-            endingIndex = this._iterationLength - 1;
+        if (endingIndex > this._activeLength) {
+            endingIndex = this._activeLength - 1;
         }
-        for (let i = endingIndex; i >= startingIndex ; --i) {
+        for (let i = endingIndex; i >= startingIndex; --i) {
             this.free(this._values[i].entityId);
         }
     }
 
-    public updateIterationLength() {
+    public computeActiveLength() {
         let lastCreatedIndex = 0;
         const l = this._values.length;
         for (let i = 0; i < l; ++i) {
@@ -245,22 +226,33 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
                 lastCreatedIndex = i;
             }
         }
-        this._iterationLength = lastCreatedIndex + 1;
+        this._activeLength = lastCreatedIndex + 1;
     }
 
     public createFromComponent(entityId: number, comp: T): T {
         if (this._keys.has(entityId)) { throw Error("entityId already exists in the pool"); }
-        let newComp = this.create(entityId, true);
-        newComp = Object.assign({}, comp);
-        newComp.entityId = entityId;
-        this._values[this._keys.get(entityId)] = newComp;
-        return newComp;
+        const newComp = this.create(entityId, true);
+        const index = this._keys.get(newComp.entityId);
+
+        const prop = JSON.parse(JSON.stringify(comp));
+
+        Object.keys(this._zeroedRef).forEach((p) => {
+            if (this._values[index].hasOwnProperty(p)) {
+                this._values[index][p] = prop[p];
+            }
+        });
+
+        this._values[index].entityId = entityId;
+
+        return this._values[index];
     }
 
-    protected createZeroedComponentAt(index: number) {
-        this.recycle(index, this._zeroedRef);
-        this._values[index].entityId = 0;
-        this._values[index].active = false;
+    protected createZeroedComponentAt(index) {
+        const prop = JSON.parse(JSON.stringify(this._zeroedRef));
+        this._values[index] = Object.create(this._zeroedRef);
+        Object.keys(this._zeroedRef).forEach((p) => {
+            this._values[index][p] = prop[p];
+        });
     }
 
     protected getIndexOfFirstAvailableSpot(): number {
@@ -273,28 +265,29 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
         return - 1;
     }
 
-    protected mapObject(oldC: T, newC: T) {
-        for (const i in newC) {
-            if (oldC.hasOwnProperty(i)) {
-                oldC[i] = newC[i];
+    protected mapValues(destination: T, source: T) {
+        for (const i in source) {
+            if (destination.hasOwnProperty(i)) {
+                destination[i] = source[i];
             }
         }
     }
 
-    protected updateIterationLengthWhenRemovingComponent(inputIndex: number) {
-        if (inputIndex >= this._iterationLength - 1) {
-            this._iterationLength -= 1;
+    protected updateActiveLength(inputIndex: number, adding: boolean) {
+        if (!adding) {
+            if (inputIndex >= this._activeLength - 1) {
+                this._activeLength -= 1;
+            }
+        } else {
+            if (inputIndex >= this._activeLength) {
+                this._activeLength += 1;
+            }
         }
     }
 
-    protected updateIterationLengthWhenAddingComponent(inputIndex: number) {
-        if (inputIndex >= this._iterationLength) {
-            this._iterationLength += 1;
-        }
-    }
 
-    get iterationLength(): number {
-        return this._iterationLength;
+    get activeLength(): number {
+        return this._activeLength;
     }
 
     get nbActive(): number {

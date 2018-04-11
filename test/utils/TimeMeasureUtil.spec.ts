@@ -6,7 +6,51 @@ import { TIMESTAMP } from "../../src/pollyFill";
 import * as DEFAULT_CONF from "../../src/utils/DefaultConfig";
 import { ITimeMeasureUtil, TimeMeasureComponent, TimeMeasureSystemEndMark, TimeMeasureSystemStartMark, TimeMeasureUtil } from "../../src/utils/TimeMeasureUtil";
 
-describe("TimeMeasureUtil", () => {
+// problem with requestionAnimationFrame is randomly fired
+// so sometimes test passed sometimes not ...
+let rafWorking = false;
+let wPerfWorking = false;
+describe("pre-requirement", () => {
+    it("requestionAnimationFrame should work", (done) => {
+        expect(requestAnimationFrame).to.not.be.equal(undefined);
+        // pause after 500ms
+        // then check that loop has been called more than once
+        let frameId = 0;
+        let firedCount = 0;
+
+        function loop() {
+            firedCount += 1;
+            frameId = requestAnimationFrame(loop);
+        }
+
+        loop();
+
+        setTimeout(() => {
+            cancelAnimationFrame(frameId);
+            if (firedCount > 1) {
+                rafWorking = true;
+                done();
+            } else {
+                rafWorking = false;
+                done(Error("WARNING ! RequestAnimationFrame not working) "));
+            }
+        }, 1000);
+
+    });
+    it("window.performance", () => {
+        expect(performance).to.not.equal(undefined);
+        expect(performance.now()).to.be.greaterThan(0);
+        expect(performance.mark).to.not.equal(undefined);
+        wPerfWorking = true;
+    });
+
+    if (rafWorking && wPerfWorking) {
+        describe("TimeMeasureUtil", test);
+    } else {
+        describe.skip("TimeMeasureUtil", test);
+    }
+});
+function test() {
 
     class DummySystem extends System {
         public hasRun = false;
@@ -161,4 +205,4 @@ describe("TimeMeasureUtil", () => {
             }, 1000);
         });
     });
-});
+}

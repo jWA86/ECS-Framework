@@ -46,7 +46,7 @@ class TimeMeasureUtil implements ITimeMeasureUtil {
     public timeMeasurePool: ComponentFactory<TimeMeasureComponent>;
     protected measures = new Map<string, {startSystem: string, endSystem: string}>();
     constructor(public sysManager: SystemManager, timeMeasurePool?: ComponentFactory<TimeMeasureComponent>) {
-        this.timeMeasurePool = timeMeasurePool || new ComponentFactory<TimeMeasureComponent>(TM_POOL_SIZE, TimeMeasureComponent, "", 0, 0, 0, 0, 0);
+        this.timeMeasurePool = timeMeasurePool || new ComponentFactory<TimeMeasureComponent>(TM_POOL_SIZE, new TimeMeasureComponent(0, false, "", 0, 0, 0, 0, 0));
      }
     public install(systemIdToMeasure: string): TimeMeasureComponent {
         // use the system id to measure as the measure id + a random number in case of multiple installation of a TimeMeasure on the same System (no use unless to measure the TM overhead)

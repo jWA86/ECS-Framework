@@ -146,7 +146,4 @@ class SystemManager {
         });
         return res;
     }
-    protected orderSystem() {
-
-    }
 }

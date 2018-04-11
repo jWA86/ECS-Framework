@@ -7,20 +7,24 @@ import { IComponent } from "../src/interfaces";
 describe("EntityFactory", () => {
 
     class PositionComponent implements IComponent {
-        constructor(public entityId: number, public active: boolean, public position = { x: 0.0, y: 0.0, z: 0.0 }) { }
+        public entityId: number;
+        public active: boolean;
+        constructor( public position = { x: 0.0, y: 0.0, z: 0.0 }) { }
     }
 
     class VelocityComponent implements IComponent {
-        constructor(public entityId, public active, public vec = { x: 0.0, y: 0.0, z: 0.0 }) { }
+        public entityId: number;
+        public active: boolean;
+        constructor( public vec = { x: 0.0, y: 0.0, z: 0.0 }) { }
     }
 
-    let positionFactory;
-    let velocityFactory;
-    let movingObjectFactory;
+    let positionFactory: ComponentFactory<PositionComponent>;
+    let velocityFactory: ComponentFactory<VelocityComponent>;
+    let movingObjectFactory: EntityFactory;
 
     beforeEach(() => {
-        positionFactory = new ComponentFactory<PositionComponent>(5, PositionComponent, { x: 0.0, y: 0.0, z: 0.0 });
-        velocityFactory = new ComponentFactory<VelocityComponent>(5, VelocityComponent, { x: 0.0, y: 0.0, z: 0.0 });
+        positionFactory = new ComponentFactory<PositionComponent>(5, new PositionComponent({ x: 0.0, y: 0.0, z: 0.0 }));
+        velocityFactory = new ComponentFactory<VelocityComponent>(5, new VelocityComponent({ x: 0.0, y: 0.0, z: 0.0 }));
         movingObjectFactory = new EntityFactory(10);
 
         movingObjectFactory.addFactory("position", positionFactory);
@@ -34,7 +38,7 @@ describe("EntityFactory", () => {
     });
     it("getFactory() should return the factory corresponding to the name", () => {
         // check the first component to be an instance of what the factory is supposed to hold
-        expect(movingObjectFactory.getFactory("position").values[0]).to.be.an.instanceOf(PositionComponent);
+        expect(movingObjectFactory.getFactory("position").values[0]).to.have.property("position");
     });
     it("create() should create a component in each child pool with the same entityId", () => {
         movingObjectFactory.create(1, true);
@@ -65,16 +69,16 @@ describe("EntityFactory", () => {
         expect(movingObjectFactory.size).to.equal(3);
     });
     it("iterationLength should be the same for all pool", () => {
-        expect(movingObjectFactory.iterationLength).to.equal(0);
-        expect(positionFactory.iterationLength).to.equal(0);
-        expect(velocityFactory.iterationLength).to.equal(0);
+        expect(movingObjectFactory.activeLength).to.equal(0);
+        expect(positionFactory.activeLength).to.equal(0);
+        expect(velocityFactory.activeLength).to.equal(0);
 
         movingObjectFactory.create(1, true);
         movingObjectFactory.create(2, true);
 
-        expect(movingObjectFactory.iterationLength).to.equal(2);
-        expect(positionFactory.iterationLength).to.equal(2);
-        expect(velocityFactory.iterationLength).to.equal(2);
+        expect(movingObjectFactory.activeLength).to.equal(2);
+        expect(positionFactory.activeLength).to.equal(2);
+        expect(velocityFactory.activeLength).to.equal(2);
     });
     it("has() should return true or false", () => {
         expect(movingObjectFactory.has(1)).to.equal(false);
@@ -124,7 +128,7 @@ describe("EntityFactory", () => {
         expect(movingObjectFactory.nbInactive).to.equal(0);
         movingObjectFactory.create(1, true);
         expect(movingObjectFactory.nbInactive).to.equal(0);
-        movingObjectFactory.create(1, false);
+        movingObjectFactory.create(2, false);
         expect(movingObjectFactory.nbInactive).to.equal(1);
     });
     it("activate all components", () => {

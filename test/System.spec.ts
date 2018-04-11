@@ -41,14 +41,14 @@ describe("System ", () => {
         }
     }
 
-    let positionFactory = new ComponentFactory<PositionComponent>(10, PositionComponent, zeroVec3);
+    let positionFactory = new ComponentFactory<PositionComponent>(10, new PositionComponent(0, false, zeroVec3));
 
     let nbActive = 3;
     let nbInactive = 2;
     let nbZeroed = positionFactory.size - nbActive - nbInactive;
 
     beforeEach(() => {
-        positionFactory = new ComponentFactory<PositionComponent>(10, PositionComponent, zeroVec3);
+        positionFactory = new ComponentFactory<PositionComponent>(10, new PositionComponent(0, false, zeroVec3));
         nbActive = 3;
         nbInactive = 2;
         nbZeroed = positionFactory.size - nbActive - nbInactive;
@@ -111,22 +111,13 @@ describe("System ", () => {
             expect(positionFactory.values[i].position.z).to.equal(0.0);
         }
     });
-    // System Manager is responsible for holding system active state
-    // it("toggle an active proprety", () => {
-    //     const s = new MoveByOneUnitSystem();
-    //     expect(s.active).to.equal(true);
-    //     s.active = false;
-    //     expect(s.active).to.equal(false);
-    //     s.active = true;
-    //     expect(s.active).to.equal(true);
-    // });
     describe("System with multiple components types", () => {
 
         let velocityFactory: ComponentFactory<VelocityComponent>;
 
         beforeEach(() => {
-            positionFactory = new ComponentFactory<PositionComponent>(5, PositionComponent, zeroVec3);
-            velocityFactory = new ComponentFactory<VelocityComponent>(5, VelocityComponent, zeroVec3);
+            positionFactory = new ComponentFactory<PositionComponent>(5, new PositionComponent(0, false, zeroVec3));
+            velocityFactory = new ComponentFactory<VelocityComponent>(5, new VelocityComponent(0, false, zeroVec3));
 
             for (let i = 1; i < positionFactory.size + 1; ++i) {
                 positionFactory.create(i, true);
@@ -150,12 +141,10 @@ describe("System ", () => {
                     posC.position.z *= veloC.velocity.z;
                 }
             }
-            // let positionFactory: ComponentFactory<PositionComponent>;
-            // let velocityFactory: ComponentFactory<VelocityComponent>;
 
             beforeEach(() => {
-                positionFactory = new ComponentFactory<PositionComponent>(5, PositionComponent, zeroVec3);
-                velocityFactory = new ComponentFactory<VelocityComponent>(5, VelocityComponent, zeroVec3);
+                positionFactory = new ComponentFactory<PositionComponent>(5, new PositionComponent(0, false, zeroVec3));
+                velocityFactory = new ComponentFactory<VelocityComponent>(5, new VelocityComponent(0, false, zeroVec3));
 
                 for (let i = 1; i < positionFactory.size + 1; ++i) {
                     positionFactory.create(i, true);
@@ -209,7 +198,6 @@ describe("System ", () => {
                 }
             }
             beforeEach(() => {
-                velocityFactory.create(4, true);
                 velocityFactory.get(4).velocity = { x: 2.0, y: 0.0, z: 0.0 };
                 expect(velocityFactory.nbCreated).to.equal(positionFactory.nbCreated);
             });
@@ -220,8 +208,8 @@ describe("System ", () => {
                         super();
                     }
                     public execute(pos: PositionComponent, velo: VelocityComponent) {
-                        expect(pos).to.be.an.instanceof(PositionComponent);
-                        expect(velo).to.be.an.instanceof(VelocityComponent);
+                        expect(pos).to.have.property("position");
+                        expect(velo).to.have.property("velocity");
                     }
                 }
                 const ms = new ArgTestSystem();
@@ -283,9 +271,9 @@ describe("System ", () => {
 
         beforeEach(() => {
 
-            positionFactory = new ComponentFactory<PositionComponent>(5, PositionComponent, zeroVec3);
-            velocityFactory = new ComponentFactory<VelocityComponent>(5, VelocityComponent, zeroVec3);
-            movingFactory = new ComponentFactory<MovingComponent>(5, MovingComponent, zeroVec3, zeroVec3);
+            positionFactory = new ComponentFactory<PositionComponent>(5, new PositionComponent(0, false, zeroVec3));
+            velocityFactory = new ComponentFactory<VelocityComponent>(5, new VelocityComponent(0, false, zeroVec3));
+            movingFactory = new ComponentFactory<MovingComponent>(5, new MovingComponent(0, false, zeroVec3, zeroVec3));
 
             for (let i = 1; i < positionFactory.size + 1; ++i) {
                 positionFactory.create(i, true);

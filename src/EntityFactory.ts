@@ -92,10 +92,10 @@ class EntityFactory implements IEntityFactory {
         this._size = size;
     }
 
-    get iterationLength(): number {
+    get activeLength(): number {
         // return iteratorLength of the first factory;
         const it = this._factories.entries();
-        return it.next().value[1].iterationLength;
+        return it.next().value[1].activeLength;
     }
 
     get nbActive(): number {

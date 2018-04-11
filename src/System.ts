@@ -25,7 +25,7 @@ abstract class System implements ISystem {
     // Query the components and execute active ones
     public process(args?: any[]) {
         const flist = this.factories;
-        const l = flist[0].iterationLength;
+        const l = flist[0].activeLength;
         const f = flist[0].values;
         for (let i = 0; i < l; ++i) {
             // get the component from the first factory that serve as a reference
