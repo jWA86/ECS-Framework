@@ -423,6 +423,18 @@ describe("Component Factory", () => {
             simpleFactory.values[simpleFactory.size - 1].prop3.x += 1;
             expect(simpleFactory.values[simpleFactory.size - 2].prop3.x).to.not.equal(simpleFactory.values[simpleFactory.size - 1].prop3.x);
         });
+        it("expand pool by + x", () => {
+            const prevSize = simpleFactory.size;
+            const c1 = simpleFactory.create(1, true);
+            simpleFactory.expand(10);
+            expect(simpleFactory.size).to.equal(prevSize + 10);
+        });
+        it("expand pool by - x", () => {
+            const prevSize = simpleFactory.size;
+            const c1 = simpleFactory.create(1, true);
+            simpleFactory.expand(-5);
+            expect(simpleFactory.size).to.equal(prevSize - 5);
+        });
         it("computeLastActiveIndex should set the lastActiveIndex to the index of the last created (non zeroed) component", () => {
             simpleFactory.create(1, true);
             simpleFactory.create(2, false);

@@ -196,6 +196,16 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
         this._size += diff;
     }
 
+    /**
+     * Expand the pool's size by a given value
+     * @param { number } amount the amount to resize to pool by (can be  a negative value)
+     */
+    public expand(amount: number) {
+        amount = Math.floor(amount);
+        const newSize = this.size + amount;
+        this.resizeTo(newSize);
+    }
+
     // overwrite fastIterationMap method we don't want to use
     public insertAfter(key: number, value: T, keyRef: number): boolean {
         return false;
