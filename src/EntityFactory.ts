@@ -37,7 +37,7 @@ class EntityFactory implements IEntityFactory {
 
     public addFactory(name: string, factory: ComponentFactory<IComponent>) {
         if (factory.size !== this._size) {
-            factory.resize(this._size);
+            factory.resizeTo(this._size);
         }
         this._factories.set(name, factory);
     }
@@ -85,9 +85,9 @@ class EntityFactory implements IEntityFactory {
         });
     }
 
-    public resize(size: number) {
+    public resizeTo(size: number) {
         this._factories.forEach((f) => {
-            f.resize(size);
+            f.resizeTo(size);
         });
         this._size = size;
     }

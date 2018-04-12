@@ -389,7 +389,7 @@ describe("Component Factory", () => {
             c1.prop1 = "non zeroed comp";
 
             expect(simpleFactory.size).to.equal(5);
-            simpleFactory.resize(3);
+            simpleFactory.resizeTo(3);
             expect(simpleFactory.size).to.equal(3);
 
             expect(simpleFactory.values[0].entityId).to.equal(1);
@@ -407,7 +407,7 @@ describe("Component Factory", () => {
 
             expect(simpleFactory.size).to.equal(5);
             expect(simpleFactory.values.length).to.equal(5);
-            simpleFactory.resize(10);
+            simpleFactory.resizeTo(10);
             expect(simpleFactory.size).to.equal(10);
             expect(simpleFactory.values.length).to.equal(10);
 

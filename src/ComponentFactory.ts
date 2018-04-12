@@ -29,8 +29,8 @@ interface IPool {
     get(entityId: number);
     /* Does the pool contain a component with this id */
     has(entityId: number): boolean;
-    /* Resize the pool, either add zeroed components or delete last components (created or zeroed indistinctly) */
-    resize(size: number);
+    /* Resize the pool to a size */
+    resizeTo(size: number);
 }
 
 interface IComponentFactory<T extends IComponent> extends IPool {
@@ -171,8 +171,12 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
     public delete(entityId: number): boolean {
         return this.free(entityId);
     }
-
-    public resize(size: number) {
+    /**
+     * Resize the pool
+     * if the size passed as parameter is inferior to the actual pool size, last components will be removed
+     * @param size desired size of the pool
+     */
+    public resizeTo(size: number) {
         size = Math.floor(size);
         let diff = size - this.size;
         if (diff > 0) {

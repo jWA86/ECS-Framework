@@ -58,12 +58,12 @@ describe("EntityFactory", () => {
         expect(velocityFactory.has(1)).to.equal(false);
     });
     it("resize() should resize all child pool", () => {
-        movingObjectFactory.resize(10);
+        movingObjectFactory.resizeTo(10);
         expect(positionFactory.size).to.equal(10);
         expect(velocityFactory.size).to.equal(10);
         expect(movingObjectFactory.size).to.equal(10);
 
-        movingObjectFactory.resize(3);
+        movingObjectFactory.resizeTo(3);
         expect(positionFactory.size).to.equal(3);
         expect(velocityFactory.size).to.equal(3);
         expect(movingObjectFactory.size).to.equal(3);
