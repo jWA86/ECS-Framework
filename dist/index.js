@@ -219,7 +219,12 @@ var ComponentFactory = /** @class */ (function (_super) {
     ComponentFactory.prototype.delete = function (entityId) {
         return this.free(entityId);
     };
-    ComponentFactory.prototype.resize = function (size) {
+    /**
+     * Resize the pool
+     * if the size passed as parameter is inferior to the actual pool size, last components will be removed
+     * @param size desired size of the pool
+     */
+    ComponentFactory.prototype.resizeTo = function (size) {
         size = Math.floor(size);
         var diff = size - this.size;
         if (diff > 0) {
@@ -238,6 +243,15 @@ var ComponentFactory = /** @class */ (function (_super) {
             }
         }
         this._size += diff;
+    };
+    /**
+     * Expand the pool's size by a given value
+     * @param { number } amount the amount to resize to pool by (can be  a negative value)
+     */
+    ComponentFactory.prototype.expand = function (amount) {
+        amount = Math.floor(amount);
+        var newSize = this.size + amount;
+        this.resizeTo(newSize);
     };
     // overwrite fastIterationMap method we don't want to use
     ComponentFactory.prototype.insertAfter = function (key, value, keyRef) {
@@ -1285,7 +1299,7 @@ var EntityFactory = /** @class */ (function () {
     };
     EntityFactory.prototype.addFactory = function (name, factory) {
         if (factory.size !== this._size) {
-            factory.resize(this._size);
+            factory.resizeTo(this._size);
         }
         this._factories.set(name, factory);
     };
@@ -1327,9 +1341,9 @@ var EntityFactory = /** @class */ (function () {
             f.create(entityId, active);
         });
     };
-    EntityFactory.prototype.resize = function (size) {
+    EntityFactory.prototype.resizeTo = function (size) {
         this._factories.forEach(function (f) {
-            f.resize(size);
+            f.resizeTo(size);
         });
         this._size = size;
     };

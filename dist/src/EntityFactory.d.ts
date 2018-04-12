@@ -18,7 +18,7 @@ declare class EntityFactory implements IEntityFactory {
     get(entityId: number): IComponent[];
     has(entityId: number): boolean;
     create(entityId: number, active: boolean): void;
-    resize(size: number): void;
+    resizeTo(size: number): void;
     readonly activeLength: number;
     readonly nbActive: number;
     readonly nbCreated: number;

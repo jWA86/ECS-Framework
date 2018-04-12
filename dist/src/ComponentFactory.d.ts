@@ -15,7 +15,7 @@ interface IPool {
     free(entityId: number): boolean;
     get(entityId: number): any;
     has(entityId: number): boolean;
-    resize(size: number): any;
+    resizeTo(size: number): any;
 }
 interface IComponentFactory<T extends IComponent> extends IPool {
     keys: Map<number, number>;
@@ -46,7 +46,17 @@ declare class ComponentFactory<T extends IComponent> extends FastIterationMap<nu
      * @param entityId
      */
     delete(entityId: number): boolean;
-    resize(size: number): void;
+    /**
+     * Resize the pool
+     * if the size passed as parameter is inferior to the actual pool size, last components will be removed
+     * @param size desired size of the pool
+     */
+    resizeTo(size: number): void;
+    /**
+     * Expand the pool's size by a given value
+     * @param { number } amount the amount to resize to pool by (can be  a negative value)
+     */
+    expand(amount: number): void;
     insertAfter(key: number, value: T, keyRef: number): boolean;
     insertBefore(key: number, value: T, keyRef: number): boolean;
     /**
