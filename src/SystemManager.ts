@@ -1,10 +1,11 @@
 import { FastIterationMap } from "FastIterationMap";
 import { IComponent, IComponentFactory, ISystem } from "./interfaces";
+import { ISystemManager } from "./ISystemManager";
 export { SystemManager  };
 
 // fixedTimeStep = update at requestionAnimation frequency
 // nonFixedTimeStep = update as much as possible between frame
-class SystemManager {
+class SystemManager implements ISystemManager {
     protected fixedTimeStepSystems: FastIterationMap<string, ISystem>;
     protected nonFixedTimeStepSystems: FastIterationMap<string, ISystem>;
     constructor() {

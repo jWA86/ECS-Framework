@@ -4,7 +4,7 @@ import { ComponentFactory, System, SystemManager } from "../../src/entry";
 import { GameLoop } from "../../src/GameLoop";
 import { TIMESTAMP } from "../../src/pollyFill";
 import * as DEFAULT_CONF from "../../src/utils/DefaultConfig";
-import { ITimeMeasureUtil, TimeMeasureComponent, TimeMeasureSystemEndMark, TimeMeasureSystemStartMark, TimeMeasureUtil } from "../../src/utils/TimeMeasureUtil";
+import { TimeMeasureComponent, TimeMeasureSystemEndMark, TimeMeasureSystemStartMark, TimeMeasureUtil } from "../../src/utils/TimeMeasureUtil";
 
 // problem with requestionAnimationFrame is randomly fired
 // so sometimes test passed sometimes not ...

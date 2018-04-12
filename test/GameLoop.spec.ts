@@ -1,6 +1,5 @@
 import { expect } from "chai";
 import "mocha";
-// import { replaceRaf } from "raf-stub";
 import { clearInterval, setInterval } from "timers";
 import { ComponentFactory } from "../src/ComponentFactory";
 import { FrameEvent, GameLoop } from "../src/GameLoop";

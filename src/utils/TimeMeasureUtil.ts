@@ -1,16 +1,17 @@
-import { ComponentFactory, IComponentFactory } from "../ComponentFactory";
-import { IComponent, SystemManager } from "../entry";
-import { FrameEvent} from "../GameLoop";
+import { ComponentFactory } from "../ComponentFactory";
+import { IComponentFactory } from "../IComponentFactory";
+import { IFrameEvent} from "../IFrameEvent";
+import { ISystemManager } from "../ISystemManager";
 import { TIMESTAMP } from "../pollyFill";
 import { System } from "../System";
 import { TM_POOL_SIZE } from "./DefaultConfig";
-
-export { ITimeMeasureUtil, TimeMeasureComponent, TimeMeasureSystem, TimeMeasureUtil, TimeMeasureSystemStartMark, TimeMeasureSystemEndMark };
+import { ITimeMeasureComponent, ITimeMeasureUtil } from "./ITimeMeasureUtil";
+export { TimeMeasureComponent, TimeMeasureSystem, TimeMeasureUtil, TimeMeasureSystemStartMark, TimeMeasureSystemEndMark };
 
 /**
  * Component that holds time measure
  */
-class TimeMeasureComponent implements IComponent {
+class TimeMeasureComponent implements ITimeMeasureComponent {
     /**
      * @param entityId
      * @param active
@@ -24,28 +25,13 @@ class TimeMeasureComponent implements IComponent {
     constructor(public entityId: number, public active: boolean, public measureId: string, public lastT: number, public minT: number, public maxT: number, public meanT: number, public frequency: number) { }
 }
 
-interface ITimeMeasureUtil {
-    /**
-     * Install marks to measure time of execution of a System
-     * @param systemId the System id to measure
-     */
-    install(systemId: string);
-    /**
-     * UnInstall marks placed around a System
-     * @param tmComponent the TimeMeasureComponent
-     */
-    uninstall(tmComponent: TimeMeasureComponent);
-    // placeStartingMark(systemIdToPlaceBefore: string);
-    // placeEndingMark(systemIdToPlaceBefore: string);
-}
-
 /**
  * Measure time passed between execution of n Systems
  */
 class TimeMeasureUtil implements ITimeMeasureUtil {
-    public timeMeasurePool: ComponentFactory<TimeMeasureComponent>;
+    public timeMeasurePool: IComponentFactory<TimeMeasureComponent>;
     protected measures = new Map<string, {startSystem: string, endSystem: string}>();
-    constructor(public sysManager: SystemManager, timeMeasurePool?: ComponentFactory<TimeMeasureComponent>) {
+    constructor(public sysManager: ISystemManager, timeMeasurePool?: IComponentFactory<TimeMeasureComponent>) {
         this.timeMeasurePool = timeMeasurePool || new ComponentFactory<TimeMeasureComponent>(TM_POOL_SIZE, new TimeMeasureComponent(0, false, "", 0, 0, 0, 0, 0));
      }
     public install(systemIdToMeasure: string): TimeMeasureComponent {
@@ -123,7 +109,7 @@ class TimeMeasureSystemEndMark extends TimeMeasureSystem {
      *  Measure time passed since the start mark and compute statistics if time.lag >= the specified frequency of computation
      * @param time FrameEvent used to decide when to compute data
      */
-    public execute(time: FrameEvent) {
+    public execute(time: IFrameEvent) {
         TimeMeasureSystem.performance.mark(this.endMark);
         this.measure();
         if ((TIMESTAMP.now() - this.lastUpdate) >= this.tmComponent.frequency) {

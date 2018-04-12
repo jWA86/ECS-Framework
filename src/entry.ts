@@ -1,10 +1,10 @@
-import { ComponentFactory, IComponent, IComponentFactory, IPool } from "./ComponentFactory";
-import { GameLoop, IFrameEvent } from "./GameLoop";
-import "./interfaces";
+import { ComponentFactory } from "./ComponentFactory";
+import { EntityFactory } from "./EntityFactory";
+import { GameLoop } from "./GameLoop";
+import * as interfaces from "./interfaces";
 import { TIMESTAMP } from "./pollyFill";
-import { ISystem, System } from "./System";
+import { System } from "./System";
 import { SystemManager } from "./SystemManager";
 import * as DEFAULT_CONF from "./utils/DefaultConfig";
-import { ITimeMeasureUtil, TimeMeasureComponent, TimeMeasureSystem, TimeMeasureSystemEndMark, TimeMeasureSystemStartMark,  TimeMeasureUtil } from "./utils/TimeMeasureUtil";
-export { ComponentFactory, EntityFactory, IComponent, IComponentFactory, IEntityFactory, IFrameEvent, IPool, GameLoop, System, ISystem, SystemManager, ITimeMeasureUtil, TimeMeasureComponent, TimeMeasureSystem, TimeMeasureSystemEndMark, TimeMeasureSystemStartMark,  TimeMeasureUtil, TIMESTAMP, DEFAULT_CONF };
-import { EntityFactory, IEntityFactory } from "./EntityFactory";
+import { TimeMeasureComponent, TimeMeasureSystem, TimeMeasureSystemEndMark, TimeMeasureSystemStartMark,  TimeMeasureUtil } from "./utils/TimeMeasureUtil";
+export { ComponentFactory, EntityFactory, interfaces, GameLoop, System, SystemManager, TimeMeasureComponent, TimeMeasureSystem, TimeMeasureSystemEndMark, TimeMeasureSystemStartMark,  TimeMeasureUtil, TIMESTAMP, DEFAULT_CONF };

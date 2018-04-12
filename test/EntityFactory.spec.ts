@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import "mocha";
 import { ComponentFactory } from "../src/ComponentFactory";
-import { EntityFactory, IEntityFactory } from "../src/EntityFactory";
+import { EntityFactory } from "../src/EntityFactory";
 import { IComponent } from "../src/interfaces";
 
 describe("EntityFactory", () => {

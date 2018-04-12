@@ -1,12 +1,7 @@
-import { ComponentFactory, IComponent, IComponentFactory, IPool } from "./ComponentFactory";
-export { EntityFactory, IEntityFactory };
-
-interface IEntityFactory extends IPool {
-    addFactory(name: string, factory: IComponentFactory<IComponent>);
-    getComponent(entityId: number, factoryName: string): IComponent;
-    /* get components by providing the entityId and the factory */
-    getFactory(name: string): IComponentFactory<IComponent>;
-}
+import { ComponentFactory } from "./ComponentFactory";
+import { IComponent } from "./IComponentFactory";
+import { IEntityFactory } from "./IEntityFactory";
+export { EntityFactory };
 
 class EntityFactory implements IEntityFactory {
     protected _factories: Map<string, ComponentFactory<IComponent>>;
