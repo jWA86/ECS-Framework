@@ -50,11 +50,12 @@ describe("pre-requirement", () => {
         describe.skip("TimeMeasureUtil", test);
     }
 });
+
 function test() {
 
-    class DummySystem extends System {
+    class DummySystem extends System<any> {
         public hasRun = false;
-        constructor() { super(); }
+        constructor() { super({ a: 0 }); }
         public process() {
             let a = 0;
             for (let i = 0; i < 1000; ++i) {
@@ -130,34 +131,33 @@ function test() {
                 }
             });
 
-            expect(tmC.entityId).to.equal(0);
+            expect(tm.timeMeasurePool.values[0].entityId).to.equal(0);
         });
     });
     describe("When GameLoop is running", () => {
         it("the TimeMeasure component should be updated with time data", (done) => {
-            // try {
 
-                const tm = new TimeMeasureUtil(sysManager);
-                const tmComponent = tm.install(s1Id);
-                const gl = new GameLoop(sysManager);
-                expect((sysManager.get(s1Id) as DummySystem).hasRun).to.equal(false);
-                expect(tmComponent.lastT).to.equal(0);
-                expect(tmComponent.maxT).to.equal(0);
-                expect(tmComponent.minT).to.equal(0);
-                expect(tmComponent.meanT).to.equal(0);
+            const tm = new TimeMeasureUtil(sysManager);
+            const tmComponent = tm.install(s1Id);
+            const gl = new GameLoop(sysManager);
+            expect((sysManager.get(s1Id) as DummySystem).hasRun).to.equal(false);
+            expect(tmComponent.lastT).to.equal(0);
+            expect(tmComponent.maxT).to.equal(0);
+            expect(tmComponent.minT).to.equal(0);
+            expect(tmComponent.meanT).to.equal(0);
 
-                gl.start();
-                setTimeout(() => {
-                    gl.stop();
-                    const timer = gl.getCurrentTimer();
-                    expect(timer.time).to.be.greaterThan(0);
-                    expect((sysManager.get(s1Id) as DummySystem).hasRun).to.equal(true);
-                    expect(tmComponent.lastT).to.be.greaterThan(0);
-                    expect(tmComponent.maxT).to.be.greaterThan(0);
-                    expect(tmComponent.minT).to.be.greaterThan(0);
-                    expect(tmComponent.meanT).to.be.greaterThan(0);
-                    done();
-                }, 500);
+            gl.start();
+            setTimeout(() => {
+                gl.stop();
+                const timer = gl.getCurrentTimer();
+                expect(timer.time).to.be.greaterThan(0);
+                expect((sysManager.get(s1Id) as DummySystem).hasRun).to.equal(true);
+                expect(tmComponent.lastT).to.be.greaterThan(0);
+                expect(tmComponent.maxT).to.be.greaterThan(0);
+                expect(tmComponent.minT).to.be.greaterThan(0);
+                expect(tmComponent.meanT).to.be.greaterThan(0);
+                done();
+            }, 600);
         });
         it("i should be able to compute the min, max and mean at a fixed frequency", (done) => {
             const tm = new TimeMeasureUtil(sysManager);
@@ -189,20 +189,22 @@ function test() {
                 expect(tmComponent.minT).to.be.equal(0);
                 expect(tmComponent.meanT).to.be.equal(0);
 
-                tmComponent.frequency = 1000 / 20;
+                tmComponent.frequency = 1000 / 100;
                 gl.resume();
+
+                setTimeout(() => {
+                    gl.stop();
+                    expect(gl.getCurrentTimer().time).to.be.greaterThan(0);
+                    expect((sysManager.get(s1Id) as DummySystem).hasRun).to.equal(true);
+                    // it should have been updated
+                    expect(tmComponent.minT).to.be.greaterThan(0);
+                    expect(tmComponent.maxT).to.be.greaterThan(0);
+                    expect(tmComponent.lastT).to.be.greaterThan(0);
+                    expect(tmComponent.meanT).to.be.greaterThan(0);
+                    done();
+                }, 1000);
             }, 300);
-            setTimeout(() => {
-                gl.stop();
-                expect(gl.getCurrentTimer().time).to.be.greaterThan(0);
-                expect((sysManager.get(s1Id) as DummySystem).hasRun).to.equal(true);
-                // it should have been updated
-                expect(tmComponent.minT).to.be.greaterThan(0);
-                expect(tmComponent.maxT).to.be.greaterThan(0);
-                expect(tmComponent.lastT).to.be.greaterThan(0);
-                expect(tmComponent.meanT).to.be.greaterThan(0);
-                done();
-            }, 1000);
+
         });
     });
 }

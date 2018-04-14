@@ -24,8 +24,8 @@ class FrameEvent implements IFrameEvent {
 class GameLoop {
     protected _running: boolean;
     protected _systemManager: SystemManager;
-    protected _fixedTSSystems: ISystem[];
-    protected _nonFixedTSSystems: ISystem[];
+    protected _fixedTSSystems: Array<ISystem<any>>;
+    protected _nonFixedTSSystems: Array<ISystem<any>>;
     protected _frameId: number;
     protected _currentTimer: FrameEvent;
     constructor(systemManager: SystemManager, timer = new FrameEvent(1000 / 30)) {

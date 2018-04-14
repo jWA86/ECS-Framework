@@ -1,9 +1,22 @@
+// const ob = {a: 1, b: 2};
+//         const keys = Object.keys(ob);
 import { IComponent, IComponentFactory } from "./interfaces";
-import { ISystem } from "./ISystem";
-export { System };
+// import { ISystem } from "./ISystem";
 
+// interface IMyObject {
+//     c1: { x: number };
+//     c2: { y: number };
+// }
+
+// interface ISystemObject {
+//         [key: string]: Object;
+// }
+
+interface ISystem<T> {
+    execute(params: T);
+
+}
 abstract class System<T> implements ISystem<T> {
-    public active: boolean = true;
     public factories: Array<IComponentFactory<IComponent>>;
     protected keys: string[];
     constructor(protected paramObj: T) {
@@ -13,9 +26,9 @@ abstract class System<T> implements ISystem<T> {
         // I need to pass an instance
         this.keys = Object.keys(this.paramObj);
     }
-    public setParamsSource(...args: Array<IComponentFactory<IComponent>>) {
-        // verify number of args
-        // verify that the component the factory holds have the proprety define by the paramObj
+    public setFactories(...args: Array<IComponentFactory<IComponent>>) {
+        // very number of args
+        // very that the component the factory holds have the proprety define by the paramObj
         this.factories = args;
     }
     public process(...args: any[]) {
@@ -41,7 +54,7 @@ abstract class System<T> implements ISystem<T> {
                     } else {
                         const c = flist[j].get(refComponent.entityId);
                         if (!c) { isFound = false; break; }
-                        params[this.keys[j]] = c;
+                        params[this.keys[0]] = c;
                     }
                 }
                 if (isFound) {

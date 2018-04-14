@@ -1,9 +1,9 @@
 import { IComponent, IComponentFactory } from "./IComponentFactory";
 export { ISystem };
 
-interface ISystem {
+interface ISystem<T> {
     active: boolean;
-    setFactories(... args: Array<IComponentFactory<IComponent>>);
     process(args?: any[]);
-    execute(... args: any[]);
+    // setParamsSource(... args: Array<IComponentFactory<IComponent>>);
+    // execute(T, ... args: any[]);
 }

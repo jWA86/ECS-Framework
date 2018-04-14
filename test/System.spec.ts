@@ -2,13 +2,13 @@ import { expect } from "chai";
 import "mocha";
 import { ComponentFactory } from "../src/ComponentFactory";
 import { EntityFactory } from "../src/EntityFactory";
-import { IComponent, IComponentFactory, ISystem } from "../src/interfaces";
+import { IComponent, IComponentFactory } from "../src/interfaces";
 import { System } from "../src/System";
 
 describe("System ", () => {
     const zeroVec3 = { x: 0.0, y: 0.0, z: 0.0 };
 
-    interface Ivec3 {
+    interface IVec3 {
         x: number;
         y: number;
         z: number;
@@ -23,32 +23,58 @@ describe("System ", () => {
     }
 
     class PositionComponent implements IComponent {
-        constructor(public entityId: number, public active: boolean, public position: Ivec3) { }
+        public entityId: number = 0;
+        public active: boolean = false;
+        constructor(public position: IVec3) {}
     }
 
     class VelocityComponent implements IComponent {
-        constructor(public entityId, public active, public velocity: Ivec3) { }
+        public entityId = 0;
+        public active = false;
+        constructor(public velocity: IVec3) { }
     }
 
-    class MoveByOneUnitSystem extends System {
-        constructor() {
-            super();
+    interface IMoveByOneUnitParams {
+        p: { position: IVec3 };
+    }
+
+    const moveByOneUnitParams: IMoveByOneUnitParams = {
+        p: {
+            position: {x: 0, y: 0, z: 0 },
+        },
+    };
+
+    class MoveByOneUnitSystem extends System<IMoveByOneUnitParams> {
+        constructor(paramObj: IMoveByOneUnitParams) {
+            super(paramObj);
         }
-        public execute(component: PositionComponent) {
-            component.position.x += 1.0;
-            component.position.y += 1.0;
-            component.position.z += 1.0;
+        public execute(params: IMoveByOneUnitParams) {
+            params.p.position.x += 1.0;
+            params.p.position.y += 1.0;
+            params.p.position.z += 1.0;
         }
     }
 
-    let positionFactory = new ComponentFactory<PositionComponent>(10, new PositionComponent(0, false, zeroVec3));
+    interface IMoveParams {
+        p: { position: IVec3 };
+        v: { velocity: IVec3 };
+    }
 
+    const moveParams: IMoveParams = {
+        p: { position: zeroVec3 },
+        v: { velocity: zeroVec3 },
+    };
+
+    let velocityFactory: ComponentFactory<VelocityComponent>;
+
+    let positionFactory;
+    const positionFactorySize = 10;
     let nbActive = 3;
     let nbInactive = 2;
-    let nbZeroed = positionFactory.size - nbActive - nbInactive;
+    let nbZeroed = positionFactorySize - nbActive - nbInactive;
 
     beforeEach(() => {
-        positionFactory = new ComponentFactory<PositionComponent>(10, new PositionComponent(0, false, zeroVec3));
+        positionFactory = new ComponentFactory<PositionComponent>(positionFactorySize, new PositionComponent(zeroVec3));
         nbActive = 3;
         nbInactive = 2;
         nbZeroed = positionFactory.size - nbActive - nbInactive;
@@ -72,10 +98,13 @@ describe("System ", () => {
 
         }
     });
-    it("should update active components", () => {
+    it("setParamsSource should ", () => {
 
-        const s = new MoveByOneUnitSystem();
-        s.setFactories(positionFactory);
+    });
+    it("should update active components", () => {
+        const params = {p: {position: {x: 0, y: 0, z: 0} }};
+        const s = new MoveByOneUnitSystem(params);
+        s.setParamsSource(positionFactory);
         s.process();
 
         for (let i = 0; i < positionFactory.nbActive; ++i) {
@@ -86,8 +115,8 @@ describe("System ", () => {
         }
     });
     it("should not update inactive components", () => {
-        const s = new MoveByOneUnitSystem();
-        s.setFactories(positionFactory);
+        const s = new MoveByOneUnitSystem(moveByOneUnitParams);
+        s.setParamsSource(positionFactory);
         s.process();
         for (let i = positionFactory.nbActive; i < positionFactory.nbActive + positionFactory.nbInactive; ++i) {
             expect(positionFactory.values[i].active).to.equal(false);
@@ -101,8 +130,8 @@ describe("System ", () => {
             expect(positionFactory.values[i].entityId).to.equal(0);
             positionFactory.values[i].active = true;
         }
-        const s = new MoveByOneUnitSystem();
-        s.setFactories(positionFactory);
+        const s = new MoveByOneUnitSystem(moveByOneUnitParams);
+        s.setParamsSource(positionFactory);
         s.process();
         for (let i = positionFactory.nbActive + positionFactory.nbInactive; i < positionFactory.size; ++i) {
             expect(positionFactory.values[i].entityId).to.equal(0);
@@ -113,11 +142,9 @@ describe("System ", () => {
     });
     describe("System with multiple components types", () => {
 
-        let velocityFactory: ComponentFactory<VelocityComponent>;
-
         beforeEach(() => {
-            positionFactory = new ComponentFactory<PositionComponent>(5, new PositionComponent(0, false, zeroVec3));
-            velocityFactory = new ComponentFactory<VelocityComponent>(5, new VelocityComponent(0, false, zeroVec3));
+            positionFactory = new ComponentFactory<PositionComponent>(5, new PositionComponent(zeroVec3));
+            velocityFactory = new ComponentFactory<VelocityComponent>(5, new VelocityComponent(zeroVec3));
 
             for (let i = 1; i < positionFactory.size + 1; ++i) {
                 positionFactory.create(i, true);
@@ -132,19 +159,19 @@ describe("System ", () => {
 
         describe("non parallel pool", () => {
 
-            class MoveSystem extends System {
-                constructor() { super(); }
+            class MoveSystem extends System<IMoveParams> {
+                constructor(params: IMoveParams) { super(params); }
 
-                public execute(posC: IPositionComponent, veloC: IVelocityComponent) {
-                    posC.position.x *= veloC.velocity.x;
-                    posC.position.y *= veloC.velocity.y;
-                    posC.position.z *= veloC.velocity.z;
+                public execute(params: IMoveParams) {
+                    params.p.position.x *= params.v.velocity.x;
+                    params.p.position.y *= params.v.velocity.y;
+                    params.p.position.z *= params.v.velocity.z;
                 }
             }
 
             beforeEach(() => {
-                positionFactory = new ComponentFactory<PositionComponent>(5, new PositionComponent(0, false, zeroVec3));
-                velocityFactory = new ComponentFactory<VelocityComponent>(5, new VelocityComponent(0, false, zeroVec3));
+                positionFactory = new ComponentFactory<PositionComponent>(5, new PositionComponent(zeroVec3));
+                velocityFactory = new ComponentFactory<VelocityComponent>(5, new VelocityComponent(zeroVec3));
 
                 for (let i = 1; i < positionFactory.size + 1; ++i) {
                     positionFactory.create(i, true);
@@ -166,9 +193,8 @@ describe("System ", () => {
             });
 
             it("should iterate on the 1st factory and update its components with components of the 2nd factory", () => {
-                const s = new MoveSystem();
-
-                s.setFactories(positionFactory, velocityFactory);
+                const s = new MoveSystem(moveParams);
+                s.setParamsSource(positionFactory, velocityFactory);
                 s.process();
 
                 for (let i = 0; i < positionFactory.size - 1; ++i) {
@@ -178,8 +204,8 @@ describe("System ", () => {
             it("should not update if there is no components with the same entityId", () => {
                 expect(positionFactory.nbActive).to.equal(velocityFactory.nbActive + 1);
 
-                const s = new MoveSystem();
-                s.setFactories(positionFactory, velocityFactory);
+                const s = new MoveSystem(moveParams);
+                s.setParamsSource(positionFactory, velocityFactory);
                 s.process();
                 // last one should not be updated since there is no velocity component associated with.
                 expect(positionFactory.values[positionFactory.size - 1].position.x).to.equal(1.0);
@@ -187,39 +213,39 @@ describe("System ", () => {
         });
 
         describe("parallel pool system", () => {
-            class MoveSystem extends System {
-                constructor() {
-                    super();
+            class MoveSystem extends System<IMoveParams> {
+                constructor(params: IMoveParams) {
+                    super(params);
                 }
-                public execute(pos: PositionComponent, velo: VelocityComponent) {
-                    pos.position.x *= velo.velocity.x;
-                    pos.position.y *= velo.velocity.y;
-                    pos.position.z *= velo.velocity.z;
+                public execute(params: IMoveParams) {
+                    params.p.position.x *= params.v.velocity.x;
+                    params.p.position.y *= params.v.velocity.y;
+                    params.p.position.z *= params.v.velocity.z;
                 }
             }
             beforeEach(() => {
                 velocityFactory.get(4).velocity = { x: 2.0, y: 0.0, z: 0.0 };
                 expect(velocityFactory.nbCreated).to.equal(positionFactory.nbCreated);
             });
-            it("should provide all the components to the execute fonction", () => {
+            it("should pass all the components to the execute fonction", () => {
 
-                class ArgTestSystem extends System {
-                    constructor() {
-                        super();
+                class ArgTestSystem extends System<IMoveParams> {
+                    constructor(params: IMoveParams) {
+                        super(params);
                     }
-                    public execute(pos: PositionComponent, velo: VelocityComponent) {
-                        expect(pos).to.have.property("position");
-                        expect(velo).to.have.property("velocity");
+                    public execute(params: IMoveParams) {
+                        expect(params.p).to.have.property("position");
+                        expect(params.v).to.have.property("velocity");
                     }
                 }
-                const ms = new ArgTestSystem();
-                ms.setFactories(positionFactory, velocityFactory);
+                const ms = new ArgTestSystem(moveParams);
+                ms.setParamsSource(positionFactory, velocityFactory);
                 ms.process();
 
             });
             it("should update the component in pools specified in the system constructor", () => {
-                const ms = new MoveSystem();
-                ms.setFactories(positionFactory, velocityFactory);
+                const ms = new MoveSystem(moveParams);
+                ms.setParamsSource(positionFactory, velocityFactory);
                 ms.process();
 
                 for (let i = 0; i < positionFactory.length; ++i) {
@@ -227,12 +253,12 @@ describe("System ", () => {
                 }
             });
             it("use of with an EntityFactory pool", () => {
-                const ms = new MoveSystem();
+                const ms = new MoveSystem(moveParams);
                 const movingEntities = new EntityFactory(10);
                 movingEntities.addFactory("position", positionFactory);
                 movingEntities.addFactory("velocity", velocityFactory);
 
-                ms.setFactories(movingEntities.getFactory("position"), movingEntities.getFactory("velocity"));
+                ms.setParamsSource(movingEntities.getFactory("position"), movingEntities.getFactory("velocity"));
                 ms.process();
 
                 for (let i = 0; i < positionFactory.nbCreated; ++i) {
@@ -249,30 +275,25 @@ describe("System ", () => {
 
         // Regroup proprieties in only one component
         class MovingComponent implements IPositionComponent, IVelocityComponent {
-            constructor(public entityId: number, public active: boolean, public position: Ivec3, public velocity: Ivec3) { }
+            constructor(public entityId: number, public active: boolean, public position: IVec3, public velocity: IVec3) { }
         }
 
-        class MoveSystem extends System {
-            constructor() { super(); }
-            // overwrite setFactories is not necessary
-            // unless you want to make sure the number of factories correspond to the number of parameters.
-            public setFactories(f1: IComponentFactory<IComponent>, f2: IComponentFactory<IComponent>) {
-                super.setFactories(f1, f2);
-            }
-            public execute(posC: IPositionComponent, veloC: IVelocityComponent) {
-                posC.position.x *= veloC.velocity.x;
-                posC.position.y *= veloC.velocity.y;
-                posC.position.z *= veloC.velocity.z;
+        class MoveSystem extends System<IMoveParams> {
+            constructor(params: IMoveParams) { super(params); }
+
+            public execute(params: IMoveParams) {
+                params.p.position.x *= params.v.velocity.x;
+                params.p.position.y *= params.v.velocity.y;
+                params.p.position.z *= params.v.velocity.z;
             }
         }
 
-        let velocityFactory: ComponentFactory<VelocityComponent>;
         let movingFactory: ComponentFactory<MovingComponent>;
 
         beforeEach(() => {
 
-            positionFactory = new ComponentFactory<PositionComponent>(5, new PositionComponent(0, false, zeroVec3));
-            velocityFactory = new ComponentFactory<VelocityComponent>(5, new VelocityComponent(0, false, zeroVec3));
+            positionFactory = new ComponentFactory<PositionComponent>(5, new PositionComponent(zeroVec3));
+            velocityFactory = new ComponentFactory<VelocityComponent>(5, new VelocityComponent(zeroVec3));
             movingFactory = new ComponentFactory<MovingComponent>(5, new MovingComponent(0, false, zeroVec3, zeroVec3));
 
             for (let i = 1; i < positionFactory.size + 1; ++i) {
@@ -303,18 +324,18 @@ describe("System ", () => {
                 m.velocity.z = 0.0;
             }
         });
-        it("should be able to get all param from one components", () => {
-            const s = new MoveSystem();
-            s.setFactories(movingFactory, movingFactory);
+        it("should be able to get all param from one componentssource", () => {
+            const s = new MoveSystem(moveParams);
+            s.setParamsSource(movingFactory, movingFactory);
             s.process();
 
             for (let i = 0; i < movingFactory.size - 1; ++i) {
                 expect(movingFactory.values[i].position.x).to.equal(2.0);
             }
         });
-        it("should be able to get all params from multiples components", () => {
-            const s = new MoveSystem();
-            s.setFactories(positionFactory, velocityFactory);
+        it("should be able to get all params from multiples components source", () => {
+            const s = new MoveSystem(moveParams);
+            s.setParamsSource(positionFactory, velocityFactory);
             s.process();
 
             for (let i = 0; i < positionFactory.size - 1; ++i) {

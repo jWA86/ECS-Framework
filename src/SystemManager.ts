@@ -6,14 +6,14 @@ export { SystemManager  };
 // fixedTimeStep = update at requestionAnimation frequency
 // nonFixedTimeStep = update as much as possible between frame
 class SystemManager implements ISystemManager {
-    protected fixedTimeStepSystems: FastIterationMap<string, ISystem>;
-    protected nonFixedTimeStepSystems: FastIterationMap<string, ISystem>;
+    protected fixedTimeStepSystems: FastIterationMap<string, ISystem<any>>;
+    protected nonFixedTimeStepSystems: FastIterationMap<string, ISystem<any>>;
     constructor() {
         this.fixedTimeStepSystems = new FastIterationMap();
         this.nonFixedTimeStepSystems = new FastIterationMap();
     }
     /* Add a system to be processed in fixed time step or at render speed*/
-    public pushSystem(system: ISystem, fixedTimeStep: boolean = false): string {
+    public pushSystem(system: ISystem<any>, fixedTimeStep: boolean = false): string {
         const id = this.generateId(system);
         // const sysWState = new SystemWithStates(id, system);
         if (fixedTimeStep) {
@@ -24,7 +24,7 @@ class SystemManager implements ISystemManager {
         return id;
     }
 
-    public insertAround(systemMiddleId: string, systemBefore: ISystem, systemAfter: ISystem): [string, string] {
+    public insertAround(systemMiddleId: string, systemBefore: ISystem<any>, systemAfter: ISystem<any>): [string, string] {
         let id1 = "";
         let id2 = "";
         id1 = this.generateId(systemBefore);
@@ -48,7 +48,7 @@ class SystemManager implements ISystemManager {
         }
     }
 
-    public insertAfter(systemRefId: string, systemToInsert: ISystem): string {
+    public insertAfter(systemRefId: string, systemToInsert: ISystem<any>): string {
         let id = "";
         if (this.fixedTimeStepSystems.has(systemRefId)) {
             id = this.generateId(systemToInsert);
@@ -60,7 +60,7 @@ class SystemManager implements ISystemManager {
         return id;
     }
 
-    public insertBefore(systemRefId: string, systemToInsert: ISystem): string {
+    public insertBefore(systemRefId: string, systemToInsert: ISystem<any>): string {
         let id = "";
         if (this.fixedTimeStepSystems.has(systemRefId)) {
             id = this.generateId(systemToInsert);
@@ -80,16 +80,16 @@ class SystemManager implements ISystemManager {
         }
         return true;
     }
-    public getFixedTSSystems(): ISystem[] {
+    public getFixedTSSystems(): Array<ISystem<any>> {
         return this.fixedTimeStepSystems.values;
     }
-    public getNonFixedTSSystems(): ISystem[] {
+    public getNonFixedTSSystems(): Array<ISystem<any>> {
         return this.nonFixedTimeStepSystems.values;
     }
     /* Get a system by its id.
     /*  return undefined if not found.
     */
-    public get(systemId: string): ISystem {
+    public get(systemId: string): ISystem<any> {
         if (this.fixedTimeStepSystems.has(systemId)) {
             return this.fixedTimeStepSystems.get(systemId);
         } else if (this.nonFixedTimeStepSystems.has(systemId)) {
@@ -101,7 +101,7 @@ class SystemManager implements ISystemManager {
     /* Generate an Id with the System class name + a number if more than one instance in the SystemManager.
     /* i.e : System, System_1, System_2
     */
-    protected generateId(system: ISystem): string {
+    protected generateId(system: ISystem<any>): string {
         const stringName: string = system.constructor["name"];
         const nbChar = stringName.length;
         const found = this.getListOfSystemId(stringName);

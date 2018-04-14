@@ -9,9 +9,10 @@ import { SystemManager } from "../src/SystemManager";
 
 // problem with requestionAnimationFrame is randomly fired
 // so sometimes test passed sometimes not ...
-let rafWorking = false;
-describe("pre-requirement", () => {
-    it("requestionAnimationFrame should work", (done) => {
+describe("GameLoop", () => {
+    let rafWorking = false;
+
+    before("requestAnimationFrame should work", (done) => {
         expect(requestAnimationFrame).to.not.be.equal(undefined);
         // pause after 500ms
         // then check that loop has been called more than once
@@ -32,15 +33,15 @@ describe("pre-requirement", () => {
                 done();
             } else {
                 rafWorking = false;
-                done(Error("WARNING ! RequestAnimationFrame not working) "));
+                done(Error("requestAnimatioNFrame not working"));
             }
         }, 1000);
-
     });
+
     if (rafWorking) {
-        describe("GameLoop should be able to", test);
+        describe("should be able to", test);
     } else {
-        describe.skip("GameLoop should be able to", test);
+        describe.skip("should be able to", test);
     }
 });
 
@@ -53,16 +54,24 @@ function test() {
         constructor() { }
     }
 
-    class FeedBackSystem extends System {
+    interface IFeedBackParams {
+        e: { emptyComp: IComponent };
+    }
+
+    const feedbackParams = {
+        e: { emptyComp: {entityId: 0, active: true} },
+    };
+
+    class FeedBackSystem extends System<IFeedBackParams> {
         public static callBack: (timer: FrameEvent, args: any[]) => void;
-        public execute(emptyComp: IComponent, timer: FrameEvent, ...args: any[]) {
+        public execute(params: IFeedBackParams, timer: FrameEvent, ...args: any[]) {
             FeedBackSystem.callBack(timer, args);
         }
     }
 
     const zeroVec3 = { x: 0.0, y: 0.0, z: 0.0 };
 
-    interface Ivec3 {
+    interface IVec3 {
         x: number;
         y: number;
         z: number;
@@ -79,22 +88,32 @@ function test() {
     class PositionComponent implements IComponent {
         public entityId: number;
         public active: boolean;
-        constructor( public position: Ivec3) { }
+        constructor( public position: IVec3) { }
     }
 
     class VelocityComponent implements IComponent {
         public entityId;
         public active;
-        constructor( public velocity: Ivec3) { }
+        constructor( public velocity: IVec3) { }
     }
 
-    class MoveSystem extends System {
-        constructor() { super(); }
+    interface IMoveParams {
+        p: { position: IVec3 };
+        v: { velocity: IVec3 };
+    }
 
-        public execute(posC: IPositionComponent, veloC: IVelocityComponent) {
-            posC.position.x *= veloC.velocity.x;
-            posC.position.y *= veloC.velocity.y;
-            posC.position.z *= veloC.velocity.z;
+    const moveParams: IMoveParams = {
+        p: { position: zeroVec3 },
+        v: { velocity: zeroVec3 },
+    };
+
+    class MoveSystem extends System<IMoveParams> {
+        constructor(params: IMoveParams) { super(params); }
+
+        public execute(params: IMoveParams) {
+            params.p.position.x *= params.v.velocity.x;
+            params.p.position.y *= params.v.velocity.y;
+            params.p.position.z *= params.v.velocity.z;
         }
     }
 
@@ -104,18 +123,27 @@ function test() {
         public active: boolean;
         constructor(public integer: number) { }
     }
-    class IncrementSystem extends System {
-        constructor() { super(); }
-        public execute(int: IntegerComponent) {
-            int.integer += 1;
+
+    interface IIntergerParams {
+        i: { integer: number };
+    }
+
+    const incrementParams =  {
+        i: { integer: 0 },
+    };
+
+    class IncrementSystem extends System<IIntergerParams> {
+        constructor(params: IIntergerParams) { super(params); }
+        public execute(params: IIntergerParams) {
+            params.i.integer += 1;
         }
     }
 
     // Dummy system that multiply an integer by itself
-    class SquareSystem extends System {
-        constructor() { super(); }
-        public execute(int: IntegerComponent) {
-            int.integer = int.integer * int.integer;
+    class SquareSystem extends System<IIntergerParams> {
+        constructor(params) { super(params); }
+        public execute(params: IIntergerParams) {
+            params.i.integer = params.i.integer * params.i.integer;
         }
     }
 
@@ -139,13 +167,13 @@ function test() {
 
         feedBackFactory = new ComponentFactory<EmptyComponent>(5, new EmptyComponent());
 
-        integerFactory = new ComponentFactory<IntegerComponent>(5,new IntegerComponent(1));
+        integerFactory = new ComponentFactory<IntegerComponent>(5, new IntegerComponent(1));
 
     });
     it("accept a list of System to iterate on", () => {
         const sM = new SystemManager();
-        sM.pushSystem(new IncrementSystem(), true);
-        sM.pushSystem(new SquareSystem(), true);
+        sM.pushSystem(new IncrementSystem(incrementParams), true);
+        sM.pushSystem(new SquareSystem(incrementParams), true);
         const gl = new GameLoop(sM);
         const res = gl.getSystemManager();
         expect(res).to.deep.equal(sM);
@@ -162,7 +190,7 @@ function test() {
     });
     it("update the time ellapsed since the game loop start", (done) => {
         // const s = new MoveSystem();
-        // s.setFactories(positionFactory, velocityFactory);
+        // s.setParamsSource(positionFactory, velocityFactory);
         const sM = new SystemManager();
         const runFor = 1000;
         const gl = new GameLoop(sM);
@@ -178,8 +206,8 @@ function test() {
     it("provid the time ellaspsed since the last frame call", (done) => {
         // checking that delta does not vary much
         const sM = new SystemManager();
-        const fbckSys = new FeedBackSystem();
-        fbckSys.setFactories(feedBackFactory);
+        const fbckSys = new FeedBackSystem(feedbackParams);
+        fbckSys.setParamsSource(feedBackFactory);
         feedBackFactory.create(1, true);
         expect(feedBackFactory.nbActive).to.gt(0);
 
@@ -234,8 +262,8 @@ function test() {
         // then we compare value to make sure it's executed at a fixed time step
         const frequency = (1000 / 60);
         feedBackFactory.create(1, true);
-        const s = new FeedBackSystem();
-        s.setFactories(feedBackFactory);
+        const s = new FeedBackSystem(feedbackParams);
+        s.setParamsSource(feedBackFactory);
         FeedBackSystem["timerArr"] = [];
         FeedBackSystem.callBack = (timer: FrameEvent) => {
             FeedBackSystem["timerArr"].push(timer.time);
@@ -268,10 +296,10 @@ function test() {
         const nFixedIntFactory = new ComponentFactory<IntegerComponent>(2, new IntegerComponent(0));
         fixedIntFactory.create(1, true);
         nFixedIntFactory.create(1, true);
-        const fixedTS = new IncrementSystem();
-        const nFixedTS = new IncrementSystem();
-        fixedTS.setFactories(fixedIntFactory);
-        nFixedTS.setFactories(nFixedIntFactory);
+        const fixedTS = new IncrementSystem(incrementParams);
+        const nFixedTS = new IncrementSystem(incrementParams);
+        fixedTS.setParamsSource(fixedIntFactory);
+        nFixedTS.setParamsSource(nFixedIntFactory);
 
         const sM = new SystemManager();
         sM.pushSystem(fixedTS, true);
@@ -306,15 +334,15 @@ function test() {
         fact2.create(1, true);
         fact3.create(1, true);
         fact4.create(1, true);
-        const incS1 = new IncrementSystem();
-        const incS2 = new IncrementSystem();
-        const incS3 = new IncrementSystem();
-        const incS4 = new IncrementSystem();
+        const incS1 = new IncrementSystem(incrementParams);
+        const incS2 = new IncrementSystem(incrementParams);
+        const incS3 = new IncrementSystem(incrementParams);
+        const incS4 = new IncrementSystem(incrementParams);
 
-        incS1.setFactories(fact1);
-        incS2.setFactories(fact2);
-        incS3.setFactories(fact3);
-        incS4.setFactories(fact4);
+        incS1.setParamsSource(fact1);
+        incS2.setParamsSource(fact2);
+        incS3.setParamsSource(fact3);
+        incS4.setParamsSource(fact4);
 
         const sM = new SystemManager();
         const pausedFSysId = sM.pushSystem(incS1, true);

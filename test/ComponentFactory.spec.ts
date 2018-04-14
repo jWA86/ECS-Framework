@@ -104,19 +104,19 @@ describe("Component Factory", () => {
             expect(simpleFactory.activeLength).to.equal(2);
         });
         it("createFrom(entityId) should create and return a deep copy of the component (recursive copy)", () => {
-            const x = 3;
-            const y = 4;
-            expect(defaultX).to.not.equal(x);
-            expect(defaultY).to.not.equal(y);
+            const xCoord = 3;
+            const yCoord = 4;
+            expect(defaultX).to.not.equal(xCoord);
+            expect(defaultY).to.not.equal(yCoord);
 
             const comp1 = objectFactory.create(1, true);
             comp1.prop1 = "comp1 string";
-            comp1.array1 = [x, y];
+            comp1.array1 = [xCoord, yCoord];
             comp1.date = new Date();
-            comp1.lObj = { "x": x, "y": y };
-            comp1.instantiatedObj = new InstantiatedObj(x, y);
-            comp1.nestedObj = new NestedObj(new InstantiatedObj(x, y));
-            comp1.arrayOfObject = [new NestedObj(new InstantiatedObj(x, y)), new NestedObj(new InstantiatedObj(x, y))];
+            comp1.lObj = { x: xCoord, y: yCoord };
+            comp1.instantiatedObj = new InstantiatedObj(xCoord, yCoord);
+            comp1.nestedObj = new NestedObj(new InstantiatedObj(xCoord, yCoord));
+            comp1.arrayOfObject = [new NestedObj(new InstantiatedObj(xCoord, yCoord)), new NestedObj(new InstantiatedObj(xCoord, yCoord))];
 
             const newCompId = 2;
             const c2 = objectFactory.createFromComponent(newCompId, comp1);
@@ -129,23 +129,23 @@ describe("Component Factory", () => {
             expect(comp2.prop1).to.equal(comp1.prop1);
 
             expect(comp2.array1.length).to.equal(2);
-            expect(comp2.array1[0]).to.equal(x);
-            expect(comp2.array1[1]).to.equal(y);
+            expect(comp2.array1[0]).to.equal(xCoord);
+            expect(comp2.array1[1]).to.equal(yCoord);
 
             expect(new Date(comp2.date)).to.deep.equal(new Date(comp1.date));
 
-            expect(comp2.lObj.x).to.equal(x);
-            expect(comp2.lObj.y).to.equal(y);
+            expect(comp2.lObj.x).to.equal(xCoord);
+            expect(comp2.lObj.y).to.equal(yCoord);
 
-            expect(comp2.instantiatedObj.x).to.equal(x);
-            expect(comp2.instantiatedObj.y).to.equal(y);
+            expect(comp2.instantiatedObj.x).to.equal(xCoord);
+            expect(comp2.instantiatedObj.y).to.equal(yCoord);
 
-            expect(comp2.nestedObj.obj1.x).to.equal(x);
-            expect(comp2.nestedObj.obj1.y).to.equal(y);
+            expect(comp2.nestedObj.obj1.x).to.equal(xCoord);
+            expect(comp2.nestedObj.obj1.y).to.equal(yCoord);
 
             expect(comp2.arrayOfObject.length).to.equal(2);
-            expect(comp2.arrayOfObject[1].obj1.x).to.equal(x);
-            expect(comp2.arrayOfObject[1].obj1.y).to.equal(y);
+            expect(comp2.arrayOfObject[1].obj1.x).to.equal(xCoord);
+            expect(comp2.arrayOfObject[1].obj1.y).to.equal(yCoord);
 
             comp2.prop1 = "modified";
             expect(comp2.prop1).to.not.equal(comp1.prop1);

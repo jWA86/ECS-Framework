@@ -1,9 +1,9 @@
 import { ComponentFactory } from "../ComponentFactory";
 import { IComponentFactory } from "../IComponentFactory";
 import { IFrameEvent} from "../IFrameEvent";
+import { ISystem } from "../ISystem";
 import { ISystemManager } from "../ISystemManager";
 import { TIMESTAMP } from "../pollyFill";
-import { System } from "../System";
 import { TM_POOL_SIZE } from "./DefaultConfig";
 import { ITimeMeasureComponent, ITimeMeasureUtil } from "./ITimeMeasureUtil";
 export { TimeMeasureComponent, TimeMeasureSystem, TimeMeasureUtil, TimeMeasureSystemStartMark, TimeMeasureSystemEndMark };
@@ -22,7 +22,9 @@ class TimeMeasureComponent implements ITimeMeasureComponent {
      * @param meanT mean time of the measure data set
      * @param frequency the frequency of minT, maxT, meanT computation
      */
-    constructor(public entityId: number, public active: boolean, public measureId: string, public lastT: number, public minT: number, public maxT: number, public meanT: number, public frequency: number) { }
+    public entityId: number;
+    public active: boolean;
+    constructor( public measureId: string, public lastT: number, public minT: number, public maxT: number, public meanT: number, public frequency: number = 0) { }
 }
 
 /**
@@ -32,7 +34,7 @@ class TimeMeasureUtil implements ITimeMeasureUtil {
     public timeMeasurePool: IComponentFactory<TimeMeasureComponent>;
     protected measures = new Map<string, {startSystem: string, endSystem: string}>();
     constructor(public sysManager: ISystemManager, timeMeasurePool?: IComponentFactory<TimeMeasureComponent>) {
-        this.timeMeasurePool = timeMeasurePool || new ComponentFactory<TimeMeasureComponent>(TM_POOL_SIZE, new TimeMeasureComponent(0, false, "", 0, 0, 0, 0, 0));
+        this.timeMeasurePool = timeMeasurePool || new ComponentFactory<TimeMeasureComponent>(TM_POOL_SIZE, new TimeMeasureComponent( "", 0, 0, 0, 0, 0));
      }
     public install(systemIdToMeasure: string): TimeMeasureComponent {
         // use the system id to measure as the measure id + a random number in case of multiple installation of a TimeMeasure on the same System (no use unless to measure the TM overhead)
@@ -58,18 +60,20 @@ class TimeMeasureUtil implements ITimeMeasureUtil {
      }
 }
 
-abstract class TimeMeasureSystem extends System {
+abstract class TimeMeasureSystem implements ISystem<void> {
     public static performance = window.performance;
+    public active = true;
     protected startMark: string;
     protected endMark: string;
     /**
      * @param tmComponent the component used for recording time
      */
     constructor(public tmComponent: TimeMeasureComponent ) {
-        super();
         this.startMark = "start" + this.tmComponent.measureId;
         this.endMark = "end" + this.tmComponent.measureId;
      }
+     /** Not used */
+    public abstract process(args: any[]);
     public getData() {
         return TimeMeasureSystem.performance.getEntriesByName(this.tmComponent.measureId);
     }
@@ -86,7 +90,7 @@ class TimeMeasureSystemStartMark extends TimeMeasureSystem {
     /**
      * Place the starting mark
      */
-    public process() {
+    public process(args: any[]) {
         // TimeMeasureSystem.performance.mark(this.startMark);
         window.performance.mark(this.startMark);
     }
@@ -112,6 +116,7 @@ class TimeMeasureSystemEndMark extends TimeMeasureSystem {
     public execute(time: IFrameEvent) {
         TimeMeasureSystem.performance.mark(this.endMark);
         this.measure();
+        // console.log(TIMESTAMP.now() - this.lastUpdate);
         if ((TIMESTAMP.now() - this.lastUpdate) >= this.tmComponent.frequency) {
             this.computeData();
             this.clearData();
