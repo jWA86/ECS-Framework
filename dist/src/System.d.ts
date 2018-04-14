@@ -1,20 +1,13 @@
 import { IComponent, IComponentFactory } from "./interfaces";
-export { System, ISystem };
-interface ISystem {
-    active: boolean;
-    setFactories(...args: Array<IComponentFactory<IComponent>>): any;
-    process(args?: any[]): any;
-    execute(...args: any[]): any;
-}
-declare abstract class System implements ISystem {
+import { ISystem } from "./ISystem";
+export { System };
+declare abstract class System<T> implements ISystem<T> {
+    protected paramObj: T;
     active: boolean;
     factories: Array<IComponentFactory<IComponent>>;
-    constructor();
-    /**  Set the source of the components that will be processed.
-     * One factory per component parameters in the order requested by the executed method.
-     * i.e :setFactories(movingFactory, movingFactory, iaFactory);
-     */
-    setFactories(...args: Array<IComponentFactory<IComponent>>): void;
-    process(args?: any[]): void;
-    abstract execute(...args: any[]): any;
+    protected keys: string[];
+    constructor(paramObj: T);
+    setParamsSource(...args: Array<IComponentFactory<IComponent>>): void;
+    process(...args: any[]): void;
+    abstract execute(params: T, ...args: any[]): any;
 }

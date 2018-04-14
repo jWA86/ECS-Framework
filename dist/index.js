@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 5);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -668,88 +668,46 @@ exports.FastIterationMap = FastIterationMap;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-// A factory for each parameters of the exectute function
-var System = /** @class */ (function () {
-    // public active: boolean = true;
-    function System() {
-        this.active = true;
-    }
-    /**  Set the source of the components that will be processed.
-     * One factory per component parameters in the order requested by the executed method.
-     * i.e :setFactories(movingFactory, movingFactory, iaFactory);
-     */
-    System.prototype.setFactories = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        this.factories = args;
-    };
-    // Query the components and execute active ones
-    System.prototype.process = function (args) {
-        var flist = this.factories;
-        var l = flist[0].activeLength;
-        var f = flist[0].values;
-        for (var i = 0; i < l; ++i) {
-            // get the component from the first factory that serve as a reference
-            // if it is active query the other components
-            var refComponent = f[i];
-            if (refComponent.active) {
-                // Array that hold component that will be used by the execute function
-                var arr = [];
-                arr.push(refComponent);
-                var isFound = true;
-                // Iterate others factories to query rest of the components
-                for (var j = 1; j < flist.length; ++j) {
-                    // If the factory is the same as the factory that serve as a reference
-                    // we push the same component to the args array,
-                    // otherwise we query the component though get(entityId)
-                    if (flist[j] === flist[0]) {
-                        arr.push(refComponent);
-                    }
-                    else {
-                        var c = flist[j].get(refComponent.entityId);
-                        if (!c) {
-                            isFound = false;
-                            break;
-                        }
-                        arr.push(c);
-                    }
-                }
-                if (isFound) {
-                    // add eventual parameters passed to the process function at the end of the execute parameters list
-                    if (args) {
-                        var al = args.length;
-                        for (var a = 0; a < al; ++a) {
-                            arr.push(args[a]);
-                        }
-                    }
-                    this.execute.apply(this, arr);
-                }
-            }
-        }
-    };
-    return System;
-}());
-exports.System = System;
+var TM_POOL_SIZE = 30;
+exports.TM_POOL_SIZE = TM_POOL_SIZE;
 
 
 /***/ }),
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var TM_POOL_SIZE = 30;
-exports.TM_POOL_SIZE = TM_POOL_SIZE;
+module.exports = __webpack_require__(5);
 
 
 /***/ }),
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(6);
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var ComponentFactory_1 = __webpack_require__(1);
+exports.ComponentFactory = ComponentFactory_1.ComponentFactory;
+var EntityFactory_1 = __webpack_require__(6);
+exports.EntityFactory = EntityFactory_1.EntityFactory;
+var GameLoop_1 = __webpack_require__(7);
+exports.GameLoop = GameLoop_1.GameLoop;
+var interfaces = __webpack_require__(8);
+exports.interfaces = interfaces;
+var pollyFill_1 = __webpack_require__(0);
+exports.TIMESTAMP = pollyFill_1.TIMESTAMP;
+var System_1 = __webpack_require__(9);
+exports.System = System_1.System;
+var SystemManager_1 = __webpack_require__(10);
+exports.SystemManager = SystemManager_1.SystemManager;
+var DEFAULT_CONF = __webpack_require__(3);
+exports.DEFAULT_CONF = DEFAULT_CONF;
+var TimeMeasureUtil_1 = __webpack_require__(11);
+exports.TimeMeasureComponent = TimeMeasureUtil_1.TimeMeasureComponent;
+exports.TimeMeasureSystem = TimeMeasureUtil_1.TimeMeasureSystem;
+exports.TimeMeasureSystemEndMark = TimeMeasureUtil_1.TimeMeasureSystemEndMark;
+exports.TimeMeasureSystemStartMark = TimeMeasureUtil_1.TimeMeasureSystemStartMark;
+exports.TimeMeasureUtil = TimeMeasureUtil_1.TimeMeasureUtil;
 
 
 /***/ }),
@@ -759,27 +717,133 @@ module.exports = __webpack_require__(6);
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var ComponentFactory_1 = __webpack_require__(1);
-exports.ComponentFactory = ComponentFactory_1.ComponentFactory;
-var GameLoop_1 = __webpack_require__(7);
-exports.GameLoop = GameLoop_1.GameLoop;
-__webpack_require__(8);
-var pollyFill_1 = __webpack_require__(0);
-exports.TIMESTAMP = pollyFill_1.TIMESTAMP;
-var System_1 = __webpack_require__(3);
-exports.System = System_1.System;
-var SystemManager_1 = __webpack_require__(9);
-exports.SystemManager = SystemManager_1.SystemManager;
-var DEFAULT_CONF = __webpack_require__(4);
-exports.DEFAULT_CONF = DEFAULT_CONF;
-var TimeMeasureUtil_1 = __webpack_require__(10);
-exports.TimeMeasureComponent = TimeMeasureUtil_1.TimeMeasureComponent;
-exports.TimeMeasureSystem = TimeMeasureUtil_1.TimeMeasureSystem;
-exports.TimeMeasureSystemEndMark = TimeMeasureUtil_1.TimeMeasureSystemEndMark;
-exports.TimeMeasureSystemStartMark = TimeMeasureUtil_1.TimeMeasureSystemStartMark;
-exports.TimeMeasureUtil = TimeMeasureUtil_1.TimeMeasureUtil;
-var EntityFactory_1 = __webpack_require__(11);
-exports.EntityFactory = EntityFactory_1.EntityFactory;
+var EntityFactory = /** @class */ (function () {
+    function EntityFactory(_size) {
+        this._size = _size;
+        this._factories = new Map();
+    }
+    EntityFactory.prototype.activate = function (entityId, value, factoriesName) {
+        var _this = this;
+        if (factoriesName) {
+            factoriesName.forEach(function (f) {
+                var ff = _this.getFactory(f);
+                if (ff) {
+                    ff.activate(entityId, value);
+                }
+            });
+        }
+        else {
+            this._factories.forEach(function (f) {
+                f.activate(entityId, value);
+            });
+        }
+    };
+    EntityFactory.prototype.activateAll = function (value) {
+        this._factories.forEach(function (f) {
+            f.activateAll(value);
+        });
+    };
+    EntityFactory.prototype.addFactory = function (name, factory) {
+        if (factory.size !== this._size) {
+            factory.resizeTo(this._size);
+        }
+        this._factories.set(name, factory);
+    };
+    EntityFactory.prototype.getComponent = function (entityId, factoryName) {
+        var f = this._factories.get(factoryName);
+        if (f) {
+            return f.get(entityId);
+        }
+        else {
+            return undefined;
+        }
+    };
+    EntityFactory.prototype.getFactory = function (name) {
+        return this._factories.get(name);
+    };
+    EntityFactory.prototype.free = function (entityId) {
+        var d = true;
+        this._factories.forEach(function (f) {
+            if (!f.free(entityId)) {
+                d = false;
+            }
+        });
+        // false if no factories
+        return this._factories.size > 0 && d;
+    };
+    EntityFactory.prototype.get = function (entityId) {
+        var e = [];
+        this._factories.forEach(function (f) {
+            e.push(f.get(entityId));
+        });
+        return e;
+    };
+    EntityFactory.prototype.has = function (entityId) {
+        var it = this._factories.entries();
+        return it.next().value[1].has(entityId);
+    };
+    EntityFactory.prototype.create = function (entityId, active) {
+        this._factories.forEach(function (f) {
+            f.create(entityId, active);
+        });
+    };
+    EntityFactory.prototype.resizeTo = function (size) {
+        this._factories.forEach(function (f) {
+            f.resizeTo(size);
+        });
+        this._size = size;
+    };
+    Object.defineProperty(EntityFactory.prototype, "activeLength", {
+        get: function () {
+            // return iteratorLength of the first factory;
+            var it = this._factories.entries();
+            return it.next().value[1].activeLength;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(EntityFactory.prototype, "nbActive", {
+        get: function () {
+            var it = this._factories.entries();
+            return it.next().value[1].nbActive;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(EntityFactory.prototype, "nbCreated", {
+        get: function () {
+            var it = this._factories.entries();
+            return it.next().value[1].nbCreated;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(EntityFactory.prototype, "nbFreeSlot", {
+        get: function () {
+            var it = this._factories.entries();
+            return it.next().value[1].nbFreeSlot;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(EntityFactory.prototype, "nbInactive", {
+        get: function () {
+            var it = this._factories.entries();
+            return it.next().value[1].nbInactive;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(EntityFactory.prototype, "size", {
+        get: function () {
+            return this._size;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return EntityFactory;
+}());
+exports.EntityFactory = EntityFactory;
 
 
 /***/ }),
@@ -920,6 +984,79 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 /***/ }),
 /* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var System = /** @class */ (function () {
+    function System(paramObj) {
+        this.paramObj = paramObj;
+        this.active = true;
+        // keys from a generic would dispense us from providing an object to the constructor
+        // still at some point I need an instance of that object
+        // since i can't instantiate a generic
+        // I need to pass an instance
+        this.keys = Object.keys(this.paramObj);
+    }
+    System.prototype.setParamsSource = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        // verify number of args
+        // verify that the component the factory holds have the proprety define by the paramObj
+        this.factories = args;
+    };
+    System.prototype.process = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        var params = this.paramObj;
+        var flist = this.factories;
+        // flist.length = this.keys.length
+        var nbComponent = flist[0].activeLength;
+        var f = flist[0].values;
+        for (var i = 0; i < nbComponent; ++i) {
+            // get the component from the first factory that serve as a reference
+            // if it is active query the other components
+            var refComponent = f[i];
+            if (refComponent.active) {
+                params[this.keys[0]] = refComponent;
+                var isFound = true;
+                // Iterate others factories to query rest of the components
+                for (var j = 1; j < flist.length; ++j) {
+                    // If the factory is the same as the factory that serve as a reference
+                    // we push the same component to the args array,
+                    // otherwise we query the component though get(entityId)
+                    if (flist[j] === flist[0]) {
+                        params[this.keys[j]] = refComponent;
+                    }
+                    else {
+                        var c = flist[j].get(refComponent.entityId);
+                        if (!c) {
+                            isFound = false;
+                            break;
+                        }
+                        params[this.keys[j]] = c;
+                    }
+                }
+                if (isFound) {
+                    // why apply is necessary ?
+                    // this.execute.apply(this, params);
+                    this.execute.apply(this, [params].concat(args));
+                }
+            }
+        }
+    };
+    return System;
+}());
+exports.System = System;
+
+
+/***/ }),
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1076,7 +1213,7 @@ exports.SystemManager = SystemManager;
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1094,25 +1231,13 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var ComponentFactory_1 = __webpack_require__(1);
 var pollyFill_1 = __webpack_require__(0);
-var System_1 = __webpack_require__(3);
-var DefaultConfig_1 = __webpack_require__(4);
+var DefaultConfig_1 = __webpack_require__(3);
 /**
  * Component that holds time measure
  */
 var TimeMeasureComponent = /** @class */ (function () {
-    /**
-     * @param entityId
-     * @param active
-     * @param measureId string to identify the measure
-     * @param lastT last measured time
-     * @param minT minimum time of the measure data set
-     * @param maxT maximum time of the measure data set
-     * @param meanT mean time of the measure data set
-     * @param frequency the frequency of minT, maxT, meanT computation
-     */
-    function TimeMeasureComponent(entityId, active, measureId, lastT, minT, maxT, meanT, frequency) {
-        this.entityId = entityId;
-        this.active = active;
+    function TimeMeasureComponent(measureId, lastT, minT, maxT, meanT, frequency) {
+        if (frequency === void 0) { frequency = 0; }
         this.measureId = measureId;
         this.lastT = lastT;
         this.minT = minT;
@@ -1130,7 +1255,7 @@ var TimeMeasureUtil = /** @class */ (function () {
     function TimeMeasureUtil(sysManager, timeMeasurePool) {
         this.sysManager = sysManager;
         this.measures = new Map();
-        this.timeMeasurePool = timeMeasurePool || new ComponentFactory_1.ComponentFactory(DefaultConfig_1.TM_POOL_SIZE, new TimeMeasureComponent(0, false, "", 0, 0, 0, 0, 0));
+        this.timeMeasurePool = timeMeasurePool || new ComponentFactory_1.ComponentFactory(DefaultConfig_1.TM_POOL_SIZE, new TimeMeasureComponent("", 0, 0, 0, 0, 0));
     }
     TimeMeasureUtil.prototype.install = function (systemIdToMeasure) {
         // use the system id to measure as the measure id + a random number in case of multiple installation of a TimeMeasure on the same System (no use unless to measure the TM overhead)
@@ -1155,24 +1280,22 @@ var TimeMeasureUtil = /** @class */ (function () {
     return TimeMeasureUtil;
 }());
 exports.TimeMeasureUtil = TimeMeasureUtil;
-var TimeMeasureSystem = /** @class */ (function (_super) {
-    __extends(TimeMeasureSystem, _super);
+var TimeMeasureSystem = /** @class */ (function () {
     /**
      * @param tmComponent the component used for recording time
      */
     function TimeMeasureSystem(tmComponent) {
-        var _this = _super.call(this) || this;
-        _this.tmComponent = tmComponent;
-        _this.startMark = "start" + _this.tmComponent.measureId;
-        _this.endMark = "end" + _this.tmComponent.measureId;
-        return _this;
+        this.tmComponent = tmComponent;
+        this.active = true;
+        this.startMark = "start" + this.tmComponent.measureId;
+        this.endMark = "end" + this.tmComponent.measureId;
     }
     TimeMeasureSystem.prototype.getData = function () {
         return TimeMeasureSystem.performance.getEntriesByName(this.tmComponent.measureId);
     };
     TimeMeasureSystem.performance = window.performance;
     return TimeMeasureSystem;
-}(System_1.System));
+}());
 exports.TimeMeasureSystem = TimeMeasureSystem;
 /**
  * System that place a mark to start the measure of time
@@ -1188,7 +1311,7 @@ var TimeMeasureSystemStartMark = /** @class */ (function (_super) {
     /**
      * Place the starting mark
      */
-    TimeMeasureSystemStartMark.prototype.process = function () {
+    TimeMeasureSystemStartMark.prototype.process = function (args) {
         // TimeMeasureSystem.performance.mark(this.startMark);
         window.performance.mark(this.startMark);
     };
@@ -1219,6 +1342,7 @@ var TimeMeasureSystemEndMark = /** @class */ (function (_super) {
     TimeMeasureSystemEndMark.prototype.execute = function (time) {
         TimeMeasureSystem.performance.mark(this.endMark);
         this.measure();
+        // console.log(TIMESTAMP.now() - this.lastUpdate);
         if ((pollyFill_1.TIMESTAMP.now() - this.lastUpdate) >= this.tmComponent.frequency) {
             this.computeData();
             this.clearData();
@@ -1262,142 +1386,6 @@ var TimeMeasureSystemEndMark = /** @class */ (function (_super) {
     return TimeMeasureSystemEndMark;
 }(TimeMeasureSystem));
 exports.TimeMeasureSystemEndMark = TimeMeasureSystemEndMark;
-
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var EntityFactory = /** @class */ (function () {
-    function EntityFactory(_size) {
-        this._size = _size;
-        this._factories = new Map();
-    }
-    EntityFactory.prototype.activate = function (entityId, value, factoriesName) {
-        var _this = this;
-        if (factoriesName) {
-            factoriesName.forEach(function (f) {
-                var ff = _this.getFactory(f);
-                if (ff) {
-                    ff.activate(entityId, value);
-                }
-            });
-        }
-        else {
-            this._factories.forEach(function (f) {
-                f.activate(entityId, value);
-            });
-        }
-    };
-    EntityFactory.prototype.activateAll = function (value) {
-        this._factories.forEach(function (f) {
-            f.activateAll(value);
-        });
-    };
-    EntityFactory.prototype.addFactory = function (name, factory) {
-        if (factory.size !== this._size) {
-            factory.resizeTo(this._size);
-        }
-        this._factories.set(name, factory);
-    };
-    EntityFactory.prototype.getComponent = function (entityId, factoryName) {
-        var f = this._factories.get(factoryName);
-        if (f) {
-            return f.get(entityId);
-        }
-        else {
-            return undefined;
-        }
-    };
-    EntityFactory.prototype.getFactory = function (name) {
-        return this._factories.get(name);
-    };
-    EntityFactory.prototype.free = function (entityId) {
-        var d = true;
-        this._factories.forEach(function (f) {
-            if (!f.free(entityId)) {
-                d = false;
-            }
-        });
-        // false if no factories
-        return this._factories.size > 0 && d;
-    };
-    EntityFactory.prototype.get = function (entityId) {
-        var e = [];
-        this._factories.forEach(function (f) {
-            e.push(f.get(entityId));
-        });
-        return e;
-    };
-    EntityFactory.prototype.has = function (entityId) {
-        var it = this._factories.entries();
-        return it.next().value[1].has(entityId);
-    };
-    EntityFactory.prototype.create = function (entityId, active) {
-        this._factories.forEach(function (f) {
-            f.create(entityId, active);
-        });
-    };
-    EntityFactory.prototype.resizeTo = function (size) {
-        this._factories.forEach(function (f) {
-            f.resizeTo(size);
-        });
-        this._size = size;
-    };
-    Object.defineProperty(EntityFactory.prototype, "activeLength", {
-        get: function () {
-            // return iteratorLength of the first factory;
-            var it = this._factories.entries();
-            return it.next().value[1].activeLength;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(EntityFactory.prototype, "nbActive", {
-        get: function () {
-            var it = this._factories.entries();
-            return it.next().value[1].nbActive;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(EntityFactory.prototype, "nbCreated", {
-        get: function () {
-            var it = this._factories.entries();
-            return it.next().value[1].nbCreated;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(EntityFactory.prototype, "nbFreeSlot", {
-        get: function () {
-            var it = this._factories.entries();
-            return it.next().value[1].nbFreeSlot;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(EntityFactory.prototype, "nbInactive", {
-        get: function () {
-            var it = this._factories.entries();
-            return it.next().value[1].nbInactive;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(EntityFactory.prototype, "size", {
-        get: function () {
-            return this._size;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    return EntityFactory;
-}());
-exports.EntityFactory = EntityFactory;
 
 
 /***/ })

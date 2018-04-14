@@ -1,14 +1,13 @@
-import { ComponentFactory } from "../ComponentFactory";
-import { IComponent, SystemManager } from "../entry";
-import { FrameEvent } from "../GameLoop";
-import { System } from "../System";
-export { ITimeMeasureUtil, TimeMeasureComponent, TimeMeasureSystem, TimeMeasureUtil, TimeMeasureSystemStartMark, TimeMeasureSystemEndMark };
+import { IComponentFactory } from "../IComponentFactory";
+import { IFrameEvent } from "../IFrameEvent";
+import { ISystem } from "../ISystem";
+import { ISystemManager } from "../ISystemManager";
+import { ITimeMeasureComponent, ITimeMeasureUtil } from "./ITimeMeasureUtil";
+export { TimeMeasureComponent, TimeMeasureSystem, TimeMeasureUtil, TimeMeasureSystemStartMark, TimeMeasureSystemEndMark };
 /**
  * Component that holds time measure
  */
-declare class TimeMeasureComponent implements IComponent {
-    entityId: number;
-    active: boolean;
+declare class TimeMeasureComponent implements ITimeMeasureComponent {
     measureId: string;
     lastT: number;
     minT: number;
@@ -25,46 +24,39 @@ declare class TimeMeasureComponent implements IComponent {
      * @param meanT mean time of the measure data set
      * @param frequency the frequency of minT, maxT, meanT computation
      */
-    constructor(entityId: number, active: boolean, measureId: string, lastT: number, minT: number, maxT: number, meanT: number, frequency: number);
-}
-interface ITimeMeasureUtil {
-    /**
-     * Install marks to measure time of execution of a System
-     * @param systemId the System id to measure
-     */
-    install(systemId: string): any;
-    /**
-     * UnInstall marks placed around a System
-     * @param tmComponent the TimeMeasureComponent
-     */
-    uninstall(tmComponent: TimeMeasureComponent): any;
+    entityId: number;
+    active: boolean;
+    constructor(measureId: string, lastT: number, minT: number, maxT: number, meanT: number, frequency?: number);
 }
 /**
  * Measure time passed between execution of n Systems
  */
 declare class TimeMeasureUtil implements ITimeMeasureUtil {
-    sysManager: SystemManager;
-    timeMeasurePool: ComponentFactory<TimeMeasureComponent>;
+    sysManager: ISystemManager;
+    timeMeasurePool: IComponentFactory<TimeMeasureComponent>;
     protected measures: Map<string, {
         startSystem: string;
         endSystem: string;
     }>;
-    constructor(sysManager: SystemManager, timeMeasurePool?: ComponentFactory<TimeMeasureComponent>);
+    constructor(sysManager: ISystemManager, timeMeasurePool?: IComponentFactory<TimeMeasureComponent>);
     install(systemIdToMeasure: string): TimeMeasureComponent;
     /**
      * Remove TimeMeasure Systems from the SystemManager and free the TimeMeasure component
      */
     uninstall(tmComponent: TimeMeasureComponent): void;
 }
-declare abstract class TimeMeasureSystem extends System {
+declare abstract class TimeMeasureSystem implements ISystem<void> {
     tmComponent: TimeMeasureComponent;
     static performance: Performance;
+    active: boolean;
     protected startMark: string;
     protected endMark: string;
     /**
      * @param tmComponent the component used for recording time
      */
     constructor(tmComponent: TimeMeasureComponent);
+    /** Not used */
+    abstract process(args: any[]): any;
     getData(): any;
 }
 /**
@@ -78,7 +70,7 @@ declare class TimeMeasureSystemStartMark extends TimeMeasureSystem {
     /**
      * Place the starting mark
      */
-    process(): void;
+    process(args: any[]): void;
     /**
      * Not used
      */
@@ -95,7 +87,7 @@ declare class TimeMeasureSystemEndMark extends TimeMeasureSystem {
      *  Measure time passed since the start mark and compute statistics if time.lag >= the specified frequency of computation
      * @param time FrameEvent used to decide when to compute data
      */
-    execute(time: FrameEvent): void;
+    execute(time: IFrameEvent): void;
     measure(): void;
     /**
      * Set max, min mean and last measure to the TMComponent from the performance.measure data set
