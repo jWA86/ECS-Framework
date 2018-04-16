@@ -91,7 +91,8 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
     * note : when the component is reuse it still has the old values
     */
     public free(entityId: number): boolean {
-        const index = this._keys.get(entityId);
+        const index = this.getIndex(entityId);
+
         if (index === undefined) { return false; }
         // update nbActive/Inactive counter
         if (this._values[index].active) {
@@ -168,7 +169,8 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
      * @param nbComponents number of components to free
      */
     public freeRangeComponents(fromKey: number, nbComponents: number): boolean {
-        const startingIndex = this._keys.get(fromKey);
+        const startingIndex = this.getIndex(fromKey);
+
         if (startingIndex === undefined) { return false; }
         let endingIndex = startingIndex + nbComponents;
         if (endingIndex > this._activeLength) {
@@ -194,7 +196,7 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
     public createFromComponent(entityId: number, comp: T): T {
         if (this._keys.has(entityId)) { throw Error("entityId already exists in the pool"); }
         const newComp = this.create(entityId, true);
-        const index = this._keys.get(newComp.entityId);
+        const index = this.getIndex(newComp.entityId);
 
         const prop = JSON.parse(JSON.stringify(comp));
 

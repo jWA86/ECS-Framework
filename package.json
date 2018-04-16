@@ -1,6 +1,6 @@
 {
   "name": "ecs-framework",
-  "version": "4.0.0-alpha",
+  "version": "4.1.0-alpha",
   "description": "Simple Component Entity System",
   "main": "./dist/index.js",
   "types": "./dist/src/entry.d.ts",
@@ -39,7 +39,7 @@
     "webpack": "^3.11.0"
   },
   "dependencies": {
-    "fastiterationmap": "^1.2.1",
+    "fastiterationmap": "^1.3.0",
     "performance-polyfill": "0.0.2"
   }
 }
