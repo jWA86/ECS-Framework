@@ -149,7 +149,7 @@ function test() {
             gl.start();
             setTimeout(() => {
                 gl.stop();
-                const timer = gl.getCurrentTimer();
+                const timer = gl.currentTimer;
                 expect(timer.time).to.be.greaterThan(0);
                 expect((sysManager.get(s1Id) as DummySystem).hasRun).to.equal(true);
                 expect(tmComponent.lastT).to.be.greaterThan(0);
@@ -180,7 +180,7 @@ function test() {
             gl.start();
             setTimeout(() => {
                 gl.stop();
-                expect(gl.getCurrentTimer().time).to.be.greaterThan(0);
+                expect(gl.currentTimer.time).to.be.greaterThan(0);
 
                 expect((sysManager.get(s1Id) as DummySystem).hasRun).to.equal(true);
                 // it should not have been updated
@@ -194,7 +194,7 @@ function test() {
 
                 setTimeout(() => {
                     gl.stop();
-                    expect(gl.getCurrentTimer().time).to.be.greaterThan(0);
+                    expect(gl.currentTimer.time).to.be.greaterThan(0);
                     expect((sysManager.get(s1Id) as DummySystem).hasRun).to.equal(true);
                     // it should have been updated
                     expect(tmComponent.minT).to.be.greaterThan(0);

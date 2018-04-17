@@ -175,7 +175,7 @@ function test() {
         sM.pushSystem(new IncrementSystem(incrementParams), true);
         sM.pushSystem(new SquareSystem(incrementParams), true);
         const gl = new GameLoop(sM);
-        const res = gl.getSystemManager();
+        const res = gl.systemManager;
         expect(res).to.deep.equal(sM);
     });
     it("start and stop execution of the loop ", (done) => {
@@ -197,7 +197,7 @@ function test() {
         gl.setFrequency(1000 / 30);
         setTimeout(() => {
             gl.stop();
-            const t = gl.getCurrentTimer();
+            const t = gl.currentTimer;
             expect(t.time).to.approximately(runFor, 30);
             done();
         }, 20);
@@ -220,7 +220,7 @@ function test() {
         const gl = new GameLoop(sM);
         setTimeout(() => {
             gl.stop();
-            const t = gl.getCurrentTimer();
+            const t = gl.currentTimer;
             const mean = deltas.reduce((prev, current, index) => {
                 return prev + current;
             });
@@ -247,11 +247,11 @@ function test() {
         gl.start();
         setTimeout(() => {
             gl.stop();
-            const t1 = gl.getCurrentTimer().time;
+            const t1 = gl.currentTimer.time;
             gl.resume();
             setTimeout(() => {
                 gl.stop();
-                const t2 = gl.getCurrentTimer().time;
+                const t2 = gl.currentTimer.time;
                 expect(t2).to.gte(t1);
                 done();
             }, 20);
@@ -276,7 +276,7 @@ function test() {
         gl.start();
         setTimeout(() => {
             gl.stop();
-            const t = gl.getCurrentTimer();
+            const t = gl.currentTimer;
             const arr = FeedBackSystem["timerArr"];
             for (let i = 1; i < arr.length - 1; ++i) {
                 const diff = arr[i + 1] - arr[i];
@@ -311,7 +311,7 @@ function test() {
         gl.start();
         setTimeout(() => {
             gl.stop();
-            const t = gl.getCurrentTimer();
+            const t = gl.currentTimer;
             const fi = fixedIntFactory.get(1).integer;
             const nfi = nFixedIntFactory.get(1).integer;
             expect(fi).to.gt(nfi);
@@ -357,11 +357,11 @@ function test() {
         gl.start();
         let paused = false;
         const interval = setInterval(() => {
-            const t = gl.getCurrentTimer();
+            const t = gl.currentTimer;
             if (t.time >= pauseAt && !paused) {
                 // pause some system
-                gl.getSystemManager().get(pausedFSysId).active = false;
-                gl.getSystemManager().get(pausedNFSysId).active = false;
+                gl.systemManager.get(pausedFSysId).active = false;
+                gl.systemManager.get(pausedNFSysId).active = false;
                 paused = true;
             }
             if (t.time >= runFor && paused) {
@@ -370,10 +370,10 @@ function test() {
                 const nonPausedComp = fact2.get(1);
                 const pausedNComp = fact3.get(1);
                 const nonPausedNComp = fact4.get(1);
-                expect(gl.getSystemManager().get(pausedFSysId).active).to.equal(false);
-                expect(gl.getSystemManager().get(pausedNFSysId).active).to.equal(false);
-                expect(gl.getSystemManager().get(sys2Id).active).to.equal(true);
-                expect(gl.getSystemManager().get(sys4Id).active).to.equal(true);
+                expect(gl.systemManager.get(pausedFSysId).active).to.equal(false);
+                expect(gl.systemManager.get(pausedNFSysId).active).to.equal(false);
+                expect(gl.systemManager.get(sys2Id).active).to.equal(true);
+                expect(gl.systemManager.get(sys4Id).active).to.equal(true);
                 expect(pausedComp.integer).to.gt(0);
                 expect(pausedNComp.integer).to.gt(0);
                 expect(pausedComp.integer).to.lt(nonPausedComp.integer);

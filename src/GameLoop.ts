@@ -1,7 +1,9 @@
-import { IComponent, IComponentFactory, ISystem } from "../src/interfaces";
+import { IComponent, IComponentFactory, ISystem, ISystemManager } from "../src/interfaces";
 import {IFrameEvent } from "./IFrameEvent";
+import { IGameLoop } from "./IGameLoop";
 import { TIMESTAMP } from "./pollyFill";
 import { SystemManager } from "./SystemManager";
+
 export { FrameEvent, GameLoop };
 
 class FrameEvent implements IFrameEvent {
@@ -21,7 +23,7 @@ class FrameEvent implements IFrameEvent {
     }
 }
 
-class GameLoop {
+class GameLoop implements IGameLoop {
     protected _running: boolean;
     protected _systemManager: SystemManager;
     protected _fixedTSSystems: Array<ISystem<any>>;
@@ -29,7 +31,7 @@ class GameLoop {
     protected _frameId: number;
     protected _currentTimer: FrameEvent;
     constructor(systemManager: SystemManager, timer = new FrameEvent(1000 / 30)) {
-        this.setSystemManager(systemManager);
+        this.systemManager  = systemManager;
         this._currentTimer = timer;
         this._running = false;
     }
@@ -37,41 +39,41 @@ class GameLoop {
     public isRunning(): boolean {
         return this._running;
     }
-    public getSystemManager(): SystemManager {
+    public get systemManager(): SystemManager {
         return this._systemManager;
     }
-    public getCurrentTimer(): FrameEvent {
-        return this._currentTimer;
-    }
-    public setCurretnTimer(timer: FrameEvent) {
-        this._currentTimer = timer;
-    }
-    public setSystemManager(systems: SystemManager) {
+    public set systemManager(systems: SystemManager) {
         this._systemManager = systems;
         this._fixedTSSystems = this._systemManager.getFixedTSSystems();
         this._nonFixedTSSystems = this._systemManager.getNonFixedTSSystems();
+    }
+    public get currentTimer(): FrameEvent {
+        return this._currentTimer;
+    }
+    public set currentTimer(timer: FrameEvent) {
+        this._currentTimer = timer;
     }
     public start(...args: any[]) {
         this._running = true;
         this._currentTimer.reset();
         this._currentTimer.lastFrame = TIMESTAMP.now();
-        this.loop(args);
+        this.loop(...args);
         // this.update(timer);
     }
     public stop() {
         this._running = false;
         cancelAnimationFrame(this._frameId);
     }
-    public resume() {
+    public resume(...args: any[]) {
         this._running = true;
         this._currentTimer.lastFrame = TIMESTAMP.now();
-        this.loop();
+        this.loop(...args);
     }
     /* Set the process frequency in mms */
     public setFrequency(frequency: number) {
         this._currentTimer.MS_PER_UPDATE = frequency;
     }
-    public loop(...args: any[]) {
+    protected loop(...args: any[]) {
         const now = TIMESTAMP.now();
         const ellapsed = now - this._currentTimer.lastFrame;
         this._currentTimer.delta = ellapsed;
@@ -94,7 +96,7 @@ class GameLoop {
         }
     }
     /* Process every Fixed Systems */
-    public updateFixedTS(... args: any[]) {
+    protected updateFixedTS(... args: any[]) {
         const l = this._fixedTSSystems.length;
         for (let i = 0; i < l; ++i) {
             if (this._fixedTSSystems[i].active) {
@@ -104,7 +106,7 @@ class GameLoop {
     }
 
      /* Process every Non Fixed Systems */
-     public updateNonFixedTS(... args: any[]) {
+     protected updateNonFixedTS(... args: any[]) {
         const l = this._nonFixedTSSystems.length;
         for (let i = 0; i < l; ++i) {
             if (this._nonFixedTSSystems[i].active) {
