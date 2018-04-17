@@ -3,7 +3,7 @@ import { IComponentFactory } from "../IComponentFactory";
 import { IFrameEvent} from "../IFrameEvent";
 import { ISystem } from "../ISystem";
 import { ISystemManager } from "../ISystemManager";
-import { TIMESTAMP } from "../pollyFill";
+import { RANDOM, TIMESTAMP } from "../pollyFill";
 import { TM_POOL_SIZE } from "./DefaultConfig";
 import { ITimeMeasureComponent, ITimeMeasureUtil } from "./ITimeMeasureUtil";
 export { TimeMeasureComponent, TimeMeasureSystem, TimeMeasureUtil, TimeMeasureSystemStartMark, TimeMeasureSystemEndMark };
@@ -38,7 +38,7 @@ class TimeMeasureUtil implements ITimeMeasureUtil {
      }
     public install(systemIdToMeasure: string): TimeMeasureComponent {
         // use the system id to measure as the measure id + a random number in case of multiple installation of a TimeMeasure on the same System (no use unless to measure the TM overhead)
-        const measureId = systemIdToMeasure + Math.floor((Math.random() * 1000000));
+        const measureId = systemIdToMeasure + RANDOM.integer(100000);
         const tmC = this.timeMeasurePool.create(this.timeMeasurePool.nbCreated + 1, true);
         tmC.measureId = measureId;
 

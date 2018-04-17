@@ -1,6 +1,7 @@
 import { FastIterationMap } from "FastIterationMap";
 import { IComponent, IComponentFactory, ISystem } from "./interfaces";
 import { ISystemManager } from "./ISystemManager";
+import { RANDOM } from "./pollyFill";
 export { SystemManager  };
 
 // fixedTimeStep = update at requestionAnimation frequency
@@ -34,7 +35,7 @@ class SystemManager implements ISystemManager {
         if (id1 === id2) {
             // add a random number to the id of id2
             // should be ok ...
-            id2 = id2 + "_" + Math.floor(Math.random() * 10000);
+            id2 = id2 + "_" + RANDOM.integer(100000);
         }
         if (this.fixedTimeStepSystems.has(systemMiddleId)) {
 
