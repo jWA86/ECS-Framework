@@ -6,5 +6,6 @@ import { IPoolManager } from "./IPoolManager";
 import { IProjectSetup } from "./IProjectSetup";
 import { ISystem } from "./ISystem";
 import { ISystemManager } from "./ISystemManager";
+import { IUtil } from "./utils/IUtil";
 
-export { IComponent, IComponentFactory, IEntityFactory, IGameLoop, IPool, IPoolManager, IFrameEvent, IProjectSetup, ISystem, ISystemManager };
+export { IComponent, IComponentFactory, IEntityFactory, IGameLoop, IPool, IPoolManager, IFrameEvent, IProjectSetup, ISystem, ISystemManager, IUtil };

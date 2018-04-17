@@ -1,5 +1,4 @@
-import { IComponent } from "../IComponentFactory";
-
+import { IComponent, IUtil } from "../interfaces";
 export { ITimeMeasureComponent, ITimeMeasureUtil };
 
 /**
@@ -22,7 +21,7 @@ interface ITimeMeasureComponent extends IComponent {
 
 }
 
-interface ITimeMeasureUtil {
+interface ITimeMeasureUtil extends IUtil {
     /**
      * Install marks to measure time of execution of a System
      * @param systemId the System id to measure
