@@ -1,5 +1,10 @@
-import { IComponent, IComponentFactory, IPool } from "../src/IComponentFactory";
-import { IEntityFactory } from "../src/IEntityFactory";
-import { IFrameEvent } from "../src/IFrameEvent";
-import { ISystem } from "../src/ISystem";
-export { IComponent, IComponentFactory, IEntityFactory, IPool, IFrameEvent, ISystem };
+import { IComponent, IComponentFactory, IPool } from "./IComponentFactory";
+import { IEntityFactory } from "./IEntityFactory";
+import { IFrameEvent } from "./IFrameEvent";
+import { IGameLoop } from "./IGameLoop";
+import { IPoolManager } from "./IPoolManager";
+import { IProjectSetup } from "./IProjectSetup";
+import { ISystem } from "./ISystem";
+import { ISystemManager } from "./ISystemManager";
+import { IUtil } from "./utils/IUtil";
+export { IComponent, IComponentFactory, IEntityFactory, IGameLoop, IPool, IPoolManager, IFrameEvent, IProjectSetup, ISystem, ISystemManager, IUtil };

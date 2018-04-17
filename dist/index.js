@@ -82,6 +82,11 @@ return /******/ (function(modules) { // webpackBootstrap
 Object.defineProperty(exports, "__esModule", { value: true });
 var TIMESTAMP = window.performance && window.performance.now ? window.performance : Date;
 exports.TIMESTAMP = TIMESTAMP;
+var RANDOM = {
+    decimal: function (max) { return Math.random() * max; },
+    integer: function (max) { return Math.floor(Math.random() * max); },
+};
+exports.RANDOM = RANDOM;
 
 
 /***/ }),
@@ -107,7 +112,8 @@ var ComponentFactory = /** @class */ (function (_super) {
     function ComponentFactory(_size, componentWithDefaultValue) {
         var _this = _super.call(this) || this;
         _this._size = _size;
-        _this._activeLength = 0; // use by the system for iteration, avoid iterate over zeroed components
+        /** Use by the system for iteration, avoid iterate over zeroed components */
+        _this._activeLength = 0;
         _this._nbActive = 0;
         _this._nbInactive = 0;
         _this._nbCreated = 0;
@@ -118,6 +124,7 @@ var ComponentFactory = /** @class */ (function (_super) {
         for (var i = 0; i < _size; ++i) {
             _this.createZeroedComponentAt(i);
         }
+        _this._type = componentWithDefaultValue.constructor["name"];
         return _this;
     }
     ComponentFactory.prototype.activate = function (entityId, value) {
@@ -372,6 +379,13 @@ var ComponentFactory = /** @class */ (function (_super) {
     Object.defineProperty(ComponentFactory.prototype, "nbFreeSlot", {
         get: function () {
             return this._size - this._nbActive - this._nbInactive;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(ComponentFactory.prototype, "type", {
+        get: function () {
+            return this._type;
         },
         enumerable: true,
         configurable: true
@@ -725,8 +739,10 @@ exports.TimeMeasureUtil = TimeMeasureUtil_1.TimeMeasureUtil;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var EntityFactory = /** @class */ (function () {
-    function EntityFactory(_size) {
+    function EntityFactory(_size, type) {
+        if (type === void 0) { type = "Entity"; }
         this._size = _size;
+        this.type = type;
         this._factories = new Map();
     }
     EntityFactory.prototype.activate = function (entityId, value, factoriesName) {
@@ -879,27 +895,35 @@ exports.FrameEvent = FrameEvent;
 var GameLoop = /** @class */ (function () {
     function GameLoop(systemManager, timer) {
         if (timer === void 0) { timer = new FrameEvent(1000 / 30); }
-        this.setSystemManager(systemManager);
+        this.systemManager = systemManager;
         this._currentTimer = timer;
         this._running = false;
     }
     GameLoop.prototype.isRunning = function () {
         return this._running;
     };
-    GameLoop.prototype.getSystemManager = function () {
-        return this._systemManager;
-    };
-    GameLoop.prototype.getCurrentTimer = function () {
-        return this._currentTimer;
-    };
-    GameLoop.prototype.setCurretnTimer = function (timer) {
-        this._currentTimer = timer;
-    };
-    GameLoop.prototype.setSystemManager = function (systems) {
-        this._systemManager = systems;
-        this._fixedTSSystems = this._systemManager.getFixedTSSystems();
-        this._nonFixedTSSystems = this._systemManager.getNonFixedTSSystems();
-    };
+    Object.defineProperty(GameLoop.prototype, "systemManager", {
+        get: function () {
+            return this._systemManager;
+        },
+        set: function (systems) {
+            this._systemManager = systems;
+            this._fixedTSSystems = this._systemManager.getFixedTSSystems();
+            this._nonFixedTSSystems = this._systemManager.getNonFixedTSSystems();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(GameLoop.prototype, "currentTimer", {
+        get: function () {
+            return this._currentTimer;
+        },
+        set: function (timer) {
+            this._currentTimer = timer;
+        },
+        enumerable: true,
+        configurable: true
+    });
     GameLoop.prototype.start = function () {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
@@ -908,7 +932,7 @@ var GameLoop = /** @class */ (function () {
         this._running = true;
         this._currentTimer.reset();
         this._currentTimer.lastFrame = pollyFill_1.TIMESTAMP.now();
-        this.loop(args);
+        this.loop.apply(this, args);
         // this.update(timer);
     };
     GameLoop.prototype.stop = function () {
@@ -916,9 +940,13 @@ var GameLoop = /** @class */ (function () {
         cancelAnimationFrame(this._frameId);
     };
     GameLoop.prototype.resume = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
         this._running = true;
         this._currentTimer.lastFrame = pollyFill_1.TIMESTAMP.now();
-        this.loop();
+        this.loop.apply(this, args);
     };
     /* Set the process frequency in mms */
     GameLoop.prototype.setFrequency = function (frequency) {
@@ -1070,6 +1098,7 @@ exports.System = System;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var FastIterationMap_1 = __webpack_require__(2);
+var pollyFill_1 = __webpack_require__(0);
 // fixedTimeStep = update at requestionAnimation frequency
 // nonFixedTimeStep = update as much as possible between frame
 var SystemManager = /** @class */ (function () {
@@ -1100,7 +1129,7 @@ var SystemManager = /** @class */ (function () {
         if (id1 === id2) {
             // add a random number to the id of id2
             // should be ok ...
-            id2 = id2 + "_" + Math.floor(Math.random() * 10000);
+            id2 = id2 + "_" + pollyFill_1.RANDOM.integer(100000);
         }
         if (this.fixedTimeStepSystems.has(systemMiddleId)) {
             this.fixedTimeStepSystems.insertAround(systemMiddleId, id1, systemBefore, id2, systemAfter);
@@ -1266,7 +1295,7 @@ var TimeMeasureUtil = /** @class */ (function () {
     }
     TimeMeasureUtil.prototype.install = function (systemIdToMeasure) {
         // use the system id to measure as the measure id + a random number in case of multiple installation of a TimeMeasure on the same System (no use unless to measure the TM overhead)
-        var measureId = systemIdToMeasure + Math.floor((Math.random() * 1000000));
+        var measureId = systemIdToMeasure + pollyFill_1.RANDOM.integer(100000);
         var tmC = this.timeMeasurePool.create(this.timeMeasurePool.nbCreated + 1, true);
         tmC.measureId = measureId;
         var res = this.sysManager.insertAround(systemIdToMeasure, new TimeMeasureSystemStartMark(tmC), new TimeMeasureSystemEndMark(tmC));

@@ -1,4 +1,4 @@
-import { IComponent } from "../IComponentFactory";
+import { IComponent, IUtil } from "../interfaces";
 export { ITimeMeasureComponent, ITimeMeasureUtil };
 /**
  * Component that holds time measure
@@ -17,7 +17,7 @@ interface ITimeMeasureComponent extends IComponent {
     /** frequency the frequency of lastT, minT, maxT, meanT computation */
     frequency: number;
 }
-interface ITimeMeasureUtil {
+interface ITimeMeasureUtil extends IUtil {
     /**
      * Install marks to measure time of execution of a System
      * @param systemId the System id to measure

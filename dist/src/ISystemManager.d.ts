@@ -5,6 +5,6 @@ interface ISystemManager {
     insertAfter(systemRefId: string, systemToInsert: ISystem<any>): any;
     insertAround(systemMiddleId: string, systemBefore: ISystem<any>, systemAfter: ISystem<any>): any;
     insertBefore(systemRefId: string, systemToInsert: ISystem<any>): any;
-    pushSystem(system: ISystem<any>): any;
+    pushSystem(system: ISystem<any>): string;
     remove(systemId: string): boolean;
 }

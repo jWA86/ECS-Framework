@@ -4,8 +4,9 @@ import { IEntityFactory } from "./IEntityFactory";
 export { EntityFactory };
 declare class EntityFactory implements IEntityFactory {
     protected _size: number;
+    type: string;
     protected _factories: Map<string, ComponentFactory<IComponent>>;
-    constructor(_size: number);
+    constructor(_size: number, type?: string);
     activate(entityId: number, value: boolean, factoriesName?: string[]): void;
     activateAll(value: boolean): void;
     addFactory(name: string, factory: ComponentFactory<IComponent>): void;

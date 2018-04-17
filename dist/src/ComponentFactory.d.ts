@@ -3,11 +3,13 @@ import { IComponent, IComponentFactory } from "./IComponentFactory";
 export { ComponentFactory };
 declare class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T> implements IComponentFactory<T> {
     protected _size: number;
+    /** Use by the system for iteration, avoid iterate over zeroed components */
     protected _activeLength: number;
     protected readonly _zeroedRef: T;
     protected _nbActive: number;
     protected _nbInactive: number;
     protected _nbCreated: number;
+    protected _type: string;
     constructor(_size: number, componentWithDefaultValue: T);
     activate(entityId: number, value: boolean): void;
     activateAll(value: boolean): void;
@@ -49,4 +51,5 @@ declare class ComponentFactory<T extends IComponent> extends FastIterationMap<nu
     readonly nbInactive: number;
     readonly nbCreated: number;
     readonly nbFreeSlot: number;
+    readonly type: string;
 }

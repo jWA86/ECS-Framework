@@ -1,5 +1,6 @@
 import { ISystem } from "../src/interfaces";
 import { IFrameEvent } from "./IFrameEvent";
+import { IGameLoop } from "./IGameLoop";
 import { SystemManager } from "./SystemManager";
 export { FrameEvent, GameLoop };
 declare class FrameEvent implements IFrameEvent {
@@ -11,7 +12,7 @@ declare class FrameEvent implements IFrameEvent {
     constructor(MS_PER_UPDATE: number);
     reset(): void;
 }
-declare class GameLoop {
+declare class GameLoop implements IGameLoop {
     protected _running: boolean;
     protected _systemManager: SystemManager;
     protected _fixedTSSystems: Array<ISystem<any>>;
@@ -20,15 +21,13 @@ declare class GameLoop {
     protected _currentTimer: FrameEvent;
     constructor(systemManager: SystemManager, timer?: FrameEvent);
     isRunning(): boolean;
-    getSystemManager(): SystemManager;
-    getCurrentTimer(): FrameEvent;
-    setCurretnTimer(timer: FrameEvent): void;
-    setSystemManager(systems: SystemManager): void;
+    systemManager: SystemManager;
+    currentTimer: FrameEvent;
     start(...args: any[]): void;
     stop(): void;
-    resume(): void;
+    resume(...args: any[]): void;
     setFrequency(frequency: number): void;
-    loop(...args: any[]): void;
-    updateFixedTS(...args: any[]): void;
-    updateNonFixedTS(...args: any[]): void;
+    protected loop(...args: any[]): void;
+    protected updateFixedTS(...args: any[]): void;
+    protected updateNonFixedTS(...args: any[]): void;
 }

@@ -5,6 +5,10 @@ interface IComponent {
 }
 interface IPool {
     activeLength: number;
+    /**
+     * Type of object the pool holds
+     */
+    type: string;
     nbActive: number;
     nbCreated: number;
     nbFreeSlot: number;
