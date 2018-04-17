@@ -6,11 +6,15 @@ interface IComponent {
 }
 
 interface IPool {
-    /* the length to iterate on created components,
+    /* The length to iterate on created components,
     * use to avoid iterating on a maximum number of zeored components which are at the queue of the pool
     */
     activeLength: number;
-    /* nb of created active components */
+    /**
+     * Type of object the pool holds
+     */
+    type: string;
+    /* Nb of created active components */
     nbActive: number;
     /* Nb actives and inactives created components */
     nbCreated: number;

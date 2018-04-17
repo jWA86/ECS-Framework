@@ -7,9 +7,11 @@ describe("Component Factory", () => {
     class ConcreteComponent implements IComponent {
         constructor(public entityId: number, public active: boolean) { }
     }
+
     class MultiPropComponent implements IComponent {
         constructor(public entityId: number, public active: boolean, public prop1: string, public prop2: number, public prop3: { x: number, y: number }) { }
     }
+
     class ComponentWithObjects implements IComponent {
         constructor(public entityId: number, public active: boolean, public prop1: string, public lObj: IlitteralObj, public instantiatedObj: InstantiatedObj, public nestedObj: NestedObj, public date: Date, public array1, public arrayOfObject: NestedObj[])  { }
     }
@@ -18,9 +20,11 @@ describe("Component Factory", () => {
         x: number;
         y: number;
     }
+
     class InstantiatedObj {
         constructor(public x: number, public y: number) { }
     }
+
     class NestedObj {
         constructor(public obj1: InstantiatedObj) {
         }
@@ -49,7 +53,13 @@ describe("Component Factory", () => {
 
         objectFactory = new ComponentFactory<ComponentWithObjects>(10, defaultComponentWithObjects);
     });
+    describe("members", () => {
+        it("provide the name of the component type it creates and holds ", () => {
+            expect(simpleFactory.type).to.equal("MultiPropComponent");
 
+            expect(objectFactory.type).to.equal("ComponentWithObjects");
+        });
+    });
     describe("create", () => {
         it("should return a component with the entityId provided", () => {
             const id = 1;

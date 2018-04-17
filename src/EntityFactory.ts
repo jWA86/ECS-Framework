@@ -5,7 +5,7 @@ export { EntityFactory };
 
 class EntityFactory implements IEntityFactory {
     protected _factories: Map<string, ComponentFactory<IComponent>>;
-    constructor(protected _size: number) {
+    constructor(protected _size: number, public type: string = "Entity") {
         this._factories = new Map();
     }
 

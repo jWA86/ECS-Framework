@@ -3,11 +3,13 @@ import { IComponent, IComponentFactory, IPool } from "./IComponentFactory";
 export { ComponentFactory };
 
 class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T> implements IComponentFactory<T> {
-    protected _activeLength: number = 0; // use by the system for iteration, avoid iterate over zeroed components
+    /** Use by the system for iteration, avoid iterate over zeroed components */
+    protected _activeLength: number = 0;
     protected readonly _zeroedRef: T;
     protected _nbActive: number = 0;
     protected _nbInactive: number = 0;
     protected _nbCreated: number = 0;
+    protected _type: string;
 
     constructor(protected _size: number, componentWithDefaultValue: T) {
         super();
@@ -19,6 +21,8 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
         for (let i = 0; i < _size; ++i) {
             this.createZeroedComponentAt(i);
         }
+
+        this._type = componentWithDefaultValue.constructor["name"];
     }
 
     public activate(entityId: number, value: boolean) {
@@ -267,5 +271,9 @@ class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T>
 
     get nbFreeSlot(): number {
         return this._size - this._nbActive - this._nbInactive;
+    }
+
+    get type(): string {
+        return this._type;
     }
 }
