@@ -1,9 +1,10 @@
-import { IGameLoop, IPool, IPoolManager, ISystemManager } from "./interfaces";
+import { IGameLoop, IPool, IPoolManager, ISystemManager, IUtil } from "./interfaces";
 export { IProjectSetup };
 
 interface IProjectSetup {
     GameLoop: IGameLoop;
-    SystemManager: ISystemManager;
     PoolManager: IPoolManager;
-    Utils: any[];
+    SystemManager: ISystemManager;
+    Utils: IUtil[];
+    // clear: () => void;
 }
