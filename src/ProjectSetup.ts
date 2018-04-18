@@ -3,6 +3,8 @@ import { IProjectSetup, IUtil } from "./interfaces";
 import { PoolManager } from "./PoolManager";
 import { SystemManager } from "./SystemManager";
 
+export { Project };
+
 class Project  {
     public project: IProjectSetup;
     protected globalObject: any;

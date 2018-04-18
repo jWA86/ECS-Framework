@@ -1,6 +1,6 @@
 {
   "name": "ecs-framework",
-  "version": "5.1.0-pre-alpha",
+  "version": "5.1.1-pre-alpha",
   "description": "Simple Component Entity System",
   "main": "./dist/index.js",
   "types": "./dist/src/entry.d.ts",
