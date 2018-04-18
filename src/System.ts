@@ -7,10 +7,6 @@ abstract class System<T> implements ISystem<T> {
     public factories: Array<IComponentFactory<IComponent>>;
     protected keys: string[];
     constructor(protected paramObj: T) {
-        // keys from a generic would dispense us from providing an object to the constructor
-        // still at some point I need an instance of that object
-        // since i can't instantiate a generic
-        // I need to pass an instance
         this.keys = Object.keys(this.paramObj);
     }
     public setParamsSource(...args: Array<IComponentFactory<IComponent>>) {

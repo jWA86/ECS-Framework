@@ -83,14 +83,15 @@ class GameLoop implements IGameLoop {
 
         // limit delta max value when browser loose focus and resume ?
         while (this._currentTimer.lag >= this._currentTimer.MS_PER_UPDATE) {
-            this.updateFixedTS(args);
+            this.updateFixedTS(...args);
             this._currentTimer.lag -= this._currentTimer.MS_PER_UPDATE;
         }
 
-        this.updateNonFixedTS(args);
+        this.updateNonFixedTS(...args);
 
         if (this._running) {
-            this._frameId = requestAnimationFrame(() => this.loop(args));
+            // is ... args necessary here ?
+            this._frameId = requestAnimationFrame(() => this.loop(...args));
         } else {
             cancelAnimationFrame(this._frameId);
         }
@@ -100,7 +101,7 @@ class GameLoop implements IGameLoop {
         const l = this._fixedTSSystems.length;
         for (let i = 0; i < l; ++i) {
             if (this._fixedTSSystems[i].active) {
-                this._fixedTSSystems[i].process([this._currentTimer, args]);
+                this._fixedTSSystems[i].process(this._currentTimer, ...args);
             }
         }
     }
@@ -110,7 +111,7 @@ class GameLoop implements IGameLoop {
         const l = this._nonFixedTSSystems.length;
         for (let i = 0; i < l; ++i) {
             if (this._nonFixedTSSystems[i].active) {
-                this._nonFixedTSSystems[i].process([this._currentTimer, args]);
+                this._nonFixedTSSystems[i].process(this._currentTimer, ...args);
             }
         }
     }

@@ -63,9 +63,9 @@ function test() {
     };
 
     class FeedBackSystem extends System<IFeedBackParams> {
-        public static callBack: (timer: FrameEvent, args: any[]) => void;
+        public static callBack: (timer: FrameEvent, ...args: any[]) => void;
         public execute(params: IFeedBackParams, timer: FrameEvent, ...args: any[]) {
-            FeedBackSystem.callBack(timer, args);
+            FeedBackSystem.callBack(timer, ...args);
         }
     }
 
@@ -383,5 +383,55 @@ function test() {
             }
         }, 20);
 
+    });
+
+    it("pass optional parameter from start to each system", (done) => {
+        feedBackFactory.create(1, true);
+        const s = new FeedBackSystem(feedbackParams);
+        s.setParamsSource(feedBackFactory);
+        FeedBackSystem["timerArr"] = [];
+        FeedBackSystem.callBack = (timer: FrameEvent, a1, a2) => {
+            FeedBackSystem["arg1"] = a1;
+            FeedBackSystem["arg2"] = a2;
+        };
+        const sM = new SystemManager();
+        sM.pushSystem(s, false);
+        const gl = new GameLoop(sM);
+
+        const arg1 = "an argument";
+        const arg2 = { n: 10 };
+
+        gl.start(arg1, arg2);
+        setTimeout(() => {
+            gl.stop();
+            expect(FeedBackSystem["arg1"]).to.be.equal(arg1);
+            expect(FeedBackSystem["arg2"]).to.be.equal(arg2);
+            done();
+        }, 600);
+    });
+    it("pass the currentTimer to each System as optional parameter", (done) => {
+        feedBackFactory.create(1, true);
+        const s = new FeedBackSystem(feedbackParams);
+        s.setParamsSource(feedBackFactory);
+        FeedBackSystem["timerArr"] = [];
+        FeedBackSystem.callBack = (timer: FrameEvent) => {
+            FeedBackSystem["timerArr"].push(timer.time);
+        };
+        const sM = new SystemManager();
+        sM.pushSystem(s, false);
+        const gl = new GameLoop(sM);
+
+        gl.start();
+        setTimeout(() => {
+            gl.stop();
+            expect(FeedBackSystem["timerArr"].length).to.be.greaterThan(0);
+            FeedBackSystem["timerArr"].forEach((v, i) => {
+                // first might be equal 0
+                if (i > 0) {
+                    expect(v).to.not.equal(0);
+                }
+            });
+            done();
+        }, 600);
     });
 }

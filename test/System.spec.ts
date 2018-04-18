@@ -193,6 +193,10 @@ describe("System ", () => {
             });
 
             it("should iterate on the 1st factory and update its components with components of the 2nd factory", () => {
+
+                for (let i = 0; i < positionFactory.size - 1; ++i) {
+                    expect(positionFactory.values[i].position.x).to.not.equal(2.0);
+                }
                 const s = new MoveSystem(moveParams);
                 s.setParamsSource(positionFactory, velocityFactory);
                 s.process();
@@ -268,6 +272,54 @@ describe("System ", () => {
                     expect(positionFactory.values[i].position.x).to.equal(0.0);
                 }
             });
+        });
+    });
+
+    describe("passing additional arguments ", () => {
+        class ArgsComponent implements IComponent {
+            public active: boolean;
+            public entityId: number;
+            constructor(public notFromComponent1: number, public notFromComponent2: number) { }
+        }
+        interface IArgsParam {
+            a1: { notFromComponent1: number };
+            a2: { notFromComponent2: number };
+        }
+
+        const defaultArgsParam: IArgsParam  = {
+            a1: { notFromComponent1: 0 },
+            a2: { notFromComponent2 : 0 },
+        };
+
+        // set component prop value from external variables value passed to the process methode
+        class ArgsSystem extends System<IArgsParam> {
+            constructor(params: IArgsParam) { super(params); }
+            public execute(params: IArgsParam, arg1: number, arg2: number ) {
+                params.a1.notFromComponent1 = arg1;
+                params.a2.notFromComponent2 = arg2;
+            }
+        }
+
+        let argsPoolFactory: ComponentFactory<ArgsComponent>;
+
+        beforeEach(() => {
+            argsPoolFactory = new ComponentFactory<ArgsComponent>(10, new ArgsComponent(0, 0));
+        });
+
+        it("additional arguments should be readable in the execute function", () => {
+            argsPoolFactory.create(1, true);
+            const sys = new ArgsSystem(defaultArgsParam);
+            sys.setParamsSource(argsPoolFactory, argsPoolFactory);
+            expect(argsPoolFactory.get(1).notFromComponent1).to.equal(0);
+            expect(argsPoolFactory.get(1).notFromComponent2).to.equal(0);
+
+            const externalArg1 = 10;
+            const externalArg2 = 20;
+
+            sys.process(externalArg1, externalArg2);
+
+            expect(argsPoolFactory.get(1).notFromComponent1).to.equal(externalArg1);
+            expect(argsPoolFactory.get(1).notFromComponent2).to.equal(externalArg2);
         });
     });
 
