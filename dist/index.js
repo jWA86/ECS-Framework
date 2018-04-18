@@ -779,12 +779,13 @@ var GameLoop = /** @class */ (function () {
         this._currentTimer.time += ellapsed;
         // limit delta max value when browser loose focus and resume ?
         while (this._currentTimer.lag >= this._currentTimer.MS_PER_UPDATE) {
-            this.updateFixedTS(args);
+            this.updateFixedTS.apply(this, args);
             this._currentTimer.lag -= this._currentTimer.MS_PER_UPDATE;
         }
-        this.updateNonFixedTS(args);
+        this.updateNonFixedTS.apply(this, args);
         if (this._running) {
-            this._frameId = requestAnimationFrame(function () { return _this.loop(args); });
+            // is ... args necessary here ?
+            this._frameId = requestAnimationFrame(function () { return _this.loop.apply(_this, args); });
         }
         else {
             cancelAnimationFrame(this._frameId);
@@ -799,9 +800,10 @@ var GameLoop = /** @class */ (function () {
         var l = this._fixedTSSystems.length;
         for (var i = 0; i < l; ++i) {
             if (this._fixedTSSystems[i].active) {
-                this._fixedTSSystems[i].process([this._currentTimer, args]);
+                (_a = this._fixedTSSystems[i]).process.apply(_a, [this._currentTimer].concat(args));
             }
         }
+        var _a;
     };
     /* Process every Non Fixed Systems */
     GameLoop.prototype.updateNonFixedTS = function () {
@@ -812,9 +814,10 @@ var GameLoop = /** @class */ (function () {
         var l = this._nonFixedTSSystems.length;
         for (var i = 0; i < l; ++i) {
             if (this._nonFixedTSSystems[i].active) {
-                this._nonFixedTSSystems[i].process([this._currentTimer, args]);
+                (_a = this._nonFixedTSSystems[i]).process.apply(_a, [this._currentTimer].concat(args));
             }
         }
+        var _a;
     };
     return GameLoop;
 }());
@@ -1274,10 +1277,6 @@ var System = /** @class */ (function () {
     function System(paramObj) {
         this.paramObj = paramObj;
         this.active = true;
-        // keys from a generic would dispense us from providing an object to the constructor
-        // still at some point I need an instance of that object
-        // since i can't instantiate a generic
-        // I need to pass an instance
         this.keys = Object.keys(this.paramObj);
     }
     System.prototype.setParamsSource = function () {
