@@ -3,7 +3,7 @@ import { EntityFactory } from "./EntityFactory";
 import { GameLoop } from "./GameLoop";
 import * as interfaces from "./interfaces";
 import { RANDOM, TIMESTAMP } from "./pollyFill";
-import { Project } from "./ProjectSetup";
+import { Project } from "./Project";
 import { System } from "./System";
 import { SystemManager } from "./SystemManager";
 import * as DEFAULT_CONF from "./utils/DefaultConfig";
