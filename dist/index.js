@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 6);
+/******/ 	return __webpack_require__(__webpack_require__.s = 8);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -78,8 +78,10 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
+/* WEBPACK VAR INJECTION */(function(global) {
 Object.defineProperty(exports, "__esModule", { value: true });
+var isBrowser = new Function("try {return this===window;}catch(e){ return false;}");
+var isNode = new Function("try {return this===global;}catch(e){return false;}");
 var TIMESTAMP = window.performance && window.performance.now ? window.performance : Date;
 exports.TIMESTAMP = TIMESTAMP;
 var RANDOM = {
@@ -87,297 +89,13 @@ var RANDOM = {
     integer: function (max) { return Math.floor(Math.random() * max); },
 };
 exports.RANDOM = RANDOM;
+var GLOBAL = isBrowser() ? window : isNode() ? global : new Error("Unknow environment");
+exports.GLOBAL = GLOBAL;
 
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(true)
-		module.exports = factory();
-	else if(typeof define === 'function' && define.amd)
-		define([], factory);
-	else {
-		var a = factory();
-		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
-	}
-})(typeof self !== 'undefined' ? self : this, function() {
-return /******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
-/******/ })
-/************************************************************************/
-/******/ ([
-/* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(1);
-
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var FastIterationMap = /** @class */ (function () {
-    function FastIterationMap() {
-        this._keys = new Map();
-        this._values = [];
-    }
-    FastIterationMap.prototype.clear = function () {
-        this._keys.clear();
-        this._values = [];
-    };
-    FastIterationMap.prototype.delete = function (key) {
-        var i = this._keys.get(key);
-        var r = this._keys.delete(key);
-        this.offsetIndexInKeys(i, -1);
-        var r2 = this._values.splice(i, 1);
-        if (r2.length > 0 && r) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    };
-    FastIterationMap.prototype.get = function (key) {
-        return this._values[this._keys.get(key)];
-    };
-    /**
-     * Return the index of an element in the value array
-     * @param key
-     */
-    FastIterationMap.prototype.getIndex = function (key) {
-        return this._keys.get(key);
-    };
-    FastIterationMap.prototype.has = function (key) {
-        return this._keys.has(key);
-    };
-    /**
-     * Insert an item after another item
-     * @param key the key of the item to insert
-     * @param value the value of the item
-     * @param keyRef the key of the item to insert after
-     */
-    FastIterationMap.prototype.insertAfter = function (key, value, keyRef) {
-        if (this._keys.get(key) !== undefined) {
-            return false;
-        }
-        var i = this._keys.get(keyRef);
-        if (i === undefined) {
-            return false;
-        }
-        this.insertValue(i + 1, value);
-        this.offsetIndexInKeys(i, 1);
-        this._keys.set(key, i + 1);
-        return true;
-    };
-    /**
-     * Insert 2 items around the another item
-     * @param keyRef the key of the item insert around
-     * @param firstK the key of the item to insert before
-     * @param firstV the value of the item to insert before
-     * @param secondK the key of the item to insert after
-     * @param secondV the value of the item to insert after
-     */
-    FastIterationMap.prototype.insertAround = function (keyRef, firstK, firstV, secondK, secondV) {
-        if (this._keys.get(firstK) !== undefined || this._keys.get(secondK) !== undefined) {
-            return false;
-        }
-        var index = this._keys.get(keyRef);
-        if (index === undefined) {
-            return false;
-        }
-        // insert the 2 items after the item of reference
-        // offset index by 2 in the keys map of all element after the index of reference
-        // in the keys map set index of the 2 new items
-        // finally swap the item of reference with the first of the 2 items inserted
-        this.insertValue(index + 1, firstV, secondV);
-        this.offsetIndexInKeys(index, 2);
-        this._keys.set(firstK, index + 1);
-        this._keys.set(secondK, index + 2);
-        return this.swap(keyRef, firstK);
-    };
-    /**
-     * Insert an item before another item
-     * @param key the key of the item to insert
-     * @param value the value of the item
-     * @param keyRef the key of the item to insert before
-     */
-    FastIterationMap.prototype.insertBefore = function (key, value, keyRef) {
-        if (this._keys.get(key) !== undefined) {
-            return false;
-        }
-        var i = this._keys.get(keyRef);
-        if (i === undefined) {
-            return false;
-        }
-        this.insertValue(i, value);
-        this.offsetIndexInKeys(i - 1, 1);
-        this._keys.set(key, i);
-        return true;
-    };
-    Object.defineProperty(FastIterationMap.prototype, "keys", {
-        get: function () {
-            return this._keys;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(FastIterationMap.prototype, "length", {
-        get: function () {
-            return this._values.length;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(FastIterationMap.prototype, "size", {
-        get: function () {
-            return this._values.length;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(FastIterationMap.prototype, "values", {
-        get: function () {
-            return this._values;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    FastIterationMap.prototype.push = function (key, value) {
-        var e = this._keys.get(key);
-        // if the key doesn't exist add the element
-        if (e === undefined) {
-            var l = this._values.push(value);
-            this._keys.set(key, l - 1);
-        }
-        else {
-            // if the key is already there, update the value
-            this._values[e] = value;
-        }
-        return this._values.length;
-    };
-    FastIterationMap.prototype.set = function (key, value) {
-        return this.push(key, value);
-    };
-    /**
-     * Swap position of 2 items in the values array and set the correct index in the keys Map
-     * @param key1
-     * @param key2
-     */
-    FastIterationMap.prototype.swap = function (key1, key2) {
-        var index1 = this._keys.get(key1);
-        var index2 = this._keys.get(key2);
-        if (index1 === undefined || index2 === undefined) {
-            return false;
-        }
-        var tmp = this._values[index1];
-        this._values[index1] = this._values[index2];
-        this._values[index2] = tmp;
-        this._keys.set(key1, index2);
-        this._keys.set(key2, index1);
-        return true;
-    };
-    FastIterationMap.prototype.insertValue = function (index) {
-        var values = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            values[_i - 1] = arguments[_i];
-        }
-        return (_a = this._values).splice.apply(_a, [index, 0].concat(values));
-        var _a;
-    };
-    /**
-     * Offset indices in the keys Map from a position ([from] and [to] not included)
-     * @param from offset after this key
-     * @param offsetVal the amount to offset indices
-     * @param to if specidied offset until this key, otherwise offset to end of the collection
-     */
-    FastIterationMap.prototype.offsetIndexInKeys = function (from, offsetVal, to) {
-        var mapIter = this._keys.entries();
-        var l = this._keys.size;
-        to = to || Number.MAX_VALUE;
-        for (var i = 0; i < l; ++i) {
-            var e = mapIter.next().value;
-            if (e[1] > from && e[1] < to) {
-                this._keys.set(e[0], e[1] += offsetVal);
-            }
-        }
-    };
-    return FastIterationMap;
-}());
-exports.FastIterationMap = FastIterationMap;
-
-
-/***/ })
-/******/ ]);
-});
-
-/***/ }),
-/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -393,7 +111,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var FastIterationMap_1 = __webpack_require__(1);
+var FastIterationMap_1 = __webpack_require__(2);
 var ComponentFactory = /** @class */ (function (_super) {
     __extends(ComponentFactory, _super);
     function ComponentFactory(_size, componentWithDefaultValue) {
@@ -683,7 +401,432 @@ exports.ComponentFactory = ComponentFactory;
 
 
 /***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(true)
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else {
+		var a = factory();
+		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
+	}
+})(typeof self !== 'undefined' ? self : this, function() {
+return /******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(1);
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var FastIterationMap = /** @class */ (function () {
+    function FastIterationMap() {
+        this._keys = new Map();
+        this._values = [];
+    }
+    FastIterationMap.prototype.clear = function () {
+        this._keys.clear();
+        this._values = [];
+    };
+    FastIterationMap.prototype.delete = function (key) {
+        var i = this._keys.get(key);
+        var r = this._keys.delete(key);
+        this.offsetIndexInKeys(i, -1);
+        var r2 = this._values.splice(i, 1);
+        if (r2.length > 0 && r) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    FastIterationMap.prototype.get = function (key) {
+        return this._values[this._keys.get(key)];
+    };
+    /**
+     * Return the index of an element in the value array
+     * @param key
+     */
+    FastIterationMap.prototype.getIndex = function (key) {
+        return this._keys.get(key);
+    };
+    FastIterationMap.prototype.has = function (key) {
+        return this._keys.has(key);
+    };
+    /**
+     * Insert an item after another item
+     * @param key the key of the item to insert
+     * @param value the value of the item
+     * @param keyRef the key of the item to insert after
+     */
+    FastIterationMap.prototype.insertAfter = function (key, value, keyRef) {
+        if (this._keys.get(key) !== undefined) {
+            return false;
+        }
+        var i = this._keys.get(keyRef);
+        if (i === undefined) {
+            return false;
+        }
+        this.insertValue(i + 1, value);
+        this.offsetIndexInKeys(i, 1);
+        this._keys.set(key, i + 1);
+        return true;
+    };
+    /**
+     * Insert 2 items around the another item
+     * @param keyRef the key of the item insert around
+     * @param firstK the key of the item to insert before
+     * @param firstV the value of the item to insert before
+     * @param secondK the key of the item to insert after
+     * @param secondV the value of the item to insert after
+     */
+    FastIterationMap.prototype.insertAround = function (keyRef, firstK, firstV, secondK, secondV) {
+        if (this._keys.get(firstK) !== undefined || this._keys.get(secondK) !== undefined) {
+            return false;
+        }
+        var index = this._keys.get(keyRef);
+        if (index === undefined) {
+            return false;
+        }
+        // insert the 2 items after the item of reference
+        // offset index by 2 in the keys map of all element after the index of reference
+        // in the keys map set index of the 2 new items
+        // finally swap the item of reference with the first of the 2 items inserted
+        this.insertValue(index + 1, firstV, secondV);
+        this.offsetIndexInKeys(index, 2);
+        this._keys.set(firstK, index + 1);
+        this._keys.set(secondK, index + 2);
+        return this.swap(keyRef, firstK);
+    };
+    /**
+     * Insert an item before another item
+     * @param key the key of the item to insert
+     * @param value the value of the item
+     * @param keyRef the key of the item to insert before
+     */
+    FastIterationMap.prototype.insertBefore = function (key, value, keyRef) {
+        if (this._keys.get(key) !== undefined) {
+            return false;
+        }
+        var i = this._keys.get(keyRef);
+        if (i === undefined) {
+            return false;
+        }
+        this.insertValue(i, value);
+        this.offsetIndexInKeys(i - 1, 1);
+        this._keys.set(key, i);
+        return true;
+    };
+    Object.defineProperty(FastIterationMap.prototype, "keys", {
+        get: function () {
+            return this._keys;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(FastIterationMap.prototype, "length", {
+        get: function () {
+            return this._values.length;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(FastIterationMap.prototype, "size", {
+        get: function () {
+            return this._values.length;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(FastIterationMap.prototype, "values", {
+        get: function () {
+            return this._values;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    FastIterationMap.prototype.push = function (key, value) {
+        var e = this._keys.get(key);
+        // if the key doesn't exist add the element
+        if (e === undefined) {
+            var l = this._values.push(value);
+            this._keys.set(key, l - 1);
+        }
+        else {
+            // if the key is already there, update the value
+            this._values[e] = value;
+        }
+        return this._values.length;
+    };
+    FastIterationMap.prototype.set = function (key, value) {
+        return this.push(key, value);
+    };
+    /**
+     * Swap position of 2 items in the values array and set the correct index in the keys Map
+     * @param key1
+     * @param key2
+     */
+    FastIterationMap.prototype.swap = function (key1, key2) {
+        var index1 = this._keys.get(key1);
+        var index2 = this._keys.get(key2);
+        if (index1 === undefined || index2 === undefined) {
+            return false;
+        }
+        var tmp = this._values[index1];
+        this._values[index1] = this._values[index2];
+        this._values[index2] = tmp;
+        this._keys.set(key1, index2);
+        this._keys.set(key2, index1);
+        return true;
+    };
+    FastIterationMap.prototype.insertValue = function (index) {
+        var values = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            values[_i - 1] = arguments[_i];
+        }
+        return (_a = this._values).splice.apply(_a, [index, 0].concat(values));
+        var _a;
+    };
+    /**
+     * Offset indices in the keys Map from a position ([from] and [to] not included)
+     * @param from offset after this key
+     * @param offsetVal the amount to offset indices
+     * @param to if specidied offset until this key, otherwise offset to end of the collection
+     */
+    FastIterationMap.prototype.offsetIndexInKeys = function (from, offsetVal, to) {
+        var mapIter = this._keys.entries();
+        var l = this._keys.size;
+        to = to || Number.MAX_VALUE;
+        for (var i = 0; i < l; ++i) {
+            var e = mapIter.next().value;
+            if (e[1] > from && e[1] < to) {
+                this._keys.set(e[0], e[1] += offsetVal);
+            }
+        }
+    };
+    return FastIterationMap;
+}());
+exports.FastIterationMap = FastIterationMap;
+
+
+/***/ })
+/******/ ]);
+});
+
+/***/ }),
 /* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var EntityFactory = /** @class */ (function () {
+    function EntityFactory(_size, type) {
+        if (type === void 0) { type = "Entity"; }
+        this._size = _size;
+        this.type = type;
+        this._factories = new Map();
+    }
+    EntityFactory.prototype.activate = function (entityId, value, factoriesName) {
+        var _this = this;
+        if (factoriesName) {
+            factoriesName.forEach(function (f) {
+                var ff = _this.getFactory(f);
+                if (ff) {
+                    ff.activate(entityId, value);
+                }
+            });
+        }
+        else {
+            this._factories.forEach(function (f) {
+                f.activate(entityId, value);
+            });
+        }
+    };
+    EntityFactory.prototype.activateAll = function (value) {
+        this._factories.forEach(function (f) {
+            f.activateAll(value);
+        });
+    };
+    EntityFactory.prototype.addFactory = function (name, factory) {
+        if (factory.size !== this._size) {
+            factory.resizeTo(this._size);
+        }
+        this._factories.set(name, factory);
+    };
+    EntityFactory.prototype.getComponent = function (entityId, factoryName) {
+        var f = this._factories.get(factoryName);
+        if (f) {
+            return f.get(entityId);
+        }
+        else {
+            return undefined;
+        }
+    };
+    EntityFactory.prototype.getFactory = function (name) {
+        return this._factories.get(name);
+    };
+    EntityFactory.prototype.free = function (entityId) {
+        var d = true;
+        this._factories.forEach(function (f) {
+            if (!f.free(entityId)) {
+                d = false;
+            }
+        });
+        // false if no factories
+        return this._factories.size > 0 && d;
+    };
+    EntityFactory.prototype.get = function (entityId) {
+        var e = [];
+        this._factories.forEach(function (f) {
+            e.push(f.get(entityId));
+        });
+        return e;
+    };
+    EntityFactory.prototype.has = function (entityId) {
+        var it = this._factories.entries();
+        return it.next().value[1].has(entityId);
+    };
+    EntityFactory.prototype.create = function (entityId, active) {
+        this._factories.forEach(function (f) {
+            f.create(entityId, active);
+        });
+    };
+    EntityFactory.prototype.resizeTo = function (size) {
+        this._factories.forEach(function (f) {
+            f.resizeTo(size);
+        });
+        this._size = size;
+    };
+    Object.defineProperty(EntityFactory.prototype, "activeLength", {
+        get: function () {
+            // return iteratorLength of the first factory;
+            var it = this._factories.entries();
+            return it.next().value[1].activeLength;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(EntityFactory.prototype, "nbActive", {
+        get: function () {
+            var it = this._factories.entries();
+            return it.next().value[1].nbActive;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(EntityFactory.prototype, "nbCreated", {
+        get: function () {
+            var it = this._factories.entries();
+            return it.next().value[1].nbCreated;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(EntityFactory.prototype, "nbFreeSlot", {
+        get: function () {
+            var it = this._factories.entries();
+            return it.next().value[1].nbFreeSlot;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(EntityFactory.prototype, "nbInactive", {
+        get: function () {
+            var it = this._factories.entries();
+            return it.next().value[1].nbInactive;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(EntityFactory.prototype, "size", {
+        get: function () {
+            return this._size;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return EntityFactory;
+}());
+exports.EntityFactory = EntityFactory;
+
+
+/***/ }),
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -825,13 +968,82 @@ exports.GameLoop = GameLoop;
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var FastIterationMap_1 = __webpack_require__(1);
+var System = /** @class */ (function () {
+    function System(paramObj) {
+        this.paramObj = paramObj;
+        this.active = true;
+        this.keys = Object.keys(this.paramObj);
+    }
+    System.prototype.setParamsSource = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        // verify number of args
+        // verify that the component the factory holds have the proprety define by the paramObj
+        this.factories = args;
+    };
+    System.prototype.process = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        var params = this.paramObj;
+        var flist = this.factories;
+        // flist.length = this.keys.length
+        var nbComponent = flist[0].activeLength;
+        var f = flist[0].values;
+        for (var i = 0; i < nbComponent; ++i) {
+            // get the component from the first factory that serve as a reference
+            // if it is active query the other components
+            var refComponent = f[i];
+            if (refComponent.active) {
+                params[this.keys[0]] = refComponent;
+                var isFound = true;
+                // Iterate others factories to query rest of the components
+                for (var j = 1; j < flist.length; ++j) {
+                    // If the factory is the same as the factory that serve as a reference
+                    // we push the same component to the args array,
+                    // otherwise we query the component though get(entityId)
+                    if (flist[j] === flist[0]) {
+                        params[this.keys[j]] = refComponent;
+                    }
+                    else {
+                        var c = flist[j].get(refComponent.entityId);
+                        if (!c) {
+                            isFound = false;
+                            break;
+                        }
+                        params[this.keys[j]] = c;
+                    }
+                }
+                if (isFound) {
+                    // why apply is necessary ?
+                    // this.execute.apply(this, params);
+                    this.execute.apply(this, [params].concat(args));
+                }
+            }
+        }
+    };
+    return System;
+}());
+exports.System = System;
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var FastIterationMap_1 = __webpack_require__(2);
 var pollyFill_1 = __webpack_require__(0);
 // fixedTimeStep = update at requestionAnimation frequency
 // nonFixedTimeStep = update as much as possible between frame
@@ -983,7 +1195,7 @@ exports.SystemManager = SystemManager;
 
 
 /***/ }),
-/* 5 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -994,182 +1206,10 @@ exports.TM_POOL_SIZE = TM_POOL_SIZE;
 
 
 /***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(7);
-
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var ComponentFactory_1 = __webpack_require__(2);
-exports.ComponentFactory = ComponentFactory_1.ComponentFactory;
-var EntityFactory_1 = __webpack_require__(8);
-exports.EntityFactory = EntityFactory_1.EntityFactory;
-var GameLoop_1 = __webpack_require__(3);
-exports.GameLoop = GameLoop_1.GameLoop;
-var interfaces = __webpack_require__(9);
-exports.interfaces = interfaces;
-var pollyFill_1 = __webpack_require__(0);
-exports.RANDOM = pollyFill_1.RANDOM;
-exports.TIMESTAMP = pollyFill_1.TIMESTAMP;
-var ProjectSetup_1 = __webpack_require__(10);
-exports.Project = ProjectSetup_1.Project;
-var System_1 = __webpack_require__(12);
-exports.System = System_1.System;
-var SystemManager_1 = __webpack_require__(4);
-exports.SystemManager = SystemManager_1.SystemManager;
-var DEFAULT_CONF = __webpack_require__(5);
-exports.DEFAULT_CONF = DEFAULT_CONF;
-var TimeMeasureUtil_1 = __webpack_require__(13);
-exports.TimeMeasureComponent = TimeMeasureUtil_1.TimeMeasureComponent;
-exports.TimeMeasureSystem = TimeMeasureUtil_1.TimeMeasureSystem;
-exports.TimeMeasureSystemEndMark = TimeMeasureUtil_1.TimeMeasureSystemEndMark;
-exports.TimeMeasureSystemStartMark = TimeMeasureUtil_1.TimeMeasureSystemStartMark;
-exports.TimeMeasureUtil = TimeMeasureUtil_1.TimeMeasureUtil;
-
-
-/***/ }),
 /* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var EntityFactory = /** @class */ (function () {
-    function EntityFactory(_size, type) {
-        if (type === void 0) { type = "Entity"; }
-        this._size = _size;
-        this.type = type;
-        this._factories = new Map();
-    }
-    EntityFactory.prototype.activate = function (entityId, value, factoriesName) {
-        var _this = this;
-        if (factoriesName) {
-            factoriesName.forEach(function (f) {
-                var ff = _this.getFactory(f);
-                if (ff) {
-                    ff.activate(entityId, value);
-                }
-            });
-        }
-        else {
-            this._factories.forEach(function (f) {
-                f.activate(entityId, value);
-            });
-        }
-    };
-    EntityFactory.prototype.activateAll = function (value) {
-        this._factories.forEach(function (f) {
-            f.activateAll(value);
-        });
-    };
-    EntityFactory.prototype.addFactory = function (name, factory) {
-        if (factory.size !== this._size) {
-            factory.resizeTo(this._size);
-        }
-        this._factories.set(name, factory);
-    };
-    EntityFactory.prototype.getComponent = function (entityId, factoryName) {
-        var f = this._factories.get(factoryName);
-        if (f) {
-            return f.get(entityId);
-        }
-        else {
-            return undefined;
-        }
-    };
-    EntityFactory.prototype.getFactory = function (name) {
-        return this._factories.get(name);
-    };
-    EntityFactory.prototype.free = function (entityId) {
-        var d = true;
-        this._factories.forEach(function (f) {
-            if (!f.free(entityId)) {
-                d = false;
-            }
-        });
-        // false if no factories
-        return this._factories.size > 0 && d;
-    };
-    EntityFactory.prototype.get = function (entityId) {
-        var e = [];
-        this._factories.forEach(function (f) {
-            e.push(f.get(entityId));
-        });
-        return e;
-    };
-    EntityFactory.prototype.has = function (entityId) {
-        var it = this._factories.entries();
-        return it.next().value[1].has(entityId);
-    };
-    EntityFactory.prototype.create = function (entityId, active) {
-        this._factories.forEach(function (f) {
-            f.create(entityId, active);
-        });
-    };
-    EntityFactory.prototype.resizeTo = function (size) {
-        this._factories.forEach(function (f) {
-            f.resizeTo(size);
-        });
-        this._size = size;
-    };
-    Object.defineProperty(EntityFactory.prototype, "activeLength", {
-        get: function () {
-            // return iteratorLength of the first factory;
-            var it = this._factories.entries();
-            return it.next().value[1].activeLength;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(EntityFactory.prototype, "nbActive", {
-        get: function () {
-            var it = this._factories.entries();
-            return it.next().value[1].nbActive;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(EntityFactory.prototype, "nbCreated", {
-        get: function () {
-            var it = this._factories.entries();
-            return it.next().value[1].nbCreated;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(EntityFactory.prototype, "nbFreeSlot", {
-        get: function () {
-            var it = this._factories.entries();
-            return it.next().value[1].nbFreeSlot;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(EntityFactory.prototype, "nbInactive", {
-        get: function () {
-            var it = this._factories.entries();
-            return it.next().value[1].nbInactive;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(EntityFactory.prototype, "size", {
-        get: function () {
-            return this._size;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    return EntityFactory;
-}());
-exports.EntityFactory = EntityFactory;
+module.exports = __webpack_require__(9);
 
 
 /***/ }),
@@ -1179,59 +1219,58 @@ exports.EntityFactory = EntityFactory;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+var ComponentFactory_1 = __webpack_require__(1);
+exports.ComponentFactory = ComponentFactory_1.ComponentFactory;
+var EntityFactory_1 = __webpack_require__(3);
+exports.EntityFactory = EntityFactory_1.EntityFactory;
+var GameLoop_1 = __webpack_require__(4);
+exports.GameLoop = GameLoop_1.GameLoop;
+var interfaces = __webpack_require__(11);
+exports.interfaces = interfaces;
+var pollyFill_1 = __webpack_require__(0);
+exports.RANDOM = pollyFill_1.RANDOM;
+exports.TIMESTAMP = pollyFill_1.TIMESTAMP;
+var Project_1 = __webpack_require__(12);
+exports.Project = Project_1.Project;
+var System_1 = __webpack_require__(5);
+exports.System = System_1.System;
+var SystemManager_1 = __webpack_require__(6);
+exports.SystemManager = SystemManager_1.SystemManager;
+var DEFAULT_CONF = __webpack_require__(7);
+exports.DEFAULT_CONF = DEFAULT_CONF;
+var TimeMeasureUtil_1 = __webpack_require__(14);
+exports.TimeMeasureComponent = TimeMeasureUtil_1.TimeMeasureComponent;
+exports.TimeMeasureSystem = TimeMeasureUtil_1.TimeMeasureSystem;
+exports.TimeMeasureSystemEndMark = TimeMeasureUtil_1.TimeMeasureSystemEndMark;
+exports.TimeMeasureSystemStartMark = TimeMeasureUtil_1.TimeMeasureSystemStartMark;
+exports.TimeMeasureUtil = TimeMeasureUtil_1.TimeMeasureUtil;
 
 
 /***/ }),
 /* 10 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-"use strict";
+var g;
 
-Object.defineProperty(exports, "__esModule", { value: true });
-var GameLoop_1 = __webpack_require__(3);
-var PoolManager_1 = __webpack_require__(11);
-var SystemManager_1 = __webpack_require__(4);
-var Project = /** @class */ (function () {
-    function Project(globalObject, _projectName) {
-        var utils = [];
-        for (var _i = 2; _i < arguments.length; _i++) {
-            utils[_i - 2] = arguments[_i];
-        }
-        this._projectName = _projectName;
-        var sysM = new SystemManager_1.SystemManager();
-        this.project = {
-            GameLoop: new GameLoop_1.GameLoop(sysM),
-            PoolManager: new PoolManager_1.PoolManager(),
-            SystemManager: sysM,
-            Utils: utils.slice()
-        };
-        globalObject[_projectName] = this.project;
-    }
-    Object.defineProperty(Project.prototype, "projectName", {
-        get: function () {
-            return this._projectName;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    /**
-     * Clear references so that the project can be garbage collected
-     */
-    Project.prototype.clear = function () {
-        this.project.GameLoop.stop();
-        this.project.GameLoop.systemManager = undefined;
-        this.project.SystemManager = undefined;
-        this.project.PoolManager = undefined;
-        this.globalObject[this._projectName] = undefined;
-        this.project.Utils = [];
-        try {
-            delete this.globalObject[this._projectName];
-        }
-        catch (e) { }
-    };
-    return Project;
-}());
-exports.Project = Project;
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
 
 
 /***/ }),
@@ -1241,7 +1280,90 @@ exports.Project = Project;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var FastIterationMap_1 = __webpack_require__(1);
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var ComponentFactory_1 = __webpack_require__(1);
+var EntityFactory_1 = __webpack_require__(3);
+var GameLoop_1 = __webpack_require__(4);
+var pollyFill_1 = __webpack_require__(0);
+var PoolManager_1 = __webpack_require__(13);
+var System_1 = __webpack_require__(5);
+var SystemManager_1 = __webpack_require__(6);
+var Project = /** @class */ (function () {
+    function Project(_projectName, dependencies) {
+        this._projectName = _projectName;
+        var sysM = new SystemManager_1.SystemManager();
+        this.gameLoop = new GameLoop_1.GameLoop(sysM);
+        this.poolManager = new PoolManager_1.PoolManager();
+        this.systemManager = sysM;
+        this._dependencies = dependencies || [];
+        pollyFill_1.GLOBAL[_projectName] = this;
+        this.exposeCore();
+        this.exposeDependencies(this._dependencies);
+    }
+    Project.prototype.clear = function () {
+        this.gameLoop.stop();
+        this.gameLoop.systemManager = undefined;
+        this.systemManager = undefined;
+        this.poolManager = undefined;
+        if (pollyFill_1.GLOBAL) {
+            pollyFill_1.GLOBAL[this._projectName] = undefined;
+            try {
+                delete pollyFill_1.GLOBAL[this._projectName];
+                this._dependencies.forEach(function (d) {
+                    pollyFill_1.GLOBAL[d.name] = undefined;
+                    delete pollyFill_1.GLOBAL[d.name];
+                });
+            }
+            catch (e) {
+                throw e;
+            }
+        }
+    };
+    Project.prototype.exposeCore = function () {
+        pollyFill_1.GLOBAL["ComponentFactory"] = ComponentFactory_1.ComponentFactory;
+        pollyFill_1.GLOBAL["System"] = System_1.System;
+        pollyFill_1.GLOBAL["EntityFactory"] = EntityFactory_1.EntityFactory;
+    };
+    Project.prototype.exposeDependencies = function (dependencies) {
+        dependencies.forEach(function (d) {
+            pollyFill_1.GLOBAL[d.name] = d.object;
+        });
+    };
+    Object.defineProperty(Project.prototype, "projectName", {
+        get: function () {
+            return this._projectName;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Project.prototype, "dependencies", {
+        get: function () {
+            return this._dependencies;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return Project;
+}());
+exports.Project = Project;
+
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var FastIterationMap_1 = __webpack_require__(2);
 var pollyFill_1 = __webpack_require__(0);
 var PoolManager = /** @class */ (function () {
     function PoolManager() {
@@ -1267,76 +1389,7 @@ exports.PoolManager = PoolManager;
 
 
 /***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var System = /** @class */ (function () {
-    function System(paramObj) {
-        this.paramObj = paramObj;
-        this.active = true;
-        this.keys = Object.keys(this.paramObj);
-    }
-    System.prototype.setParamsSource = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        // verify number of args
-        // verify that the component the factory holds have the proprety define by the paramObj
-        this.factories = args;
-    };
-    System.prototype.process = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        var params = this.paramObj;
-        var flist = this.factories;
-        // flist.length = this.keys.length
-        var nbComponent = flist[0].activeLength;
-        var f = flist[0].values;
-        for (var i = 0; i < nbComponent; ++i) {
-            // get the component from the first factory that serve as a reference
-            // if it is active query the other components
-            var refComponent = f[i];
-            if (refComponent.active) {
-                params[this.keys[0]] = refComponent;
-                var isFound = true;
-                // Iterate others factories to query rest of the components
-                for (var j = 1; j < flist.length; ++j) {
-                    // If the factory is the same as the factory that serve as a reference
-                    // we push the same component to the args array,
-                    // otherwise we query the component though get(entityId)
-                    if (flist[j] === flist[0]) {
-                        params[this.keys[j]] = refComponent;
-                    }
-                    else {
-                        var c = flist[j].get(refComponent.entityId);
-                        if (!c) {
-                            isFound = false;
-                            break;
-                        }
-                        params[this.keys[j]] = c;
-                    }
-                }
-                if (isFound) {
-                    // why apply is necessary ?
-                    // this.execute.apply(this, params);
-                    this.execute.apply(this, [params].concat(args));
-                }
-            }
-        }
-    };
-    return System;
-}());
-exports.System = System;
-
-
-/***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1352,9 +1405,9 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var ComponentFactory_1 = __webpack_require__(2);
+var ComponentFactory_1 = __webpack_require__(1);
 var pollyFill_1 = __webpack_require__(0);
-var DefaultConfig_1 = __webpack_require__(5);
+var DefaultConfig_1 = __webpack_require__(7);
 /**
  * Component that holds time measure
  */
