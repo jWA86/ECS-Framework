@@ -58,6 +58,10 @@ class TimeMeasureUtil implements ITimeMeasureUtil {
         this.timeMeasurePool.free(tmComponent.entityId);
         this.measures.delete(tmId);
      }
+
+    public getMeasures(tmComponent: TimeMeasureComponent) {
+        return TimeMeasureSystem.performance.getEntriesByName(tmComponent.measureId);
+     }
 }
 
 abstract class TimeMeasureSystem implements ISystem<void> {
@@ -73,58 +77,10 @@ abstract class TimeMeasureSystem implements ISystem<void> {
         this.endMark = "end" + this.tmComponent.measureId;
      }
      /** Not used */
-    public abstract process(args: any[]);
-    public getData() {
+    public abstract process(...args: any[]);
+
+    public getMeasures() {
         return TimeMeasureSystem.performance.getEntriesByName(this.tmComponent.measureId);
-    }
-}
-
-/**
- * System that place a mark to start the measure of time
- */
-class TimeMeasureSystemStartMark extends TimeMeasureSystem {
-    /**
-     * @param tmComponent the component used for recording time
-     */
-    constructor(tmComponent: TimeMeasureComponent) { super(tmComponent); }
-    /**
-     * Place the starting mark
-     */
-    public process(args: any[]) {
-        // TimeMeasureSystem.performance.mark(this.startMark);
-        window.performance.mark(this.startMark);
-    }
-    /**
-     * Not used
-     */
-    public execute() {}
-}
-
-class TimeMeasureSystemEndMark extends TimeMeasureSystem {
-    public lastUpdate: number = 0;
-    constructor(tmComponent: TimeMeasureComponent) { super(tmComponent); }
-    /**
-     * @param args first args have to be a FrameEvent object
-     */
-    public process(args: any[]) {
-       this.execute(args[0]);
-    }
-    /**
-     *  Measure time passed since the start mark and compute statistics if time.lag >= the specified frequency of computation
-     * @param time FrameEvent used to decide when to compute data
-     */
-    public execute(time: IFrameEvent) {
-        TimeMeasureSystem.performance.mark(this.endMark);
-        this.measure();
-        // console.log(TIMESTAMP.now() - this.lastUpdate);
-        if ((TIMESTAMP.now() - this.lastUpdate) >= this.tmComponent.frequency) {
-            this.computeData();
-            this.clearData();
-            this.lastUpdate = TIMESTAMP.now();
-        }
-    }
-    public measure() {
-        TimeMeasureSystem.performance.measure(this.tmComponent.measureId, this.startMark, this.endMark);
     }
     /**
      * Set max, min mean and last measure to the TMComponent from the performance.measure data set
@@ -149,12 +105,62 @@ class TimeMeasureSystemEndMark extends TimeMeasureSystem {
         this.tmComponent.meanT = mean;
         this.tmComponent.maxT = max;
         this.tmComponent.minT = min;
-        this.tmComponent.lastT = measures[l - 1].duration;
+        l > 0 ? this.tmComponent.lastT = measures[l - 1].duration : this.tmComponent.lastT = undefined;
     }
+
+    public measure() {
+        TimeMeasureSystem.performance.measure(this.tmComponent.measureId, this.startMark, this.endMark);
+    }
+
     /**
      * Clear the measure data set
      */
-    public clearData() {
+    public clearMeasures() {
         TimeMeasureSystem.performance.clearMeasures(this.tmComponent.measureId);
+    }
+}
+
+/**
+ * System that place a mark to start the measure of time
+ */
+class TimeMeasureSystemStartMark extends TimeMeasureSystem {
+    /**
+     * @param tmComponent the component used for recording time
+     */
+    constructor(tmComponent: TimeMeasureComponent) { super(tmComponent); }
+    /**
+     * Place the starting mark
+     */
+    public process(...args: any[]) {
+        TimeMeasureSystem.performance.mark(this.startMark);
+    }
+    /**
+     * Not used
+     */
+    public execute() {}
+}
+
+class TimeMeasureSystemEndMark extends TimeMeasureSystem {
+    public lastUpdate: number = 0;
+    constructor(tmComponent: TimeMeasureComponent) { super(tmComponent); }
+    /**
+     * @param args first args have to be a FrameEvent object
+     */
+    public process(...args: any[]) {
+       this.execute(args[0]);
+    }
+    /**
+     *  Measure time passed since the start mark and compute statistics if time.lag >= the specified frequency of computation
+     * @param time FrameEvent used to decide when to compute data
+     */
+    public execute(time: IFrameEvent) {
+        TimeMeasureSystem.performance.mark(this.endMark);
+        this.measure();
+        // console.log(TIMESTAMP.now() - this.lastUpdate);
+        if ((TIMESTAMP.now() - this.lastUpdate) >= this.tmComponent.frequency) {
+            this.computeData();
+            this.clearMeasures();
+            this.lastUpdate = TIMESTAMP.now();
+        }
     }
 }

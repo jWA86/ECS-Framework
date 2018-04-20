@@ -4,14 +4,14 @@ import { ComponentFactory, System, SystemManager } from "../../src/entry";
 import { GameLoop } from "../../src/GameLoop";
 import { TIMESTAMP } from "../../src/pollyFill";
 import * as DEFAULT_CONF from "../../src/utils/DefaultConfig";
-import { TimeMeasureComponent, TimeMeasureSystemEndMark, TimeMeasureSystemStartMark, TimeMeasureUtil } from "../../src/utils/TimeMeasureUtil";
+import { TimeMeasureComponent, TimeMeasureSystem,  TimeMeasureSystemEndMark, TimeMeasureSystemStartMark, TimeMeasureUtil  } from "../../src/utils/TimeMeasureUtil";
 
 // problem with requestionAnimationFrame is randomly fired
 // so sometimes test passed sometimes not ...
 let rafWorking = false;
 let wPerfWorking = false;
-describe("pre-requirement", () => {
-    it("requestionAnimationFrame should work", (done) => {
+describe("TimeMeasureUtil pre-requirement", () => {
+    before("requestionAnimationFrame should work", (done) => {
         expect(requestAnimationFrame).to.not.be.equal(undefined);
         // pause after 500ms
         // then check that loop has been called more than once
@@ -32,18 +32,19 @@ describe("pre-requirement", () => {
                 done();
             } else {
                 rafWorking = false;
-                done(Error("WARNING ! RequestAnimationFrame not working) "));
+                done(Error("WARNING ! RequestAnimationFrame not working"));
             }
         }, 1000);
 
     });
-    it("window.performance", () => {
+    before("window.performance", () => {
         expect(performance).to.not.equal(undefined);
         expect(performance.now()).to.be.greaterThan(0);
         expect(performance.mark).to.not.equal(undefined);
         wPerfWorking = true;
     });
 
+    // is it executed AFTER "Before" ?
     if (rafWorking && wPerfWorking) {
         describe("TimeMeasureUtil", test);
     } else {
@@ -59,7 +60,7 @@ function test() {
         public process() {
             let a = 0;
             for (let i = 0; i < 1000; ++i) {
-                a += i * 2;
+                a += i * Math.random();
             }
             this.execute();
         }
@@ -73,7 +74,8 @@ function test() {
     let s2Id: string;
     let s3Id: string;
     let s4Id: string;
-    beforeEach("", () => {
+
+    beforeEach(() => {
         sysManager = new SystemManager();
         s1Id = sysManager.pushSystem(new DummySystem(), false);
         s2Id = sysManager.pushSystem(new DummySystem());
@@ -84,6 +86,28 @@ function test() {
         it("should instantiate a component factory if one is not passed as a parameter", () => {
             const tm = new TimeMeasureUtil(sysManager);
             expect(tm.timeMeasurePool.size).to.equal(DEFAULT_CONF.TM_POOL_SIZE);
+        });
+    });
+    describe("get", () => {
+        it("get current performance.measure", (done) => {
+            const tm = new TimeMeasureUtil(sysManager);
+            const tmComponent = tm.install(s1Id);
+            tmComponent.frequency = Number.MAX_SAFE_INTEGER;
+            const gl = new GameLoop(sysManager);
+            expect((sysManager.get(s1Id) as DummySystem).hasRun).to.equal(false);
+
+            gl.start();
+            setTimeout(() => {
+                gl.stop();
+                const timer = gl.currentTimer;
+                expect(timer.time).to.be.greaterThan(0);
+                expect((sysManager.get(s1Id) as DummySystem).hasRun).to.equal(true);
+
+                const res = tm.getMeasures(tmComponent);
+                expect(res.length).to.be.greaterThan(1);
+                expect(res[0].duration).to.not.equal(undefined);
+                done();
+            }, 600);
         });
     });
     describe("Install", () => {
@@ -159,7 +183,7 @@ function test() {
                 done();
             }, 600);
         });
-        it("i should be able to compute the min, max and mean at a fixed frequency", (done) => {
+        it("I should be able to compute the min, max and mean at a fixed frequency", (done) => {
             const tm = new TimeMeasureUtil(sysManager);
             const tmComponent = tm.install(s1Id);
             // Test with low frequency update, make sure it's not updated
@@ -189,6 +213,7 @@ function test() {
                 expect(tmComponent.minT).to.be.equal(0);
                 expect(tmComponent.meanT).to.be.equal(0);
 
+                // every 10ms
                 tmComponent.frequency = 1000 / 100;
                 gl.resume();
 
@@ -197,14 +222,34 @@ function test() {
                     expect(gl.currentTimer.time).to.be.greaterThan(0);
                     expect((sysManager.get(s1Id) as DummySystem).hasRun).to.equal(true);
                     // it should have been updated
-                    expect(tmComponent.minT).to.be.greaterThan(0);
+                    // expect(tmComponent.minT).to.be.greaterThan(0);
                     expect(tmComponent.maxT).to.be.greaterThan(0);
                     expect(tmComponent.lastT).to.be.greaterThan(0);
                     expect(tmComponent.meanT).to.be.greaterThan(0);
+
                     done();
                 }, 1000);
             }, 300);
 
+        });
+        it("clear should clear performance.measure", (done) => {
+            const tm = new TimeMeasureUtil(sysManager);
+            const tmComponent = tm.install(s1Id);
+            tmComponent.frequency = Number.MAX_SAFE_INTEGER;
+            const gl = new GameLoop(sysManager);
+
+            gl.start();
+            setTimeout(() => {
+                gl.stop();
+                const timer = gl.currentTimer;
+                expect(timer.time).to.be.greaterThan(0);
+                expect((sysManager.get(s1Id) as DummySystem).hasRun).to.equal(true);
+                const tmSys: TimeMeasureSystem = sysManager.getNonFixedTSSystems()[2] as TimeMeasureSystem;
+                expect(tmSys.getMeasures().length).to.be.greaterThan(0);
+                tmSys.clearMeasures();
+                expect(tmSys.getMeasures().length).to.equal(0);
+                done();
+            }, 600);
         });
     });
 }
