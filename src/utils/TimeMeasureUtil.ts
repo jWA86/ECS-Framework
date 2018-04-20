@@ -24,7 +24,7 @@ class TimeMeasureComponent implements ITimeMeasureComponent {
      */
     public entityId: number;
     public active: boolean;
-    constructor( public measureId: string, public lastT: number, public minT: number, public maxT: number, public meanT: number, public frequency: number = 0) { }
+    constructor( public measureId: string, public lastT: number, public minT: number, public maxT: number, public meanT: number, public frequency: number = 1000) { }
 }
 
 /**
@@ -156,7 +156,6 @@ class TimeMeasureSystemEndMark extends TimeMeasureSystem {
     public execute(time: IFrameEvent) {
         TimeMeasureSystem.performance.mark(this.endMark);
         this.measure();
-        // console.log(TIMESTAMP.now() - this.lastUpdate);
         if ((TIMESTAMP.now() - this.lastUpdate) >= this.tmComponent.frequency) {
             this.computeData();
             this.clearMeasures();
