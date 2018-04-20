@@ -1453,6 +1453,9 @@ var TimeMeasureUtil = /** @class */ (function () {
         this.timeMeasurePool.free(tmComponent.entityId);
         this.measures.delete(tmId);
     };
+    TimeMeasureUtil.prototype.getMeasures = function (tmComponent) {
+        return TimeMeasureSystem.performance.getEntriesByName(tmComponent.measureId);
+    };
     return TimeMeasureUtil;
 }());
 exports.TimeMeasureUtil = TimeMeasureUtil;
@@ -1466,72 +1469,13 @@ var TimeMeasureSystem = /** @class */ (function () {
         this.startMark = "start" + this.tmComponent.measureId;
         this.endMark = "end" + this.tmComponent.measureId;
     }
-    TimeMeasureSystem.prototype.getData = function () {
+    TimeMeasureSystem.prototype.getMeasures = function () {
         return TimeMeasureSystem.performance.getEntriesByName(this.tmComponent.measureId);
-    };
-    TimeMeasureSystem.performance = window.performance;
-    return TimeMeasureSystem;
-}());
-exports.TimeMeasureSystem = TimeMeasureSystem;
-/**
- * System that place a mark to start the measure of time
- */
-var TimeMeasureSystemStartMark = /** @class */ (function (_super) {
-    __extends(TimeMeasureSystemStartMark, _super);
-    /**
-     * @param tmComponent the component used for recording time
-     */
-    function TimeMeasureSystemStartMark(tmComponent) {
-        return _super.call(this, tmComponent) || this;
-    }
-    /**
-     * Place the starting mark
-     */
-    TimeMeasureSystemStartMark.prototype.process = function (args) {
-        // TimeMeasureSystem.performance.mark(this.startMark);
-        window.performance.mark(this.startMark);
-    };
-    /**
-     * Not used
-     */
-    TimeMeasureSystemStartMark.prototype.execute = function () { };
-    return TimeMeasureSystemStartMark;
-}(TimeMeasureSystem));
-exports.TimeMeasureSystemStartMark = TimeMeasureSystemStartMark;
-var TimeMeasureSystemEndMark = /** @class */ (function (_super) {
-    __extends(TimeMeasureSystemEndMark, _super);
-    function TimeMeasureSystemEndMark(tmComponent) {
-        var _this = _super.call(this, tmComponent) || this;
-        _this.lastUpdate = 0;
-        return _this;
-    }
-    /**
-     * @param args first args have to be a FrameEvent object
-     */
-    TimeMeasureSystemEndMark.prototype.process = function (args) {
-        this.execute(args[0]);
-    };
-    /**
-     *  Measure time passed since the start mark and compute statistics if time.lag >= the specified frequency of computation
-     * @param time FrameEvent used to decide when to compute data
-     */
-    TimeMeasureSystemEndMark.prototype.execute = function (time) {
-        TimeMeasureSystem.performance.mark(this.endMark);
-        this.measure();
-        // console.log(TIMESTAMP.now() - this.lastUpdate);
-        if ((pollyFill_1.TIMESTAMP.now() - this.lastUpdate) >= this.tmComponent.frequency) {
-            this.computeData();
-            this.clearData();
-            this.lastUpdate = pollyFill_1.TIMESTAMP.now();
-        }
-    };
-    TimeMeasureSystemEndMark.prototype.measure = function () {
-        TimeMeasureSystem.performance.measure(this.tmComponent.measureId, this.startMark, this.endMark);
     };
     /**
      * Set max, min mean and last measure to the TMComponent from the performance.measure data set
      */
-    TimeMeasureSystemEndMark.prototype.computeData = function () {
+    TimeMeasureSystem.prototype.computeData = function () {
         var measures = TimeMeasureSystem.performance.getEntriesByName(this.tmComponent.measureId);
         var l = measures.length;
         var min = Number.MAX_VALUE;
@@ -1551,13 +1495,79 @@ var TimeMeasureSystemEndMark = /** @class */ (function (_super) {
         this.tmComponent.meanT = mean;
         this.tmComponent.maxT = max;
         this.tmComponent.minT = min;
-        this.tmComponent.lastT = measures[l - 1].duration;
+        l > 0 ? this.tmComponent.lastT = measures[l - 1].duration : this.tmComponent.lastT = undefined;
+    };
+    TimeMeasureSystem.prototype.measure = function () {
+        TimeMeasureSystem.performance.measure(this.tmComponent.measureId, this.startMark, this.endMark);
     };
     /**
      * Clear the measure data set
      */
-    TimeMeasureSystemEndMark.prototype.clearData = function () {
+    TimeMeasureSystem.prototype.clearMeasures = function () {
         TimeMeasureSystem.performance.clearMeasures(this.tmComponent.measureId);
+    };
+    TimeMeasureSystem.performance = window.performance;
+    return TimeMeasureSystem;
+}());
+exports.TimeMeasureSystem = TimeMeasureSystem;
+/**
+ * System that place a mark to start the measure of time
+ */
+var TimeMeasureSystemStartMark = /** @class */ (function (_super) {
+    __extends(TimeMeasureSystemStartMark, _super);
+    /**
+     * @param tmComponent the component used for recording time
+     */
+    function TimeMeasureSystemStartMark(tmComponent) {
+        return _super.call(this, tmComponent) || this;
+    }
+    /**
+     * Place the starting mark
+     */
+    TimeMeasureSystemStartMark.prototype.process = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        TimeMeasureSystem.performance.mark(this.startMark);
+    };
+    /**
+     * Not used
+     */
+    TimeMeasureSystemStartMark.prototype.execute = function () { };
+    return TimeMeasureSystemStartMark;
+}(TimeMeasureSystem));
+exports.TimeMeasureSystemStartMark = TimeMeasureSystemStartMark;
+var TimeMeasureSystemEndMark = /** @class */ (function (_super) {
+    __extends(TimeMeasureSystemEndMark, _super);
+    function TimeMeasureSystemEndMark(tmComponent) {
+        var _this = _super.call(this, tmComponent) || this;
+        _this.lastUpdate = 0;
+        return _this;
+    }
+    /**
+     * @param args first args have to be a FrameEvent object
+     */
+    TimeMeasureSystemEndMark.prototype.process = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        this.execute(args[0]);
+    };
+    /**
+     *  Measure time passed since the start mark and compute statistics if time.lag >= the specified frequency of computation
+     * @param time FrameEvent used to decide when to compute data
+     */
+    TimeMeasureSystemEndMark.prototype.execute = function (time) {
+        TimeMeasureSystem.performance.mark(this.endMark);
+        this.measure();
+        // console.log(TIMESTAMP.now() - this.lastUpdate);
+        if ((pollyFill_1.TIMESTAMP.now() - this.lastUpdate) >= this.tmComponent.frequency) {
+            this.computeData();
+            this.clearMeasures();
+            this.lastUpdate = pollyFill_1.TIMESTAMP.now();
+        }
     };
     return TimeMeasureSystemEndMark;
 }(TimeMeasureSystem));

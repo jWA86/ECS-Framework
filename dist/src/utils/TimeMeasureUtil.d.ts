@@ -44,6 +44,7 @@ declare class TimeMeasureUtil implements ITimeMeasureUtil {
      * Remove TimeMeasure Systems from the SystemManager and free the TimeMeasure component
      */
     uninstall(tmComponent: TimeMeasureComponent): void;
+    getMeasures(tmComponent: TimeMeasureComponent): any;
 }
 declare abstract class TimeMeasureSystem implements ISystem<void> {
     tmComponent: TimeMeasureComponent;
@@ -56,8 +57,17 @@ declare abstract class TimeMeasureSystem implements ISystem<void> {
      */
     constructor(tmComponent: TimeMeasureComponent);
     /** Not used */
-    abstract process(args: any[]): any;
-    getData(): any;
+    abstract process(...args: any[]): any;
+    getMeasures(): any;
+    /**
+     * Set max, min mean and last measure to the TMComponent from the performance.measure data set
+     */
+    computeData(): void;
+    measure(): void;
+    /**
+     * Clear the measure data set
+     */
+    clearMeasures(): void;
 }
 /**
  * System that place a mark to start the measure of time
@@ -70,7 +80,7 @@ declare class TimeMeasureSystemStartMark extends TimeMeasureSystem {
     /**
      * Place the starting mark
      */
-    process(args: any[]): void;
+    process(...args: any[]): void;
     /**
      * Not used
      */
@@ -82,19 +92,10 @@ declare class TimeMeasureSystemEndMark extends TimeMeasureSystem {
     /**
      * @param args first args have to be a FrameEvent object
      */
-    process(args: any[]): void;
+    process(...args: any[]): void;
     /**
      *  Measure time passed since the start mark and compute statistics if time.lag >= the specified frequency of computation
      * @param time FrameEvent used to decide when to compute data
      */
     execute(time: IFrameEvent): void;
-    measure(): void;
-    /**
-     * Set max, min mean and last measure to the TMComponent from the performance.measure data set
-     */
-    computeData(): void;
-    /**
-     * Clear the measure data set
-     */
-    clearData(): void;
 }
