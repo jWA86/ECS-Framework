@@ -36,6 +36,9 @@ describe("Project Setup", () => {
         const p = new Project("project4");
         expect(p.systemManager).to.be.an.instanceof(SystemManager);
     });
+    it("expose keyboard shortcut", () => {
+
+    });
     describe("exposing core features of the framework so we can easily instantiate them at runtime", () => {
         class DummyComponent {
             public entityId = 0;
@@ -68,5 +71,6 @@ describe("Project Setup", () => {
             const d: DummyComponent = new GLOBAL["DummyComponent"](10);
             expect(d.prop1).to.equal(10);
         });
+
     });
 });

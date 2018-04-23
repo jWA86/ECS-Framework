@@ -1,7 +1,8 @@
+import * as Mousetrap from "mousetrap";
 import { ComponentFactory } from "./ComponentFactory";
 import { EntityFactory } from "./EntityFactory";
 import { GameLoop } from "./GameLoop";
-import { IProject, IUtil } from "./interfaces";
+import { IGraphics, IHtmlInterface, IKeyboardShortCut, IProject, IUtil } from "./interfaces";
 import { GLOBAL } from "./pollyFill";
 import { PoolManager } from "./PoolManager";
 import { System } from "./System";
@@ -11,19 +12,25 @@ export { Project };
 
 class Project implements IProject {
     public gameLoop: GameLoop;
+    public graphics: IGraphics;
     public poolManager: PoolManager;
     public systemManager: SystemManager;
+    public keyboardShortCut: IKeyboardShortCut;
+
     protected _dependencies: any[];
-    constructor(protected _projectName: string, dependencies?: Array<{name: string, object: any}>) {
+    constructor(protected _projectName: string, dependencies?: Array<{ name: string, object: any }>) {
+
         const sysM = new SystemManager();
         this.gameLoop = new GameLoop(sysM);
         this.poolManager = new PoolManager();
         this.systemManager = sysM;
         this._dependencies = dependencies || [];
+        this.keyboardShortCut = Mousetrap;
 
-        GLOBAL[_projectName] = this;
+        GLOBAL[this._projectName] = this;
         this.exposeCore();
         this.exposeDependencies(this._dependencies);
+
     }
 
     public clear() {
@@ -66,5 +73,4 @@ class Project implements IProject {
     get dependencies(): any[] {
         return this._dependencies;
     }
-
 }
