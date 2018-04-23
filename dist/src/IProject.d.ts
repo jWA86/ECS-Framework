@@ -1,5 +1,8 @@
-import { IGameLoop, IPoolManager, ISystemManager } from "./interfaces";
-export { IProject };
+import { IGameLoop, IGraphics, IPoolManager, ISystemManager } from "./interfaces";
+export { IKeyboardShortCut, IProject };
+interface IKeyboardShortCut {
+    bind: (...args: any[]) => void;
+}
 interface IProject {
     dependencies: Array<{
         name: string;
@@ -8,5 +11,7 @@ interface IProject {
     gameLoop: IGameLoop;
     poolManager: IPoolManager;
     systemManager: ISystemManager;
+    graphics: IGraphics;
+    keyboardShortCut: IKeyboardShortCut;
     clear: () => void;
 }
