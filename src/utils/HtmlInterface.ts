@@ -17,7 +17,7 @@ class HtmlInterface implements IUtil, IHtmlInterface {
     public install(placeHolderId: string, display?: false) {
         this._placeHolderId = placeHolderId;
         const obj = `<object id="${this._htmlId}" type="text/html" data="${this._url}"></object>`;
-        document.getElementById(placeHolderId).insertAdjacentHTML("beforeend", obj);
+        document.getElementById(placeHolderId).insertAdjacentHTML("afterbegin", obj);
         this.toggleDisplay(display);
 
     }
