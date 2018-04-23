@@ -6,7 +6,7 @@ export { HtmlInterface };
 class HtmlInterface implements IUtil, IHtmlInterface {
 
     protected _placeHolderId: string;
-    protected _display: boolean;
+    protected _display: boolean = false;
 
     constructor(protected _htmlId: string, protected _url: string) { }
 
