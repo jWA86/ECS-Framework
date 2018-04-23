@@ -2502,6 +2502,7 @@ var HtmlInterface = /** @class */ (function () {
     function HtmlInterface(_htmlId, _url) {
         this._htmlId = _htmlId;
         this._url = _url;
+        this._display = false;
     }
     /**
      * Insert the html object inside a container
