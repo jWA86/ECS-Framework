@@ -2511,7 +2511,7 @@ var HtmlInterface = /** @class */ (function () {
     HtmlInterface.prototype.install = function (placeHolderId, display) {
         this._placeHolderId = placeHolderId;
         var obj = "<object id=\"" + this._htmlId + "\" type=\"text/html\" data=\"" + this._url + "\"></object>";
-        document.getElementById(placeHolderId).insertAdjacentHTML("beforeend", obj);
+        document.getElementById(placeHolderId).insertAdjacentHTML("afterbegin", obj);
         this.toggleDisplay(display);
     };
     /**
