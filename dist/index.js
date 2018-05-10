@@ -1045,7 +1045,7 @@ exports.System = System;
 Object.defineProperty(exports, "__esModule", { value: true });
 var FastIterationMap_1 = __webpack_require__(2);
 var pollyFill_1 = __webpack_require__(0);
-// fixedTimeStep = update at requestionAnimation frequency
+// fixedTimeStep = frame independant // https://docs.unity3d.com/Manual/class-TimeManager.html
 // nonFixedTimeStep = update as much as possible between frame
 var SystemManager = /** @class */ (function () {
     function SystemManager() {
@@ -2591,9 +2591,9 @@ var DefaultConfig_1 = __webpack_require__(7);
  * Component that holds time measure
  */
 var TimeMeasureComponent = /** @class */ (function () {
-    function TimeMeasureComponent(measureId, lastT, minT, maxT, meanT, frequency) {
+    function TimeMeasureComponent(systemId, lastT, minT, maxT, meanT, frequency) {
         if (frequency === void 0) { frequency = 1000; }
-        this.measureId = measureId;
+        this.systemId = systemId;
         this.lastT = lastT;
         this.minT = minT;
         this.maxT = maxT;
@@ -2613,27 +2613,28 @@ var TimeMeasureUtil = /** @class */ (function () {
         this.timeMeasurePool = timeMeasurePool || new ComponentFactory_1.ComponentFactory(DefaultConfig_1.TM_POOL_SIZE, new TimeMeasureComponent("", 0, 0, 0, 0, 0));
     }
     TimeMeasureUtil.prototype.install = function (systemIdToMeasure) {
-        // use the system id to measure as the measure id + a random number in case of multiple installation of a TimeMeasure on the same System (no use unless to measure the TM overhead)
-        var measureId = systemIdToMeasure + pollyFill_1.RANDOM.integer(100000);
+        if (this.measures.has(systemIdToMeasure)) {
+            throw Error("the system already have a time measure installed");
+        }
+        var measureId = systemIdToMeasure;
         var tmC = this.timeMeasurePool.create(this.timeMeasurePool.nbCreated + 1, true);
-        tmC.measureId = measureId;
+        tmC.systemId = measureId;
         var res = this.sysManager.insertAround(systemIdToMeasure, new TimeMeasureSystemStartMark(tmC), new TimeMeasureSystemEndMark(tmC));
-        this.measures.set(measureId, { startSystem: res[0], endSystem: res[1] });
+        this.measures.set(measureId, { startSystem: res[0], endSystem: res[1], tmComponentId: tmC.entityId });
         return tmC;
     };
     /**
      * Remove TimeMeasure Systems from the SystemManager and free the TimeMeasure component
      */
-    TimeMeasureUtil.prototype.uninstall = function (tmComponent) {
-        var tmId = tmComponent.measureId;
-        var systemIds = this.measures.get(tmId);
-        this.sysManager.remove(systemIds.startSystem);
-        this.sysManager.remove(systemIds.endSystem);
-        this.timeMeasurePool.free(tmComponent.entityId);
-        this.measures.delete(tmId);
+    TimeMeasureUtil.prototype.uninstall = function (systemId) {
+        var measure = this.measures.get(systemId);
+        this.sysManager.remove(measure.startSystem);
+        this.sysManager.remove(measure.endSystem);
+        this.timeMeasurePool.free(measure.tmComponentId);
+        this.measures.delete(systemId);
     };
-    TimeMeasureUtil.prototype.getMeasures = function (tmComponent) {
-        return TimeMeasureSystem.performance.getEntriesByName(tmComponent.measureId);
+    TimeMeasureUtil.prototype.getMeasures = function (systemId) {
+        return TimeMeasureSystem.performance.getEntriesByName(systemId);
     };
     return TimeMeasureUtil;
 }());
@@ -2645,17 +2646,17 @@ var TimeMeasureSystem = /** @class */ (function () {
     function TimeMeasureSystem(tmComponent) {
         this.tmComponent = tmComponent;
         this.active = true;
-        this.startMark = "start" + this.tmComponent.measureId;
-        this.endMark = "end" + this.tmComponent.measureId;
+        this.startMark = "start" + this.tmComponent.systemId;
+        this.endMark = "end" + this.tmComponent.systemId;
     }
     TimeMeasureSystem.prototype.getMeasures = function () {
-        return TimeMeasureSystem.performance.getEntriesByName(this.tmComponent.measureId);
+        return TimeMeasureSystem.performance.getEntriesByName(this.tmComponent.systemId);
     };
     /**
      * Set max, min mean and last measure to the TMComponent from the performance.measure data set
      */
     TimeMeasureSystem.prototype.computeData = function () {
-        var measures = TimeMeasureSystem.performance.getEntriesByName(this.tmComponent.measureId);
+        var measures = TimeMeasureSystem.performance.getEntriesByName(this.tmComponent.systemId);
         var l = measures.length;
         var min = Number.MAX_VALUE;
         var max = 0;
@@ -2677,13 +2678,13 @@ var TimeMeasureSystem = /** @class */ (function () {
         l > 0 ? this.tmComponent.lastT = measures[l - 1].duration : this.tmComponent.lastT = undefined;
     };
     TimeMeasureSystem.prototype.measure = function () {
-        TimeMeasureSystem.performance.measure(this.tmComponent.measureId, this.startMark, this.endMark);
+        TimeMeasureSystem.performance.measure(this.tmComponent.systemId, this.startMark, this.endMark);
     };
     /**
      * Clear the measure data set
      */
     TimeMeasureSystem.prototype.clearMeasures = function () {
-        TimeMeasureSystem.performance.clearMeasures(this.tmComponent.measureId);
+        TimeMeasureSystem.performance.clearMeasures(this.tmComponent.systemId);
     };
     TimeMeasureSystem.performance = window.performance;
     return TimeMeasureSystem;

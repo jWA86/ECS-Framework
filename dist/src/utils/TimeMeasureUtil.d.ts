@@ -8,7 +8,7 @@ export { TimeMeasureComponent, TimeMeasureSystem, TimeMeasureUtil, TimeMeasureSy
  * Component that holds time measure
  */
 declare class TimeMeasureComponent implements ITimeMeasureComponent {
-    measureId: string;
+    systemId: string;
     lastT: number;
     minT: number;
     maxT: number;
@@ -17,7 +17,7 @@ declare class TimeMeasureComponent implements ITimeMeasureComponent {
     /**
      * @param entityId
      * @param active
-     * @param measureId string to identify the measure
+     * @param systemId the id of the system being measured
      * @param lastT last measured time
      * @param minT minimum time of the measure data set
      * @param maxT maximum time of the measure data set
@@ -26,7 +26,7 @@ declare class TimeMeasureComponent implements ITimeMeasureComponent {
      */
     entityId: number;
     active: boolean;
-    constructor(measureId: string, lastT: number, minT: number, maxT: number, meanT: number, frequency?: number);
+    constructor(systemId: string, lastT: number, minT: number, maxT: number, meanT: number, frequency?: number);
 }
 /**
  * Measure time passed between execution of n Systems
@@ -37,14 +37,15 @@ declare class TimeMeasureUtil implements ITimeMeasureUtil {
     protected measures: Map<string, {
         startSystem: string;
         endSystem: string;
+        tmComponentId: number;
     }>;
     constructor(sysManager: ISystemManager, timeMeasurePool?: IComponentFactory<TimeMeasureComponent>);
     install(systemIdToMeasure: string): TimeMeasureComponent;
     /**
      * Remove TimeMeasure Systems from the SystemManager and free the TimeMeasure component
      */
-    uninstall(tmComponent: TimeMeasureComponent): void;
-    getMeasures(tmComponent: TimeMeasureComponent): any;
+    uninstall(systemId: string): void;
+    getMeasures(systemId: string): any;
 }
 declare abstract class TimeMeasureSystem implements ISystem<void> {
     tmComponent: TimeMeasureComponent;
