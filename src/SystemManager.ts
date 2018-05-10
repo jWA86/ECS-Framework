@@ -4,7 +4,7 @@ import { ISystemManager } from "./ISystemManager";
 import { RANDOM } from "./pollyFill";
 export { SystemManager  };
 
-// fixedTimeStep = update at requestionAnimation frequency
+// fixedTimeStep = frame independant // https://docs.unity3d.com/Manual/class-TimeManager.html
 // nonFixedTimeStep = update as much as possible between frame
 class SystemManager implements ISystemManager {
     protected fixedTimeStepSystems: FastIterationMap<string, ISystem<any>>;

@@ -6,8 +6,8 @@ export { ITimeMeasureComponent, ITimeMeasureUtil };
  */
 interface ITimeMeasureComponent extends IComponent {
 
-    /** string to identify the measure */
-    measureId: string;
+    /** the id of the system being measured */
+    systemId: string;
     /** last measured time */
     lastT: number;
     /** minimum time of the measure data set */
@@ -29,7 +29,7 @@ interface ITimeMeasureUtil extends IUtil {
     install(systemId: string);
     /**
      * UnInstall marks placed around a System
-     * @param tmComponent the TimeMeasureComponent
+     * @param systemId the id of the system we want to uninstall the time measure
      */
-    uninstall(tmComponent: ITimeMeasureComponent);
+    uninstall(systemId: string);
 }

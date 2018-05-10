@@ -15,7 +15,7 @@ class TimeMeasureComponent implements ITimeMeasureComponent {
     /**
      * @param entityId
      * @param active
-     * @param measureId string to identify the measure
+     * @param systemId the id of the system being measured
      * @param lastT last measured time
      * @param minT minimum time of the measure data set
      * @param maxT maximum time of the measure data set
@@ -24,7 +24,7 @@ class TimeMeasureComponent implements ITimeMeasureComponent {
      */
     public entityId: number;
     public active: boolean;
-    constructor( public measureId: string, public lastT: number, public minT: number, public maxT: number, public meanT: number, public frequency: number = 1000) { }
+    constructor( public systemId: string, public lastT: number, public minT: number, public maxT: number, public meanT: number, public frequency: number = 1000) { }
 }
 
 /**
@@ -32,36 +32,38 @@ class TimeMeasureComponent implements ITimeMeasureComponent {
  */
 class TimeMeasureUtil implements ITimeMeasureUtil {
     public timeMeasurePool: IComponentFactory<TimeMeasureComponent>;
-    protected measures = new Map<string, {startSystem: string, endSystem: string}>();
+    protected measures = new Map<string, {startSystem: string, endSystem: string, tmComponentId: number}>();
     constructor(public sysManager: ISystemManager, timeMeasurePool?: IComponentFactory<TimeMeasureComponent>) {
         this.timeMeasurePool = timeMeasurePool || new ComponentFactory<TimeMeasureComponent>(TM_POOL_SIZE, new TimeMeasureComponent( "", 0, 0, 0, 0, 0));
      }
     public install(systemIdToMeasure: string): TimeMeasureComponent {
-        // use the system id to measure as the measure id + a random number in case of multiple installation of a TimeMeasure on the same System (no use unless to measure the TM overhead)
-        const measureId = systemIdToMeasure + RANDOM.integer(100000);
-        const tmC = this.timeMeasurePool.create(this.timeMeasurePool.nbCreated + 1, true);
-        tmC.measureId = measureId;
+        if (this.measures.has(systemIdToMeasure)) {
+            throw Error("the system already have a time measure installed");
+        }
+        const measureId = systemIdToMeasure;
+        const tmC: TimeMeasureComponent = this.timeMeasurePool.create(this.timeMeasurePool.nbCreated + 1, true);
+        tmC.systemId = measureId;
 
         const res = this.sysManager.insertAround(systemIdToMeasure, new TimeMeasureSystemStartMark(tmC), new TimeMeasureSystemEndMark(tmC));
 
-        this.measures.set(measureId, {startSystem: res[0], endSystem: res[1]});
+        this.measures.set(measureId, {startSystem: res[0], endSystem: res[1], tmComponentId: tmC.entityId});
         return tmC;
     }
     /**
      * Remove TimeMeasure Systems from the SystemManager and free the TimeMeasure component
      */
-    public uninstall(tmComponent: TimeMeasureComponent) {
-        const tmId = tmComponent.measureId;
-        const systemIds = this.measures.get(tmId);
-        this.sysManager.remove(systemIds.startSystem);
-        this.sysManager.remove(systemIds.endSystem);
-        this.timeMeasurePool.free(tmComponent.entityId);
-        this.measures.delete(tmId);
-     }
+    public uninstall(systemId: string) {
+        const measure = this.measures.get(systemId);
+        this.sysManager.remove(measure.startSystem);
+        this.sysManager.remove(measure.endSystem);
 
-    public getMeasures(tmComponent: TimeMeasureComponent) {
-        return TimeMeasureSystem.performance.getEntriesByName(tmComponent.measureId);
-     }
+        this.timeMeasurePool.free(measure.tmComponentId);
+        this.measures.delete(systemId);
+    }
+
+    public getMeasures(systemId: string) {
+        return TimeMeasureSystem.performance.getEntriesByName(systemId);
+    }
 }
 
 abstract class TimeMeasureSystem implements ISystem<void> {
@@ -73,20 +75,20 @@ abstract class TimeMeasureSystem implements ISystem<void> {
      * @param tmComponent the component used for recording time
      */
     constructor(public tmComponent: TimeMeasureComponent ) {
-        this.startMark = "start" + this.tmComponent.measureId;
-        this.endMark = "end" + this.tmComponent.measureId;
+        this.startMark = "start" + this.tmComponent.systemId;
+        this.endMark = "end" + this.tmComponent.systemId;
      }
      /** Not used */
     public abstract process(...args: any[]);
 
     public getMeasures() {
-        return TimeMeasureSystem.performance.getEntriesByName(this.tmComponent.measureId);
+        return TimeMeasureSystem.performance.getEntriesByName(this.tmComponent.systemId);
     }
     /**
      * Set max, min mean and last measure to the TMComponent from the performance.measure data set
      */
     public computeData() {
-        const measures = TimeMeasureSystem.performance.getEntriesByName(this.tmComponent.measureId);
+        const measures = TimeMeasureSystem.performance.getEntriesByName(this.tmComponent.systemId);
         const l = measures.length;
         let min = Number.MAX_VALUE;
         let max = 0;
@@ -109,14 +111,14 @@ abstract class TimeMeasureSystem implements ISystem<void> {
     }
 
     public measure() {
-        TimeMeasureSystem.performance.measure(this.tmComponent.measureId, this.startMark, this.endMark);
+        TimeMeasureSystem.performance.measure(this.tmComponent.systemId, this.startMark, this.endMark);
     }
 
     /**
      * Clear the measure data set
      */
     public clearMeasures() {
-        TimeMeasureSystem.performance.clearMeasures(this.tmComponent.measureId);
+        TimeMeasureSystem.performance.clearMeasures(this.tmComponent.systemId);
     }
 }
 

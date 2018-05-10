@@ -103,7 +103,7 @@ function test() {
                 expect(timer.time).to.be.greaterThan(0);
                 expect((sysManager.get(s1Id) as DummySystem).hasRun).to.equal(true);
 
-                const res = tm.getMeasures(tmComponent);
+                const res = tm.getMeasures(tmComponent.systemId);
                 expect(res.length).to.be.greaterThan(1);
                 expect(res[0].duration).to.not.equal(undefined);
                 done();
@@ -119,7 +119,7 @@ function test() {
         it("the timeMeasureComponent should have a meadureId, the last measure, the minimum, maximum and mean of the measure data set", () => {
             const tm = new TimeMeasureUtil(sysManager);
             const tmComponent = tm.install(s1Id);
-            expect(tmComponent.measureId).to.not.equal("");
+            expect(tmComponent.systemId).to.not.equal("");
             expect(tmComponent.lastT).to.equal(0);
             expect(tmComponent.minT).to.equal(0);
             expect(tmComponent.maxT).to.equal(0);
@@ -145,7 +145,7 @@ function test() {
             const tmC = tm.install(s2Id);
             expect(tmC).to.not.equal(undefined);
 
-            tm.uninstall(tmC);
+            tm.uninstall(s2Id);
 
             const systems = sysManager.getNonFixedTSSystems();
             systems.forEach((v, index) => {
