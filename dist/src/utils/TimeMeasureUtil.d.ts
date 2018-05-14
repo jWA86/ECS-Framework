@@ -13,6 +13,7 @@ declare class TimeMeasureComponent implements ITimeMeasureComponent {
     minT: number;
     maxT: number;
     meanT: number;
+    nbCall: number;
     frequency: number;
     /**
      * @param entityId
@@ -26,7 +27,7 @@ declare class TimeMeasureComponent implements ITimeMeasureComponent {
      */
     entityId: number;
     active: boolean;
-    constructor(systemId: string, lastT: number, minT: number, maxT: number, meanT: number, frequency?: number);
+    constructor(systemId: string, lastT: number, minT: number, maxT: number, meanT: number, nbCall: number, frequency?: number);
 }
 /**
  * Measure time passed between execution of n Systems

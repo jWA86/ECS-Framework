@@ -24,8 +24,8 @@ declare class GameLoop implements IGameLoop {
     systemManager: SystemManager;
     currentTimer: FrameEvent;
     start(...args: any[]): void;
+    pause(): void;
     stop(): void;
-    resume(...args: any[]): void;
     setFrequency(frequency: number): void;
     protected loop(...args: any[]): void;
     protected updateFixedTS(...args: any[]): void;

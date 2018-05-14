@@ -886,23 +886,16 @@ var GameLoop = /** @class */ (function () {
             args[_i] = arguments[_i];
         }
         this._running = true;
-        this._currentTimer.reset();
         this._currentTimer.lastFrame = pollyFill_1.TIMESTAMP.now();
         this.loop.apply(this, args);
-        // this.update(timer);
     };
-    GameLoop.prototype.stop = function () {
+    GameLoop.prototype.pause = function () {
         this._running = false;
         cancelAnimationFrame(this._frameId);
     };
-    GameLoop.prototype.resume = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        this._running = true;
-        this._currentTimer.lastFrame = pollyFill_1.TIMESTAMP.now();
-        this.loop.apply(this, args);
+    GameLoop.prototype.stop = function () {
+        this.pause();
+        this._currentTimer.reset();
     };
     /* Set the process frequency in mms */
     GameLoop.prototype.setFrequency = function (frequency) {
@@ -2591,13 +2584,14 @@ var DefaultConfig_1 = __webpack_require__(7);
  * Component that holds time measure
  */
 var TimeMeasureComponent = /** @class */ (function () {
-    function TimeMeasureComponent(systemId, lastT, minT, maxT, meanT, frequency) {
+    function TimeMeasureComponent(systemId, lastT, minT, maxT, meanT, nbCall, frequency) {
         if (frequency === void 0) { frequency = 1000; }
         this.systemId = systemId;
         this.lastT = lastT;
         this.minT = minT;
         this.maxT = maxT;
         this.meanT = meanT;
+        this.nbCall = nbCall;
         this.frequency = frequency;
     }
     return TimeMeasureComponent;
@@ -2610,7 +2604,7 @@ var TimeMeasureUtil = /** @class */ (function () {
     function TimeMeasureUtil(sysManager, timeMeasurePool) {
         this.sysManager = sysManager;
         this.measures = new Map();
-        this.timeMeasurePool = timeMeasurePool || new ComponentFactory_1.ComponentFactory(DefaultConfig_1.TM_POOL_SIZE, new TimeMeasureComponent("", 0, 0, 0, 0, 0));
+        this.timeMeasurePool = timeMeasurePool || new ComponentFactory_1.ComponentFactory(DefaultConfig_1.TM_POOL_SIZE, new TimeMeasureComponent("", 0, 0, 0, 0, 0, 0));
     }
     TimeMeasureUtil.prototype.install = function (systemIdToMeasure) {
         if (this.measures.has(systemIdToMeasure)) {
@@ -2679,12 +2673,14 @@ var TimeMeasureSystem = /** @class */ (function () {
     };
     TimeMeasureSystem.prototype.measure = function () {
         TimeMeasureSystem.performance.measure(this.tmComponent.systemId, this.startMark, this.endMark);
+        this.tmComponent.nbCall += 1;
     };
     /**
      * Clear the measure data set
      */
     TimeMeasureSystem.prototype.clearMeasures = function () {
         TimeMeasureSystem.performance.clearMeasures(this.tmComponent.systemId);
+        this.tmComponent.nbCall = 0;
     };
     TimeMeasureSystem.performance = window.performance;
     return TimeMeasureSystem;
