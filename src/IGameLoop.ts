@@ -4,7 +4,7 @@ export { IGameLoop };
 interface IGameLoop {
     start: (...args: any[]) => void;
     stop: () => void;
-    resume: () => void;
+    pause: () => void;
     systemManager: ISystemManager;
     currentTimer: IFrameEvent;
 }

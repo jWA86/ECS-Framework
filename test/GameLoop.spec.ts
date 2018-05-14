@@ -196,7 +196,7 @@ function test() {
         const gl = new GameLoop(sM);
         gl.setFrequency(1000 / 30);
         setTimeout(() => {
-            gl.stop();
+            gl.pause();
             const t = gl.currentTimer;
             expect(t.time).to.approximately(runFor, 30);
             done();
@@ -219,7 +219,7 @@ function test() {
         const runFor = 1000;
         const gl = new GameLoop(sM);
         setTimeout(() => {
-            gl.stop();
+            gl.pause();
             const t = gl.currentTimer;
             const mean = deltas.reduce((prev, current, index) => {
                 return prev + current;
@@ -236,7 +236,7 @@ function test() {
     });
     it("pause and resume execution of the loop", (done) => {
         // start
-        // stop after 250ms
+        // pause after 250ms
         // get the time
         // resume
         // stop after 250ms
@@ -246,11 +246,11 @@ function test() {
         const runFor = 500;
         gl.start();
         setTimeout(() => {
-            gl.stop();
+            gl.pause();
             const t1 = gl.currentTimer.time;
-            gl.resume();
+            gl.start();
             setTimeout(() => {
-                gl.stop();
+                gl.pause();
                 const t2 = gl.currentTimer.time;
                 expect(t2).to.gte(t1);
                 done();
@@ -275,7 +275,7 @@ function test() {
         const runFor = 500;
         gl.start();
         setTimeout(() => {
-            gl.stop();
+            gl.pause();
             const t = gl.currentTimer;
             const arr = FeedBackSystem["timerArr"];
             for (let i = 1; i < arr.length - 1; ++i) {
@@ -310,7 +310,7 @@ function test() {
         const runFor = 500;
         gl.start();
         setTimeout(() => {
-            gl.stop();
+            gl.pause();
             const t = gl.currentTimer;
             const fi = fixedIntFactory.get(1).integer;
             const nfi = nFixedIntFactory.get(1).integer;

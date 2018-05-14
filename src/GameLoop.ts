@@ -55,19 +55,16 @@ class GameLoop implements IGameLoop {
     }
     public start(...args: any[]) {
         this._running = true;
-        this._currentTimer.reset();
         this._currentTimer.lastFrame = TIMESTAMP.now();
         this.loop(...args);
-        // this.update(timer);
     }
-    public stop() {
+    public pause() {
         this._running = false;
         cancelAnimationFrame(this._frameId);
     }
-    public resume(...args: any[]) {
-        this._running = true;
-        this._currentTimer.lastFrame = TIMESTAMP.now();
-        this.loop(...args);
+    public stop() {
+        this.pause();
+        this._currentTimer.reset();
     }
     /* Set the process frequency in mms */
     public setFrequency(frequency: number) {

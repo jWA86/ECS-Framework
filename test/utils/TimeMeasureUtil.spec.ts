@@ -98,7 +98,7 @@ function test() {
 
             gl.start();
             setTimeout(() => {
-                gl.stop();
+                gl.pause();
                 const timer = gl.currentTimer;
                 expect(timer.time).to.be.greaterThan(0);
                 expect((sysManager.get(s1Id) as DummySystem).hasRun).to.equal(true);
@@ -172,7 +172,7 @@ function test() {
 
             gl.start();
             setTimeout(() => {
-                gl.stop();
+                gl.pause();
                 const timer = gl.currentTimer;
                 expect(timer.time).to.be.greaterThan(0);
                 expect((sysManager.get(s1Id) as DummySystem).hasRun).to.equal(true);
@@ -203,7 +203,7 @@ function test() {
 
             gl.start();
             setTimeout(() => {
-                gl.stop();
+                gl.pause();
                 expect(gl.currentTimer.time).to.be.greaterThan(0);
 
                 expect((sysManager.get(s1Id) as DummySystem).hasRun).to.equal(true);
@@ -215,10 +215,10 @@ function test() {
 
                 // every 10ms
                 tmComponent.frequency = 1000 / 100;
-                gl.resume();
+                gl.start();
 
                 setTimeout(() => {
-                    gl.stop();
+                    gl.pause();
                     expect(gl.currentTimer.time).to.be.greaterThan(0);
                     expect((sysManager.get(s1Id) as DummySystem).hasRun).to.equal(true);
                     // it should have been updated
@@ -240,7 +240,7 @@ function test() {
 
             gl.start();
             setTimeout(() => {
-                gl.stop();
+                gl.pause();
                 const timer = gl.currentTimer;
                 expect(timer.time).to.be.greaterThan(0);
                 expect((sysManager.get(s1Id) as DummySystem).hasRun).to.equal(true);

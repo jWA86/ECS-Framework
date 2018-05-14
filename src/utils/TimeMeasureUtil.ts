@@ -24,7 +24,7 @@ class TimeMeasureComponent implements ITimeMeasureComponent {
      */
     public entityId: number;
     public active: boolean;
-    constructor( public systemId: string, public lastT: number, public minT: number, public maxT: number, public meanT: number, public frequency: number = 1000) { }
+    constructor( public systemId: string, public lastT: number, public minT: number, public maxT: number, public meanT: number, public nbCall: number, public frequency: number = 1000) { }
 }
 
 /**
@@ -34,7 +34,7 @@ class TimeMeasureUtil implements ITimeMeasureUtil {
     public timeMeasurePool: IComponentFactory<TimeMeasureComponent>;
     protected measures = new Map<string, {startSystem: string, endSystem: string, tmComponentId: number}>();
     constructor(public sysManager: ISystemManager, timeMeasurePool?: IComponentFactory<TimeMeasureComponent>) {
-        this.timeMeasurePool = timeMeasurePool || new ComponentFactory<TimeMeasureComponent>(TM_POOL_SIZE, new TimeMeasureComponent( "", 0, 0, 0, 0, 0));
+        this.timeMeasurePool = timeMeasurePool || new ComponentFactory<TimeMeasureComponent>(TM_POOL_SIZE, new TimeMeasureComponent( "", 0, 0, 0, 0, 0, 0));
      }
     public install(systemIdToMeasure: string): TimeMeasureComponent {
         if (this.measures.has(systemIdToMeasure)) {
@@ -112,6 +112,7 @@ abstract class TimeMeasureSystem implements ISystem<void> {
 
     public measure() {
         TimeMeasureSystem.performance.measure(this.tmComponent.systemId, this.startMark, this.endMark);
+        this.tmComponent.nbCall += 1;
     }
 
     /**
@@ -119,6 +120,7 @@ abstract class TimeMeasureSystem implements ISystem<void> {
      */
     public clearMeasures() {
         TimeMeasureSystem.performance.clearMeasures(this.tmComponent.systemId);
+        this.tmComponent.nbCall = 0;
     }
 }
 
