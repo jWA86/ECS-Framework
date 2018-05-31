@@ -864,8 +864,8 @@ var GameLoop = /** @class */ (function () {
         },
         set: function (systems) {
             this._systemManager = systems;
-            this._fixedTSSystems = this._systemManager.getFixedTSSystems();
-            this._nonFixedTSSystems = this._systemManager.getNonFixedTSSystems();
+            this._fixedTSSystems = this._systemManager.getFixedTSSystemsArray();
+            this._nonFixedTSSystems = this._systemManager.getNonFixedTSSystemsArray();
         },
         enumerable: true,
         configurable: true
@@ -1114,10 +1114,16 @@ var SystemManager = /** @class */ (function () {
         }
         return true;
     };
-    SystemManager.prototype.getFixedTSSystems = function () {
+    // public getFixedTSSystems(): IFastIterationMap<string, ISystem<any>> {
+    //     return this.fixedTimeStepSystems;
+    // }
+    // public getNonFixedTSSystems(): IFastIterationMap<string, ISystem<any>>  {
+    //     return this.nonFixedTimeStepSystems;
+    // }
+    SystemManager.prototype.getFixedTSSystemsArray = function () {
         return this.fixedTimeStepSystems.values;
     };
-    SystemManager.prototype.getNonFixedTSSystems = function () {
+    SystemManager.prototype.getNonFixedTSSystemsArray = function () {
         return this.nonFixedTimeStepSystems.values;
     };
     /* Get a system by its id.

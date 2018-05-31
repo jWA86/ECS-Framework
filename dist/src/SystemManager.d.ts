@@ -11,8 +11,8 @@ declare class SystemManager implements ISystemManager {
     insertAfter(systemRefId: string, systemToInsert: ISystem<any>): string;
     insertBefore(systemRefId: string, systemToInsert: ISystem<any>): string;
     remove(systemId: string): boolean;
-    getFixedTSSystems(): Array<ISystem<any>>;
-    getNonFixedTSSystems(): Array<ISystem<any>>;
+    getFixedTSSystemsArray(): Array<ISystem<any>>;
+    getNonFixedTSSystemsArray(): Array<ISystem<any>>;
     get(systemId: string): ISystem<any>;
     protected generateId(system: ISystem<any>): string;
     protected getListOfSystemId(className: string): string[];
