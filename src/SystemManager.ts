@@ -81,12 +81,12 @@ class SystemManager implements ISystemManager {
         }
         return true;
     }
-    // public getFixedTSSystems(): IFastIterationMap<string, ISystem<any>> {
-    //     return this.fixedTimeStepSystems;
-    // }
-    // public getNonFixedTSSystems(): IFastIterationMap<string, ISystem<any>>  {
-    //     return this.nonFixedTimeStepSystems;
-    // }
+    public getFixedTSSystems(): IFastIterationMap<string, ISystem<any>> {
+        return this.fixedTimeStepSystems;
+    }
+    public getNonFixedTSSystems(): IFastIterationMap<string, ISystem<any>>  {
+        return this.nonFixedTimeStepSystems;
+    }
 
     public getFixedTSSystemsArray(): Array<ISystem<any>> {
         return this.fixedTimeStepSystems.values;
