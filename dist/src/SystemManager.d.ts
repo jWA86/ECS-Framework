@@ -1,4 +1,4 @@
-import { FastIterationMap } from "FastIterationMap";
+import { FastIterationMap, IFastIterationMap } from "FastIterationMap";
 import { ISystem } from "./interfaces";
 import { ISystemManager } from "./ISystemManager";
 export { SystemManager };
@@ -11,6 +11,8 @@ declare class SystemManager implements ISystemManager {
     insertAfter(systemRefId: string, systemToInsert: ISystem<any>): string;
     insertBefore(systemRefId: string, systemToInsert: ISystem<any>): string;
     remove(systemId: string): boolean;
+    getFixedTSSystems(): IFastIterationMap<string, ISystem<any>>;
+    getNonFixedTSSystems(): IFastIterationMap<string, ISystem<any>>;
     getFixedTSSystemsArray(): Array<ISystem<any>>;
     getNonFixedTSSystemsArray(): Array<ISystem<any>>;
     get(systemId: string): ISystem<any>;

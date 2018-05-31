@@ -1114,12 +1114,12 @@ var SystemManager = /** @class */ (function () {
         }
         return true;
     };
-    // public getFixedTSSystems(): IFastIterationMap<string, ISystem<any>> {
-    //     return this.fixedTimeStepSystems;
-    // }
-    // public getNonFixedTSSystems(): IFastIterationMap<string, ISystem<any>>  {
-    //     return this.nonFixedTimeStepSystems;
-    // }
+    SystemManager.prototype.getFixedTSSystems = function () {
+        return this.fixedTimeStepSystems;
+    };
+    SystemManager.prototype.getNonFixedTSSystems = function () {
+        return this.nonFixedTimeStepSystems;
+    };
     SystemManager.prototype.getFixedTSSystemsArray = function () {
         return this.fixedTimeStepSystems.values;
     };
