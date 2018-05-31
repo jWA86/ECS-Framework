@@ -1,4 +1,4 @@
-import { FastIterationMap } from "FastIterationMap";
+import { FastIterationMap, IFastIterationMap } from "FastIterationMap";
 import { IComponent, IComponentFactory, ISystem } from "./interfaces";
 import { ISystemManager } from "./ISystemManager";
 import { RANDOM } from "./pollyFill";
@@ -81,10 +81,17 @@ class SystemManager implements ISystemManager {
         }
         return true;
     }
-    public getFixedTSSystems(): Array<ISystem<any>> {
+    // public getFixedTSSystems(): IFastIterationMap<string, ISystem<any>> {
+    //     return this.fixedTimeStepSystems;
+    // }
+    // public getNonFixedTSSystems(): IFastIterationMap<string, ISystem<any>>  {
+    //     return this.nonFixedTimeStepSystems;
+    // }
+
+    public getFixedTSSystemsArray(): Array<ISystem<any>> {
         return this.fixedTimeStepSystems.values;
     }
-    public getNonFixedTSSystems(): Array<ISystem<any>> {
+    public getNonFixedTSSystemsArray(): Array<ISystem<any>> {
         return this.nonFixedTimeStepSystems.values;
     }
     /* Get a system by its id.

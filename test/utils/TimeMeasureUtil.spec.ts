@@ -131,7 +131,7 @@ function test() {
             const tmComponent = tm.install(s1Id);
             expect(sysManager.get("TimeMeasureSystemStartMark")).to.not.equal(undefined);
             expect(sysManager.get("TimeMeasureSystemEndMark")).to.not.equal(undefined);
-            const systems = sysManager.getNonFixedTSSystems();
+            const systems = sysManager.getNonFixedTSSystemsArray();
 
             expect(systems[0]).to.be.instanceof(TimeMeasureSystemStartMark);
             expect(systems[2]).to.be.instanceof(TimeMeasureSystemEndMark);
@@ -147,7 +147,7 @@ function test() {
 
             tm.uninstall(s2Id);
 
-            const systems = sysManager.getNonFixedTSSystems();
+            const systems = sysManager.getNonFixedTSSystemsArray();
             systems.forEach((v, index) => {
                 if (index === 1) {
                     expect(systems[index - 1]).to.not.instanceof(TimeMeasureSystemStartMark || TimeMeasureSystemEndMark);
@@ -244,7 +244,7 @@ function test() {
                 const timer = gl.currentTimer;
                 expect(timer.time).to.be.greaterThan(0);
                 expect((sysManager.get(s1Id) as DummySystem).hasRun).to.equal(true);
-                const tmSys: TimeMeasureSystem = sysManager.getNonFixedTSSystems()[2] as TimeMeasureSystem;
+                const tmSys: TimeMeasureSystem = sysManager.getNonFixedTSSystemsArray()[2] as TimeMeasureSystem;
                 expect(tmSys.getMeasures().length).to.be.greaterThan(0);
                 tmSys.clearMeasures();
                 expect(tmSys.getMeasures().length).to.equal(0);

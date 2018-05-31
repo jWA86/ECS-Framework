@@ -44,8 +44,8 @@ class GameLoop implements IGameLoop {
     }
     public set systemManager(systems: SystemManager) {
         this._systemManager = systems;
-        this._fixedTSSystems = this._systemManager.getFixedTSSystems();
-        this._nonFixedTSSystems = this._systemManager.getNonFixedTSSystems();
+        this._fixedTSSystems = this._systemManager.getFixedTSSystemsArray();
+        this._nonFixedTSSystems = this._systemManager.getNonFixedTSSystemsArray();
     }
     public get currentTimer(): FrameEvent {
         return this._currentTimer;

@@ -76,11 +76,11 @@ describe("SystemManager should be able to", () => {
             const nFSystem = new FeedBackSystem(feedbackParams);
             const firstId = sysManager.pushSystem(nFSystem, true);
             const secondId = sysManager.pushSystem(nFSystem, false);
-            expect(sysManager.getFixedTSSystems().length).to.equal(1);
-            expect(sysManager.getNonFixedTSSystems().length).to.equal(1);
-            const fs = sysManager.getFixedTSSystems()[0];
+            expect(sysManager.getFixedTSSystemsArray().length).to.equal(1);
+            expect(sysManager.getNonFixedTSSystemsArray().length).to.equal(1);
+            const fs = sysManager.getFixedTSSystemsArray()[0];
             expect(fs).to.deep.equal(fSystem);
-            const nfs = sysManager.getNonFixedTSSystems()[0];
+            const nfs = sysManager.getNonFixedTSSystemsArray()[0];
             expect(nfs).to.deep.equal(nFSystem);
         });
         it("insert a system before an other system ", () => {
@@ -92,8 +92,8 @@ describe("SystemManager should be able to", () => {
 
             sysManager.insertBefore(firstId,  new IncrementSystem(incrementParams));
             sysManager.insertBefore(secondId,  new IncrementSystem(incrementParams));
-            expect(sysManager.getFixedTSSystems()[0]).to.be.instanceof(IncrementSystem);
-            expect(sysManager.getNonFixedTSSystems()[0]).to.be.instanceof(IncrementSystem);
+            expect(sysManager.getFixedTSSystemsArray()[0]).to.be.instanceof(IncrementSystem);
+            expect(sysManager.getNonFixedTSSystemsArray()[0]).to.be.instanceof(IncrementSystem);
         });
         it("insert a system after an other system ", () => {
             const sysManager = new SystemManager();
@@ -104,8 +104,8 @@ describe("SystemManager should be able to", () => {
 
             sysManager.insertAfter(firstId,  new IncrementSystem(incrementParams));
             sysManager.insertAfter(secondId,  new IncrementSystem(incrementParams));
-            expect(sysManager.getFixedTSSystems()[1]).to.be.instanceof(IncrementSystem);
-            expect(sysManager.getNonFixedTSSystems()[1]).to.be.instanceof(IncrementSystem);
+            expect(sysManager.getFixedTSSystemsArray()[1]).to.be.instanceof(IncrementSystem);
+            expect(sysManager.getNonFixedTSSystemsArray()[1]).to.be.instanceof(IncrementSystem);
         });
         it("insert a system around an other system ", () => {
             const sysManager = new SystemManager();
@@ -117,13 +117,13 @@ describe("SystemManager should be able to", () => {
             sysManager.insertAround(firstId, new IncrementSystem(incrementParams), new IncrementSystem(incrementParams));
             sysManager.insertAround(secondId,  new IncrementSystem(incrementParams), new IncrementSystem(incrementParams));
 
-            expect(sysManager.getFixedTSSystems()[0]).to.be.instanceof(IncrementSystem);
-            expect(sysManager.getFixedTSSystems()[1]).to.be.instanceof(FeedBackSystem);
-            expect(sysManager.getFixedTSSystems()[2]).to.be.instanceof(IncrementSystem);
+            expect(sysManager.getFixedTSSystemsArray()[0]).to.be.instanceof(IncrementSystem);
+            expect(sysManager.getFixedTSSystemsArray()[1]).to.be.instanceof(FeedBackSystem);
+            expect(sysManager.getFixedTSSystemsArray()[2]).to.be.instanceof(IncrementSystem);
 
-            expect(sysManager.getNonFixedTSSystems()[0]).to.be.instanceof(IncrementSystem);
-            expect(sysManager.getNonFixedTSSystems()[1]).to.be.instanceof(FeedBackSystem);
-            expect(sysManager.getNonFixedTSSystems()[2]).to.be.instanceof(IncrementSystem);
+            expect(sysManager.getNonFixedTSSystemsArray()[0]).to.be.instanceof(IncrementSystem);
+            expect(sysManager.getNonFixedTSSystemsArray()[1]).to.be.instanceof(FeedBackSystem);
+            expect(sysManager.getNonFixedTSSystemsArray()[2]).to.be.instanceof(IncrementSystem);
         });
     });
     describe("remove", () => {
@@ -133,12 +133,12 @@ describe("SystemManager should be able to", () => {
             const nFSystem = new FeedBackSystem(feedbackParams);
             const firstId = sysManager.pushSystem(nFSystem, true);
             const secondId = sysManager.pushSystem(nFSystem, false);
-            expect(sysManager.getFixedTSSystems().length).to.equal(1);
-            expect(sysManager.getNonFixedTSSystems().length).to.equal(1);
+            expect(sysManager.getFixedTSSystemsArray().length).to.equal(1);
+            expect(sysManager.getNonFixedTSSystemsArray().length).to.equal(1);
             sysManager.remove(firstId);
             sysManager.remove(secondId);
-            expect(sysManager.getFixedTSSystems().length).to.equal(0);
-            expect(sysManager.getNonFixedTSSystems().length).to.equal(0);
+            expect(sysManager.getFixedTSSystemsArray().length).to.equal(0);
+            expect(sysManager.getNonFixedTSSystemsArray().length).to.equal(0);
         });
     });
     describe("get", () => {
@@ -163,8 +163,8 @@ describe("SystemManager should be able to", () => {
             const nFSystem = new FeedBackSystem(feedbackParams);
             const firstId = sysManager.pushSystem(nFSystem, true);
             const secondId = sysManager.pushSystem(nFSystem, false);
-            expect(sysManager.getNonFixedTSSystems()[0].active).to.equal(true);
-            expect(sysManager.getFixedTSSystems()[0].active).to.equal(true);
+            expect(sysManager.getNonFixedTSSystemsArray()[0].active).to.equal(true);
+            expect(sysManager.getFixedTSSystemsArray()[0].active).to.equal(true);
         });
     });
 });
