@@ -1395,6 +1395,7 @@ var Project = /** @class */ (function () {
         configurable: true
     });
     Object.defineProperty(Project.prototype, "dependencies", {
+        /** Class that could be instantiate after the project has started */
         get: function () {
             return this._dependencies;
         },
