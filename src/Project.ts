@@ -32,7 +32,7 @@ class Project implements IProject {
         GLOBAL[this._projectName] = this;
         this.exposeCore();
         this.exposeDependencies(this._dependencies);
-
+        this.utils = new Map();
     }
 
     public clear() {

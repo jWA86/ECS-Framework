@@ -13,4 +13,5 @@ interface IProject {
     graphics: IGraphics;
     keyboardShortCut: IKeyboardShortCut;
     clear: () => void;
+    utils: Map<string, IUtil>;
 }
