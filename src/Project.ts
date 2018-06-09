@@ -16,6 +16,8 @@ class Project implements IProject {
     public poolManager: PoolManager;
     public systemManager: SystemManager;
     public keyboardShortCut: IKeyboardShortCut;
+    /** Centralize instances of utils here */
+    public utils: Map<string, IUtil>;
 
     protected _dependencies: any[];
     constructor(protected _projectName: string, dependencies?: Array<{ name: string, object: any }>) {
@@ -69,7 +71,7 @@ class Project implements IProject {
     get projectName(): string {
         return this._projectName;
     }
-
+    /** Class that could be instantiate after the project has started */
     get dependencies(): any[] {
         return this._dependencies;
     }
