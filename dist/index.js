@@ -1357,6 +1357,7 @@ var Project = /** @class */ (function () {
         pollyFill_1.GLOBAL[this._projectName] = this;
         this.exposeCore();
         this.exposeDependencies(this._dependencies);
+        this.utils = new Map();
     }
     Project.prototype.clear = function () {
         this.gameLoop.stop();

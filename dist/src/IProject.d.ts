@@ -1,4 +1,4 @@
-import { IGameLoop, IGraphics, IPoolManager, ISystemManager } from "./interfaces";
+import { IGameLoop, IGraphics, IPoolManager, ISystemManager, IUtil } from "./interfaces";
 export { IKeyboardShortCut, IProject };
 interface IKeyboardShortCut {
     bind: (...args: any[]) => void;
@@ -14,4 +14,5 @@ interface IProject {
     graphics: IGraphics;
     keyboardShortCut: IKeyboardShortCut;
     clear: () => void;
+    utils: Map<string, IUtil>;
 }
