@@ -5,17 +5,17 @@ export { Graphics };
 class Graphics implements IGraphics {
 
     protected _canvas: HTMLCanvasElement;
-    protected _context: CanvasRenderingContext2D | WebGLRenderingContext;
-    constructor(protected _canvasId: string, protected _renderingContext: "2d" | "webgl") { }
+    protected _context: CanvasRenderingContext2D | WebGLRenderingContext| WebGL2RenderingContext;
+    constructor(protected _canvasId: string, protected _renderingContext: "2d" | "webgl" | "webgl2") { }
 
-    protected initCanvas() {
+    public initCanvas() {
         this._canvas = document.getElementById(this._canvasId) as HTMLCanvasElement;
         this._context = this._canvas.getContext(this._renderingContext);
     }
 
-    protected get2DCanvasRenderingContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
-        return canvas.getContext("2d");
-    }
+    // protected getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D | WebGLRenderingContext | WebGL2RenderingContext {
+    //     return canvas.getContext("2d");
+    // }
     public get canvasId() {
         return this._canvasId;
     }
