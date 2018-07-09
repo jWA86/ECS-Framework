@@ -1292,10 +1292,10 @@ var Graphics = /** @class */ (function () {
         this._canvas = document.getElementById(this._canvasId);
         this._context = this._canvas.getContext(this._renderingContext);
     };
-    Graphics.prototype.get2DCanvasRenderingContext = function (canvas) {
-        return canvas.getContext("2d");
-    };
     Object.defineProperty(Graphics.prototype, "canvasId", {
+        // protected getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D | WebGLRenderingContext | WebGL2RenderingContext {
+        //     return canvas.getContext("2d");
+        // }
         get: function () {
             return this._canvasId;
         },
