@@ -23,7 +23,8 @@ describe("SystemManager should be able to", () => {
     };
 
     class IncrementSystem extends System<IIntegerParams> {
-        constructor(params: IIntegerParams) { super(params); }
+        protected _parameters: IIntegerParams = incrementParams;
+        constructor() { super(); }
         public execute(params: IIntegerParams) {
             params.i.integer += 1;
         }
@@ -39,8 +40,9 @@ describe("SystemManager should be able to", () => {
 
     class FeedBackSystem extends System<IFeedBackParams> {
         public static callBack: (timer: FrameEvent) => void;
-        constructor(params: IFeedBackParams) {
-            super(params);
+        protected _parameters: IFeedBackParams = feedbackParams;
+        constructor() {
+            super();
         }
         public execute(params: IFeedBackParams, timer: FrameEvent) {
             FeedBackSystem.callBack(timer);
@@ -50,12 +52,12 @@ describe("SystemManager should be able to", () => {
     describe("add system", () => {
         it("set an unique id for each system instance it holds", () => {
             const sysManager = new SystemManager();
-            const firstId = sysManager.pushSystem(new FeedBackSystem(feedbackParams), true);
-            const secondId = sysManager.pushSystem(new IncrementSystem(incrementParams), true);
-            const thirdId = sysManager.pushSystem(new FeedBackSystem(feedbackParams), true);
-            const fourthId = sysManager.pushSystem(new FeedBackSystem(feedbackParams), true);
-            const fifthId = sysManager.pushSystem(new FeedBackSystem(feedbackParams), false);
-            const sixId = sysManager.pushSystem(new FeedBackSystem(feedbackParams), false);
+            const firstId = sysManager.pushSystem(new FeedBackSystem(), true);
+            const secondId = sysManager.pushSystem(new IncrementSystem(), true);
+            const thirdId = sysManager.pushSystem(new FeedBackSystem(), true);
+            const fourthId = sysManager.pushSystem(new FeedBackSystem(), true);
+            const fifthId = sysManager.pushSystem(new FeedBackSystem(), false);
+            const sixId = sysManager.pushSystem(new FeedBackSystem(), false);
             // should be different
             expect(secondId).to.not.equal(firstId);
             expect(thirdId).to.not.equal(firstId);
@@ -72,8 +74,8 @@ describe("SystemManager should be able to", () => {
         });
         it("in separate collection based on wether it should be processed at fixed time step or not", () => {
             const sysManager = new SystemManager();
-            const fSystem = new FeedBackSystem(feedbackParams);
-            const nFSystem = new FeedBackSystem(feedbackParams);
+            const fSystem = new FeedBackSystem();
+            const nFSystem = new FeedBackSystem();
             const firstId = sysManager.pushSystem(nFSystem, true);
             const secondId = sysManager.pushSystem(nFSystem, false);
             expect(sysManager.getFixedTSSystemsArray().length).to.equal(1);
@@ -85,37 +87,37 @@ describe("SystemManager should be able to", () => {
         });
         it("insert a system before an other system ", () => {
             const sysManager = new SystemManager();
-            const fSystem = new FeedBackSystem(feedbackParams);
-            const nFSystem = new FeedBackSystem(feedbackParams);
+            const fSystem = new FeedBackSystem();
+            const nFSystem = new FeedBackSystem();
             const firstId = sysManager.pushSystem(nFSystem, true);
             const secondId = sysManager.pushSystem(nFSystem, false);
 
-            sysManager.insertBefore(firstId,  new IncrementSystem(incrementParams));
-            sysManager.insertBefore(secondId,  new IncrementSystem(incrementParams));
+            sysManager.insertBefore(firstId,  new IncrementSystem());
+            sysManager.insertBefore(secondId,  new IncrementSystem());
             expect(sysManager.getFixedTSSystemsArray()[0]).to.be.instanceof(IncrementSystem);
             expect(sysManager.getNonFixedTSSystemsArray()[0]).to.be.instanceof(IncrementSystem);
         });
         it("insert a system after an other system ", () => {
             const sysManager = new SystemManager();
-            const fSystem = new FeedBackSystem(feedbackParams);
-            const nFSystem = new FeedBackSystem(feedbackParams);
+            const fSystem = new FeedBackSystem();
+            const nFSystem = new FeedBackSystem();
             const firstId = sysManager.pushSystem(nFSystem, true);
             const secondId = sysManager.pushSystem(nFSystem, false);
 
-            sysManager.insertAfter(firstId,  new IncrementSystem(incrementParams));
-            sysManager.insertAfter(secondId,  new IncrementSystem(incrementParams));
+            sysManager.insertAfter(firstId,  new IncrementSystem());
+            sysManager.insertAfter(secondId,  new IncrementSystem());
             expect(sysManager.getFixedTSSystemsArray()[1]).to.be.instanceof(IncrementSystem);
             expect(sysManager.getNonFixedTSSystemsArray()[1]).to.be.instanceof(IncrementSystem);
         });
         it("insert a system around an other system ", () => {
             const sysManager = new SystemManager();
-            const fFSystem = new FeedBackSystem(feedbackParams);
-            const nFSystem = new FeedBackSystem(feedbackParams);
+            const fFSystem = new FeedBackSystem();
+            const nFSystem = new FeedBackSystem();
             const firstId = sysManager.pushSystem(fFSystem, true);
             const secondId = sysManager.pushSystem(nFSystem, false);
 
-            sysManager.insertAround(firstId, new IncrementSystem(incrementParams), new IncrementSystem(incrementParams));
-            sysManager.insertAround(secondId,  new IncrementSystem(incrementParams), new IncrementSystem(incrementParams));
+            sysManager.insertAround(firstId, new IncrementSystem(), new IncrementSystem());
+            sysManager.insertAround(secondId,  new IncrementSystem(), new IncrementSystem());
 
             expect(sysManager.getFixedTSSystemsArray()[0]).to.be.instanceof(IncrementSystem);
             expect(sysManager.getFixedTSSystemsArray()[1]).to.be.instanceof(FeedBackSystem);
@@ -129,8 +131,8 @@ describe("SystemManager should be able to", () => {
     describe("remove", () => {
         it("should remove the system from the SystemManager by providing the system id", () => {
             const sysManager = new SystemManager();
-            const fSystem = new FeedBackSystem(feedbackParams);
-            const nFSystem = new FeedBackSystem(feedbackParams);
+            const fSystem = new FeedBackSystem();
+            const nFSystem = new FeedBackSystem();
             const firstId = sysManager.pushSystem(nFSystem, true);
             const secondId = sysManager.pushSystem(nFSystem, false);
             expect(sysManager.getFixedTSSystemsArray().length).to.equal(1);
@@ -144,8 +146,8 @@ describe("SystemManager should be able to", () => {
     describe("get", () => {
         it("a system by its id", () => {
             const sysManager = new SystemManager();
-            const fSystem = new FeedBackSystem(feedbackParams);
-            const nFSystem = new FeedBackSystem(feedbackParams);
+            const fSystem = new FeedBackSystem();
+            const nFSystem = new FeedBackSystem();
             const firstId = sysManager.pushSystem(nFSystem, true);
             const secondId = sysManager.pushSystem(nFSystem, false);
 
@@ -159,8 +161,8 @@ describe("SystemManager should be able to", () => {
     describe("set systems states :", () => {
         it("active by default", () => {
             const sysManager = new SystemManager();
-            const fSystem = new FeedBackSystem(feedbackParams);
-            const nFSystem = new FeedBackSystem(feedbackParams);
+            const fSystem = new FeedBackSystem();
+            const nFSystem = new FeedBackSystem();
             const firstId = sysManager.pushSystem(nFSystem, true);
             const secondId = sysManager.pushSystem(nFSystem, false);
             expect(sysManager.getNonFixedTSSystemsArray()[0].active).to.equal(true);

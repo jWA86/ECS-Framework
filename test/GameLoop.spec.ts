@@ -7,46 +7,43 @@ import { IComponent, IComponentFactory, IFrameEvent } from "../src/interfaces";
 import { System } from "../src/System";
 import { SystemManager } from "../src/SystemManager";
 
-// problem with requestionAnimationFrame is randomly fired
-// so sometimes test passed sometimes not ...
-describe("GameLoop", () => {
+// RequestAnimationFrame doesn't work if the page/tab is in background, so these tests have to be run in the browsers, Karma won't make it works.
+
+const isRequestAnimationFrameWorking = () => {
     let rafWorking = false;
+    expect(requestAnimationFrame).to.not.be.equal(undefined);
 
-    before("requestAnimationFrame should work", (done) => {
-        expect(requestAnimationFrame).to.not.be.equal(undefined);
-        // pause after 500ms
-        // then check that loop has been called more than once
-        let frameId = 0;
-        let firedCount = 0;
+    // pause after 500ms
+    // then check that loop has been called more than once
+    let frameId = 0;
+    let firedCount = 0;
 
-        function loop() {
-            firedCount += 1;
-            frameId = requestAnimationFrame(loop);
-        }
-
-        loop();
-
-        setTimeout(() => {
-            cancelAnimationFrame(frameId);
-            if (firedCount > 1) {
-                rafWorking = true;
-                done();
-            } else {
-                rafWorking = false;
-                done(Error("requestAnimatioNFrame not working"));
-            }
-        }, 1000);
-    });
-
-    if (rafWorking) {
-        describe("should be able to", test);
-    } else {
-        describe.skip("should be able to", test);
+    function loop() {
+        firedCount += 1;
+        frameId = requestAnimationFrame(loop);
     }
-});
 
-function test() {
-    this.timeout(3000);
+    loop();
+
+    setTimeout(() => {
+        cancelAnimationFrame(frameId);
+        if (firedCount > 10) {
+            rafWorking = true;
+        } else {
+            rafWorking = false;
+        }
+        expect(rafWorking, "WARNING ! RequestAnimationFrame not working, run tests in foreground").to.equal(true);
+    }, 800);
+
+};
+
+const isPerformanceWorking = () => {
+    expect(performance).to.not.equal(undefined);
+    expect(performance.now()).to.be.greaterThan(0);
+    expect(performance.mark, "window.performance.mark is not defined").to.not.equal(undefined);
+};
+
+describe("GameLoop", () => {
     const perf = window.performance && window.performance.now ? window.performance : Date;
     class EmptyComponent implements IComponent {
         public entityId: number;
@@ -64,6 +61,7 @@ function test() {
 
     class FeedBackSystem extends System<IFeedBackParams> {
         public static callBack: (timer: FrameEvent, ...args: any[]) => void;
+        protected _parameters: IFeedBackParams = feedbackParams;
         public execute(params: IFeedBackParams, timer: FrameEvent, ...args: any[]) {
             FeedBackSystem.callBack(timer, ...args);
         }
@@ -108,7 +106,8 @@ function test() {
     };
 
     class MoveSystem extends System<IMoveParams> {
-        constructor(params: IMoveParams) { super(params); }
+        protected _parameters: IMoveParams = moveParams;
+        constructor() { super(); }
 
         public execute(params: IMoveParams) {
             params.p.position.x *= params.v.velocity.x;
@@ -133,7 +132,8 @@ function test() {
     };
 
     class IncrementSystem extends System<IIntergerParams> {
-        constructor(params: IIntergerParams) { super(params); }
+        protected _parameters: IIntergerParams = incrementParams;
+        constructor() { super(); }
         public execute(params: IIntergerParams) {
             params.i.integer += 1;
         }
@@ -141,7 +141,8 @@ function test() {
 
     // Dummy system that multiply an integer by itself
     class SquareSystem extends System<IIntergerParams> {
-        constructor(params) { super(params); }
+        protected _parameters: IIntergerParams = incrementParams;
+        constructor() { super(); }
         public execute(params: IIntergerParams) {
             params.i.integer = params.i.integer * params.i.integer;
         }
@@ -153,6 +154,8 @@ function test() {
     let feedBackFactory = new ComponentFactory<EmptyComponent>(5, new EmptyComponent());
 
     beforeEach(() => {
+        isRequestAnimationFrameWorking();
+        isPerformanceWorking();
         positionFactory = new ComponentFactory<PositionComponent>(10, new PositionComponent(zeroVec3));
 
         for (let i = 1; i < 6; ++i) {
@@ -172,8 +175,8 @@ function test() {
     });
     it("accept a list of System to iterate on", () => {
         const sM = new SystemManager();
-        sM.pushSystem(new IncrementSystem(incrementParams), true);
-        sM.pushSystem(new SquareSystem(incrementParams), true);
+        sM.pushSystem(new IncrementSystem(), true);
+        sM.pushSystem(new SquareSystem(), true);
         const gl = new GameLoop(sM);
         const res = gl.systemManager;
         expect(res).to.deep.equal(sM);
@@ -200,14 +203,14 @@ function test() {
             const t = gl.currentTimer;
             expect(t.time).to.approximately(runFor, 30);
             done();
-        }, 20);
+        }, runFor);
         gl.start();
     });
-    it("provid the time ellaspsed since the last frame call", (done) => {
+    it("provide the time ellaspsed since the last frame call", (done) => {
         // checking that delta does not vary much
         const sM = new SystemManager();
-        const fbckSys = new FeedBackSystem(feedbackParams);
-        fbckSys.setParamsSource(feedBackFactory);
+        const fbckSys = new FeedBackSystem();
+        fbckSys.setParamSource("e", feedBackFactory);
         feedBackFactory.create(1, true);
         expect(feedBackFactory.nbActive).to.gt(0);
 
@@ -215,6 +218,7 @@ function test() {
         FeedBackSystem.callBack = (timer) => {
             deltas.push(timer.delta);
         };
+
         sM.pushSystem(fbckSys, false);
         const runFor = 1000;
         const gl = new GameLoop(sM);
@@ -262,8 +266,8 @@ function test() {
         // then we compare value to make sure it's executed at a fixed time step
         const frequency = (1000 / 60);
         feedBackFactory.create(1, true);
-        const s = new FeedBackSystem(feedbackParams);
-        s.setParamsSource(feedBackFactory);
+        const s = new FeedBackSystem();
+        s.setParamSource("e", feedBackFactory);
         FeedBackSystem["timerArr"] = [];
         FeedBackSystem.callBack = (timer: FrameEvent) => {
             FeedBackSystem["timerArr"].push(timer.time);
@@ -296,10 +300,10 @@ function test() {
         const nFixedIntFactory = new ComponentFactory<IntegerComponent>(2, new IntegerComponent(0));
         fixedIntFactory.create(1, true);
         nFixedIntFactory.create(1, true);
-        const fixedTS = new IncrementSystem(incrementParams);
-        const nFixedTS = new IncrementSystem(incrementParams);
-        fixedTS.setParamsSource(fixedIntFactory);
-        nFixedTS.setParamsSource(nFixedIntFactory);
+        const fixedTS = new IncrementSystem();
+        const nFixedTS = new IncrementSystem();
+        fixedTS.setParamSource("i", fixedIntFactory);
+        nFixedTS.setParamSource("i",  nFixedIntFactory);
 
         const sM = new SystemManager();
         sM.pushSystem(fixedTS, true);
@@ -317,7 +321,7 @@ function test() {
             expect(fi).to.gt(nfi);
             done();
 
-        }, 10);
+        }, runFor);
     });
     it("pause each system individually", (done) => {
         // 2 increments systems
@@ -334,15 +338,15 @@ function test() {
         fact2.create(1, true);
         fact3.create(1, true);
         fact4.create(1, true);
-        const incS1 = new IncrementSystem(incrementParams);
-        const incS2 = new IncrementSystem(incrementParams);
-        const incS3 = new IncrementSystem(incrementParams);
-        const incS4 = new IncrementSystem(incrementParams);
+        const incS1 = new IncrementSystem();
+        const incS2 = new IncrementSystem();
+        const incS3 = new IncrementSystem();
+        const incS4 = new IncrementSystem();
 
-        incS1.setParamsSource(fact1);
-        incS2.setParamsSource(fact2);
-        incS3.setParamsSource(fact3);
-        incS4.setParamsSource(fact4);
+        incS1.setParamSource("i", fact1);
+        incS2.setParamSource("i", fact2);
+        incS3.setParamSource("i", fact3);
+        incS4.setParamSource("i", fact4);
 
         const sM = new SystemManager();
         const pausedFSysId = sM.pushSystem(incS1, true);
@@ -387,8 +391,8 @@ function test() {
 
     it("pass optional parameter from start to each system", (done) => {
         feedBackFactory.create(1, true);
-        const s = new FeedBackSystem(feedbackParams);
-        s.setParamsSource(feedBackFactory);
+        const s = new FeedBackSystem();
+        s.setParamSource("e", feedBackFactory);
         FeedBackSystem["timerArr"] = [];
         FeedBackSystem.callBack = (timer: FrameEvent, a1, a2) => {
             FeedBackSystem["arg1"] = a1;
@@ -411,8 +415,8 @@ function test() {
     });
     it("pass the currentTimer to each System as optional parameter", (done) => {
         feedBackFactory.create(1, true);
-        const s = new FeedBackSystem(feedbackParams);
-        s.setParamsSource(feedBackFactory);
+        const s = new FeedBackSystem();
+        s.setParamSource("e", feedBackFactory);
         FeedBackSystem["timerArr"] = [];
         FeedBackSystem.callBack = (timer: FrameEvent) => {
             FeedBackSystem["timerArr"].push(timer.time);
@@ -434,4 +438,4 @@ function test() {
             done();
         }, 600);
     });
-}
+});

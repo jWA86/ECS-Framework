@@ -20,7 +20,7 @@ class TimeMeasureComponent implements ITimeMeasureComponent {
      * @param minT minimum time of the measure data set
      * @param maxT maximum time of the measure data set
      * @param meanT mean time of the measure data set
-     * @param frequency the frequency of minT, maxT, meanT computation
+     * @param frequency the frequency at which to sample
      */
     public entityId: number;
     public active: boolean;
@@ -66,11 +66,12 @@ class TimeMeasureUtil implements ITimeMeasureUtil {
     }
 }
 
-abstract class TimeMeasureSystem implements ISystem<void> {
+abstract class TimeMeasureSystem implements ISystem<{}> {
     public static performance = window.performance;
     public active = true;
     protected startMark: string;
     protected endMark: string;
+    protected _parameters = {};
     /**
      * @param tmComponent the component used for recording time
      */
@@ -79,7 +80,10 @@ abstract class TimeMeasureSystem implements ISystem<void> {
         this.endMark = "end" + this.tmComponent.systemId;
      }
      /** Not used */
+    public get parameters() { return this._parameters; }
     public abstract process(...args: any[]);
+    public abstract execute(...args: any[]);
+    public setParamSource() {}
 
     public getMeasures() {
         return TimeMeasureSystem.performance.getEntriesByName(this.tmComponent.systemId);
@@ -155,9 +159,8 @@ class TimeMeasureSystemEndMark extends TimeMeasureSystem {
     }
     /**
      *  Measure time passed since the start mark and compute statistics if time.lag >= the specified frequency of computation
-     * @param time FrameEvent used to decide when to compute data
      */
-    public execute(time: IFrameEvent) {
+    public execute(time?: IFrameEvent) {
         TimeMeasureSystem.performance.mark(this.endMark);
         this.measure();
         if ((TIMESTAMP.now() - this.lastUpdate) >= this.tmComponent.frequency) {
