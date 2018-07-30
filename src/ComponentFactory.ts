@@ -1,5 +1,5 @@
 import { FastIterationMap } from "FastIterationMap";
-import { IComponent, IComponentFactory, IPool } from "./IComponentFactory";
+import { IComponent, IComponentFactory } from "./IComponentFactory";
 export { ComponentFactory };
 
 class ComponentFactory<T extends IComponent> extends FastIterationMap<number, T> implements IComponentFactory<T> {

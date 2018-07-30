@@ -1,4 +1,4 @@
-import { FastIterationMap } from "fastiterationmap";
+import { FastIterationMap } from "FastIterationMap";
 import { IComponent, IComponentFactory } from "./interfaces";
 import { ISystem } from "./ISystem";
 export { System };

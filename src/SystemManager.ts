@@ -1,5 +1,5 @@
 import { FastIterationMap, IFastIterationMap } from "FastIterationMap";
-import { IComponent, IComponentFactory, ISystem } from "./interfaces";
+import { ISystem } from "./interfaces";
 import { ISystemManager } from "./ISystemManager";
 import { RANDOM } from "./pollyFill";
 export { SystemManager  };

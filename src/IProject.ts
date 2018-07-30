@@ -1,4 +1,4 @@
-import { IGameLoop, IGraphics, IPool, IPoolManager, ISystemManager, IUtil } from "./interfaces";
+import { IGameLoop, IGraphics, IPoolManager, ISystemManager, IUtil } from "./interfaces";
 export { IKeyboardShortCut, IProject };
 
 interface IKeyboardShortCut {

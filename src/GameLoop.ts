@@ -1,4 +1,4 @@
-import { IComponent, IComponentFactory, ISystem, ISystemManager } from "../src/interfaces";
+import { ISystem } from "../src/interfaces";
 import {IFrameEvent } from "./IFrameEvent";
 import { IGameLoop } from "./IGameLoop";
 import { TIMESTAMP } from "./pollyFill";

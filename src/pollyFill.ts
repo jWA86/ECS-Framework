@@ -1,5 +1,3 @@
-import { Z_VERSION_ERROR } from "zlib";
-
 export { GLOBAL, RANDOM, TIMESTAMP };
 
 const isBrowser = new Function("try {return this===window;}catch(e){ return false;}");

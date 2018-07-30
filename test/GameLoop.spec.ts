@@ -3,7 +3,7 @@ import "mocha";
 import { clearInterval, setInterval } from "timers";
 import { ComponentFactory } from "../src/ComponentFactory";
 import { FrameEvent, GameLoop } from "../src/GameLoop";
-import { IComponent, IComponentFactory, IFrameEvent } from "../src/interfaces";
+import { IComponent } from "../src/interfaces";
 import { System } from "../src/System";
 import { SystemManager } from "../src/SystemManager";
 

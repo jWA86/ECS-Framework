@@ -23,7 +23,7 @@ declare class TimeMeasureComponent implements ITimeMeasureComponent {
      * @param minT minimum time of the measure data set
      * @param maxT maximum time of the measure data set
      * @param meanT mean time of the measure data set
-     * @param frequency the frequency of minT, maxT, meanT computation
+     * @param frequency the frequency at which to sample
      */
     entityId: number;
     active: boolean;
@@ -48,18 +48,22 @@ declare class TimeMeasureUtil implements ITimeMeasureUtil {
     uninstall(systemId: string): void;
     getMeasures(systemId: string): any;
 }
-declare abstract class TimeMeasureSystem implements ISystem<void> {
+declare abstract class TimeMeasureSystem implements ISystem<{}> {
     tmComponent: TimeMeasureComponent;
     static performance: Performance;
     active: boolean;
     protected startMark: string;
     protected endMark: string;
+    protected _parameters: {};
     /**
      * @param tmComponent the component used for recording time
      */
     constructor(tmComponent: TimeMeasureComponent);
     /** Not used */
+    readonly parameters: {};
     abstract process(...args: any[]): any;
+    abstract execute(...args: any[]): any;
+    setParamSource(): void;
     getMeasures(): any;
     /**
      * Set max, min mean and last measure to the TMComponent from the performance.measure data set
@@ -97,7 +101,6 @@ declare class TimeMeasureSystemEndMark extends TimeMeasureSystem {
     process(...args: any[]): void;
     /**
      *  Measure time passed since the start mark and compute statistics if time.lag >= the specified frequency of computation
-     * @param time FrameEvent used to decide when to compute data
      */
-    execute(time: IFrameEvent): void;
+    execute(time?: IFrameEvent): void;
 }

@@ -98,6 +98,293 @@ exports.GLOBAL = GLOBAL;
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(true)
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else {
+		var a = factory();
+		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
+	}
+})(typeof self !== 'undefined' ? self : this, function() {
+return /******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(1);
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var FastIterationMap = /** @class */ (function () {
+    function FastIterationMap() {
+        this._keys = new Map();
+        this._values = [];
+    }
+    FastIterationMap.prototype.clear = function () {
+        this._keys.clear();
+        this._values = [];
+    };
+    FastIterationMap.prototype.delete = function (key) {
+        var i = this._keys.get(key);
+        var r = this._keys.delete(key);
+        this.offsetIndexInKeys(i, -1);
+        var r2 = this._values.splice(i, 1);
+        if (r2.length > 0 && r) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    FastIterationMap.prototype.get = function (key) {
+        return this._values[this._keys.get(key)];
+    };
+    /**
+     * Return the index of an element in the value array
+     * @param key
+     */
+    FastIterationMap.prototype.getIndex = function (key) {
+        return this._keys.get(key);
+    };
+    FastIterationMap.prototype.has = function (key) {
+        return this._keys.has(key);
+    };
+    /**
+     * Insert an item after another item
+     * @param key the key of the item to insert
+     * @param value the value of the item
+     * @param keyRef the key of the item to insert after
+     */
+    FastIterationMap.prototype.insertAfter = function (key, value, keyRef) {
+        if (this._keys.get(key) !== undefined) {
+            return false;
+        }
+        var i = this._keys.get(keyRef);
+        if (i === undefined) {
+            return false;
+        }
+        this.insertValue(i + 1, value);
+        this.offsetIndexInKeys(i, 1);
+        this._keys.set(key, i + 1);
+        return true;
+    };
+    /**
+     * Insert 2 items around the another item
+     * @param keyRef the key of the item insert around
+     * @param firstK the key of the item to insert before
+     * @param firstV the value of the item to insert before
+     * @param secondK the key of the item to insert after
+     * @param secondV the value of the item to insert after
+     */
+    FastIterationMap.prototype.insertAround = function (keyRef, firstK, firstV, secondK, secondV) {
+        if (this._keys.get(firstK) !== undefined || this._keys.get(secondK) !== undefined) {
+            return false;
+        }
+        var index = this._keys.get(keyRef);
+        if (index === undefined) {
+            return false;
+        }
+        // insert the 2 items after the item of reference
+        // offset index by 2 in the keys map of all element after the index of reference
+        // in the keys map set index of the 2 new items
+        // finally swap the item of reference with the first of the 2 items inserted
+        this.insertValue(index + 1, firstV, secondV);
+        this.offsetIndexInKeys(index, 2);
+        this._keys.set(firstK, index + 1);
+        this._keys.set(secondK, index + 2);
+        return this.swap(keyRef, firstK);
+    };
+    /**
+     * Insert an item before another item
+     * @param key the key of the item to insert
+     * @param value the value of the item
+     * @param keyRef the key of the item to insert before
+     */
+    FastIterationMap.prototype.insertBefore = function (key, value, keyRef) {
+        if (this._keys.get(key) !== undefined) {
+            return false;
+        }
+        var i = this._keys.get(keyRef);
+        if (i === undefined) {
+            return false;
+        }
+        this.insertValue(i, value);
+        this.offsetIndexInKeys(i - 1, 1);
+        this._keys.set(key, i);
+        return true;
+    };
+    Object.defineProperty(FastIterationMap.prototype, "keys", {
+        get: function () {
+            return this._keys;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(FastIterationMap.prototype, "length", {
+        get: function () {
+            return this._values.length;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(FastIterationMap.prototype, "size", {
+        get: function () {
+            return this._values.length;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(FastIterationMap.prototype, "values", {
+        get: function () {
+            return this._values;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    FastIterationMap.prototype.push = function (key, value) {
+        var e = this._keys.get(key);
+        // if the key doesn't exist add the element
+        if (e === undefined) {
+            var l = this._values.push(value);
+            this._keys.set(key, l - 1);
+        }
+        else {
+            // if the key is already there, update the value
+            this._values[e] = value;
+        }
+        return this._values.length;
+    };
+    FastIterationMap.prototype.set = function (key, value) {
+        return this.push(key, value);
+    };
+    /**
+     * Swap position of 2 items in the values array and set the correct index in the keys Map
+     * @param key1
+     * @param key2
+     */
+    FastIterationMap.prototype.swap = function (key1, key2) {
+        var index1 = this._keys.get(key1);
+        var index2 = this._keys.get(key2);
+        if (index1 === undefined || index2 === undefined) {
+            return false;
+        }
+        var tmp = this._values[index1];
+        this._values[index1] = this._values[index2];
+        this._values[index2] = tmp;
+        this._keys.set(key1, index2);
+        this._keys.set(key2, index1);
+        return true;
+    };
+    FastIterationMap.prototype.insertValue = function (index) {
+        var values = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            values[_i - 1] = arguments[_i];
+        }
+        return (_a = this._values).splice.apply(_a, [index, 0].concat(values));
+        var _a;
+    };
+    /**
+     * Offset indices in the keys Map from a position ([from] and [to] not included)
+     * @param from offset after this key
+     * @param offsetVal the amount to offset indices
+     * @param to if specidied offset until this key, otherwise offset to end of the collection
+     */
+    FastIterationMap.prototype.offsetIndexInKeys = function (from, offsetVal, to) {
+        var mapIter = this._keys.entries();
+        var l = this._keys.size;
+        to = to || Number.MAX_VALUE;
+        for (var i = 0; i < l; ++i) {
+            var e = mapIter.next().value;
+            if (e[1] > from && e[1] < to) {
+                this._keys.set(e[0], e[1] += offsetVal);
+            }
+        }
+    };
+    return FastIterationMap;
+}());
+exports.FastIterationMap = FastIterationMap;
+
+
+/***/ })
+/******/ ]);
+});
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
 "use strict";
 
 var __extends = (this && this.__extends) || (function () {
@@ -111,7 +398,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var FastIterationMap_1 = __webpack_require__(2);
+var FastIterationMap_1 = __webpack_require__(1);
 var ComponentFactory = /** @class */ (function (_super) {
     __extends(ComponentFactory, _super);
     function ComponentFactory(_size, componentWithDefaultValue) {
@@ -401,293 +688,6 @@ exports.ComponentFactory = ComponentFactory;
 
 
 /***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(true)
-		module.exports = factory();
-	else if(typeof define === 'function' && define.amd)
-		define([], factory);
-	else {
-		var a = factory();
-		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
-	}
-})(typeof self !== 'undefined' ? self : this, function() {
-return /******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
-/******/ })
-/************************************************************************/
-/******/ ([
-/* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(1);
-
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var FastIterationMap = /** @class */ (function () {
-    function FastIterationMap() {
-        this._keys = new Map();
-        this._values = [];
-    }
-    FastIterationMap.prototype.clear = function () {
-        this._keys.clear();
-        this._values = [];
-    };
-    FastIterationMap.prototype.delete = function (key) {
-        var i = this._keys.get(key);
-        var r = this._keys.delete(key);
-        this.offsetIndexInKeys(i, -1);
-        var r2 = this._values.splice(i, 1);
-        if (r2.length > 0 && r) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    };
-    FastIterationMap.prototype.get = function (key) {
-        return this._values[this._keys.get(key)];
-    };
-    /**
-     * Return the index of an element in the value array
-     * @param key
-     */
-    FastIterationMap.prototype.getIndex = function (key) {
-        return this._keys.get(key);
-    };
-    FastIterationMap.prototype.has = function (key) {
-        return this._keys.has(key);
-    };
-    /**
-     * Insert an item after another item
-     * @param key the key of the item to insert
-     * @param value the value of the item
-     * @param keyRef the key of the item to insert after
-     */
-    FastIterationMap.prototype.insertAfter = function (key, value, keyRef) {
-        if (this._keys.get(key) !== undefined) {
-            return false;
-        }
-        var i = this._keys.get(keyRef);
-        if (i === undefined) {
-            return false;
-        }
-        this.insertValue(i + 1, value);
-        this.offsetIndexInKeys(i, 1);
-        this._keys.set(key, i + 1);
-        return true;
-    };
-    /**
-     * Insert 2 items around the another item
-     * @param keyRef the key of the item insert around
-     * @param firstK the key of the item to insert before
-     * @param firstV the value of the item to insert before
-     * @param secondK the key of the item to insert after
-     * @param secondV the value of the item to insert after
-     */
-    FastIterationMap.prototype.insertAround = function (keyRef, firstK, firstV, secondK, secondV) {
-        if (this._keys.get(firstK) !== undefined || this._keys.get(secondK) !== undefined) {
-            return false;
-        }
-        var index = this._keys.get(keyRef);
-        if (index === undefined) {
-            return false;
-        }
-        // insert the 2 items after the item of reference
-        // offset index by 2 in the keys map of all element after the index of reference
-        // in the keys map set index of the 2 new items
-        // finally swap the item of reference with the first of the 2 items inserted
-        this.insertValue(index + 1, firstV, secondV);
-        this.offsetIndexInKeys(index, 2);
-        this._keys.set(firstK, index + 1);
-        this._keys.set(secondK, index + 2);
-        return this.swap(keyRef, firstK);
-    };
-    /**
-     * Insert an item before another item
-     * @param key the key of the item to insert
-     * @param value the value of the item
-     * @param keyRef the key of the item to insert before
-     */
-    FastIterationMap.prototype.insertBefore = function (key, value, keyRef) {
-        if (this._keys.get(key) !== undefined) {
-            return false;
-        }
-        var i = this._keys.get(keyRef);
-        if (i === undefined) {
-            return false;
-        }
-        this.insertValue(i, value);
-        this.offsetIndexInKeys(i - 1, 1);
-        this._keys.set(key, i);
-        return true;
-    };
-    Object.defineProperty(FastIterationMap.prototype, "keys", {
-        get: function () {
-            return this._keys;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(FastIterationMap.prototype, "length", {
-        get: function () {
-            return this._values.length;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(FastIterationMap.prototype, "size", {
-        get: function () {
-            return this._values.length;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(FastIterationMap.prototype, "values", {
-        get: function () {
-            return this._values;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    FastIterationMap.prototype.push = function (key, value) {
-        var e = this._keys.get(key);
-        // if the key doesn't exist add the element
-        if (e === undefined) {
-            var l = this._values.push(value);
-            this._keys.set(key, l - 1);
-        }
-        else {
-            // if the key is already there, update the value
-            this._values[e] = value;
-        }
-        return this._values.length;
-    };
-    FastIterationMap.prototype.set = function (key, value) {
-        return this.push(key, value);
-    };
-    /**
-     * Swap position of 2 items in the values array and set the correct index in the keys Map
-     * @param key1
-     * @param key2
-     */
-    FastIterationMap.prototype.swap = function (key1, key2) {
-        var index1 = this._keys.get(key1);
-        var index2 = this._keys.get(key2);
-        if (index1 === undefined || index2 === undefined) {
-            return false;
-        }
-        var tmp = this._values[index1];
-        this._values[index1] = this._values[index2];
-        this._values[index2] = tmp;
-        this._keys.set(key1, index2);
-        this._keys.set(key2, index1);
-        return true;
-    };
-    FastIterationMap.prototype.insertValue = function (index) {
-        var values = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            values[_i - 1] = arguments[_i];
-        }
-        return (_a = this._values).splice.apply(_a, [index, 0].concat(values));
-        var _a;
-    };
-    /**
-     * Offset indices in the keys Map from a position ([from] and [to] not included)
-     * @param from offset after this key
-     * @param offsetVal the amount to offset indices
-     * @param to if specidied offset until this key, otherwise offset to end of the collection
-     */
-    FastIterationMap.prototype.offsetIndexInKeys = function (from, offsetVal, to) {
-        var mapIter = this._keys.entries();
-        var l = this._keys.size;
-        to = to || Number.MAX_VALUE;
-        for (var i = 0; i < l; ++i) {
-            var e = mapIter.next().value;
-            if (e[1] > from && e[1] < to) {
-                this._keys.set(e[0], e[1] += offsetVal);
-            }
-        }
-    };
-    return FastIterationMap;
-}());
-exports.FastIterationMap = FastIterationMap;
-
-
-/***/ })
-/******/ ]);
-});
-
-/***/ }),
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -967,37 +967,48 @@ exports.GameLoop = GameLoop;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+var FastIterationMap_1 = __webpack_require__(1);
+// Comment forcer l'implementation des noms de parametres lors de l'heritage/ implementation
 var System = /** @class */ (function () {
-    function System(paramObj) {
-        this.paramObj = paramObj;
+    function System() {
         this.active = true;
-        this.keys = Object.keys(this.paramObj);
+        this.initialized = false;
     }
-    System.prototype.setParamsSource = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        // verify number of args
-        // verify that the component the factory holds have the proprety define by the paramObj
-        this.factories = args;
+    System.prototype.init = function () {
+        this.parametersSource = new FastIterationMap_1.FastIterationMap();
+        this.extractingParametersKeys();
+        this.initialized = true;
     };
+    Object.defineProperty(System.prototype, "parameters", {
+        get: function () {
+            return this._parameters;
+        },
+        set: function (val) {
+            // to implement
+            this._parameters = val;
+            this.init();
+        },
+        enumerable: true,
+        configurable: true
+    });
     System.prototype.process = function () {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
-        var params = this.paramObj;
-        var flist = this.factories;
+        // Holds currently process component
+        var params = this._parameters;
+        // const flist = this.factories;
+        var flist = this.parametersSource.values;
         // flist.length = this.keys.length
-        var nbComponent = flist[0].activeLength;
-        var f = flist[0].values;
+        var nbComponent = flist[0].source.activeLength;
+        var f = flist[0].source.values;
         for (var i = 0; i < nbComponent; ++i) {
             // get the component from the first factory that serve as a reference
             // if it is active query the other components
             var refComponent = f[i];
             if (refComponent.active) {
-                params[this.keys[0]] = refComponent;
+                params[flist[0].key] = refComponent;
                 var isFound = true;
                 // Iterate others factories to query rest of the components
                 for (var j = 1; j < flist.length; ++j) {
@@ -1005,15 +1016,15 @@ var System = /** @class */ (function () {
                     // we push the same component to the args array,
                     // otherwise we query the component though get(entityId)
                     if (flist[j] === flist[0]) {
-                        params[this.keys[j]] = refComponent;
+                        params[flist[j].key] = refComponent;
                     }
                     else {
-                        var c = flist[j].get(refComponent.entityId);
+                        var c = flist[j].source.get(refComponent.entityId);
                         if (!c) {
                             isFound = false;
                             break;
                         }
-                        params[this.keys[j]] = c;
+                        params[flist[j].key] = c;
                     }
                 }
                 if (isFound) {
@@ -1023,6 +1034,23 @@ var System = /** @class */ (function () {
                 }
             }
         }
+    };
+    System.prototype.setParamSource = function (paramKey, pool) {
+        if (!this.initialized) {
+            this.init();
+        }
+        if (!this.parametersSource.has(paramKey)) {
+            throw new Error("Parameter name '" + paramKey + "' is not a parameter of the system.");
+        }
+        this.parametersSource.set(paramKey, { key: paramKey, source: pool });
+    };
+    /** Extract parameters key from the parameter object */
+    System.prototype.extractingParametersKeys = function () {
+        var _this = this;
+        var keys = Object.keys(this._parameters);
+        keys.forEach(function (k) {
+            _this.parametersSource.set(k, { key: k, source: undefined });
+        });
     };
     return System;
 }());
@@ -1036,7 +1064,7 @@ exports.System = System;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var FastIterationMap_1 = __webpack_require__(2);
+var FastIterationMap_1 = __webpack_require__(1);
 var pollyFill_1 = __webpack_require__(0);
 // fixedTimeStep = frame independant // https://docs.unity3d.com/Manual/class-TimeManager.html
 // nonFixedTimeStep = update as much as possible between frame
@@ -1218,7 +1246,7 @@ module.exports = __webpack_require__(9);
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var ComponentFactory_1 = __webpack_require__(1);
+var ComponentFactory_1 = __webpack_require__(2);
 exports.ComponentFactory = ComponentFactory_1.ComponentFactory;
 var EntityFactory_1 = __webpack_require__(3);
 exports.EntityFactory = EntityFactory_1.EntityFactory;
@@ -1338,7 +1366,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var Mousetrap = __webpack_require__(14);
-var ComponentFactory_1 = __webpack_require__(1);
+var ComponentFactory_1 = __webpack_require__(2);
 var EntityFactory_1 = __webpack_require__(3);
 var GameLoop_1 = __webpack_require__(4);
 var pollyFill_1 = __webpack_require__(0);
@@ -2466,7 +2494,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/*global define:false */
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var FastIterationMap_1 = __webpack_require__(2);
+var FastIterationMap_1 = __webpack_require__(1);
 var pollyFill_1 = __webpack_require__(0);
 var PoolManager = /** @class */ (function () {
     function PoolManager() {
@@ -2585,7 +2613,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var ComponentFactory_1 = __webpack_require__(1);
+var ComponentFactory_1 = __webpack_require__(2);
 var pollyFill_1 = __webpack_require__(0);
 var DefaultConfig_1 = __webpack_require__(7);
 /**
@@ -2648,9 +2676,17 @@ var TimeMeasureSystem = /** @class */ (function () {
     function TimeMeasureSystem(tmComponent) {
         this.tmComponent = tmComponent;
         this.active = true;
+        this._parameters = {};
         this.startMark = "start" + this.tmComponent.systemId;
         this.endMark = "end" + this.tmComponent.systemId;
     }
+    Object.defineProperty(TimeMeasureSystem.prototype, "parameters", {
+        /** Not used */
+        get: function () { return this._parameters; },
+        enumerable: true,
+        configurable: true
+    });
+    TimeMeasureSystem.prototype.setParamSource = function () { };
     TimeMeasureSystem.prototype.getMeasures = function () {
         return TimeMeasureSystem.performance.getEntriesByName(this.tmComponent.systemId);
     };
@@ -2741,7 +2777,6 @@ var TimeMeasureSystemEndMark = /** @class */ (function (_super) {
     };
     /**
      *  Measure time passed since the start mark and compute statistics if time.lag >= the specified frequency of computation
-     * @param time FrameEvent used to decide when to compute data
      */
     TimeMeasureSystemEndMark.prototype.execute = function (time) {
         TimeMeasureSystem.performance.mark(this.endMark);

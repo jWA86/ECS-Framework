@@ -2,7 +2,7 @@ import * as Mousetrap from "mousetrap";
 import { ComponentFactory } from "./ComponentFactory";
 import { EntityFactory } from "./EntityFactory";
 import { GameLoop } from "./GameLoop";
-import { IGraphics, IHtmlInterface, IKeyboardShortCut, IProject, IUtil } from "./interfaces";
+import { IGraphics, IKeyboardShortCut, IProject, IUtil } from "./interfaces";
 import { GLOBAL } from "./pollyFill";
 import { PoolManager } from "./PoolManager";
 import { System } from "./System";
