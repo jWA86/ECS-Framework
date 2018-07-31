@@ -8,7 +8,7 @@ abstract class System<T> implements ISystem<T> {
 
     public active: boolean = true;
 
-    public parametersSource: FastIterationMap<string, { key: string, source: IComponentFactory<IComponent> }>;
+    protected _parametersSource: FastIterationMap<string, { key: string, source: IComponentFactory<IComponent> }>;
 
     /** Object containing the currently processed component parameters */
     protected abstract _parameters: T;
@@ -17,7 +17,7 @@ abstract class System<T> implements ISystem<T> {
 
     public abstract execute(params: T, ...args: any[]);
     public init() {
-        this.parametersSource = new FastIterationMap<string, { key: string, source: IComponentFactory<IComponent> }>();
+        this._parametersSource = new FastIterationMap<string, { key: string, source: IComponentFactory<IComponent> }>();
 
         this.extractingParametersKeys();
         this.initialized = true;
@@ -31,11 +31,16 @@ abstract class System<T> implements ISystem<T> {
         this._parameters = val;
         this.init();
     }
+    public get parameterSource() {
+        if (!this.initialized) { this.init(); }
+        return this._parametersSource;
+    }
+
     public process(...args: any[]) {
         // Holds currently process component
         const params = this._parameters;
         // const flist = this.factories;
-        const flist = this.parametersSource.values;
+        const flist = this._parametersSource.values;
         // flist.length = this.keys.length
         const nbComponent = flist[0].source.activeLength;
         const f = flist[0].source.values;
@@ -70,10 +75,15 @@ abstract class System<T> implements ISystem<T> {
 
     public setParamSource(paramKey: string, pool: IComponentFactory<IComponent>) {
         if (!this.initialized) { this.init(); }
-        if (!this.parametersSource.has(paramKey)) {
-            throw new Error("Parameter name '" + paramKey + "' is not a parameter of the system.");
+        // set the same source to every parameters if the key is *
+        if (paramKey === "*") {
+            this._parametersSource.values.forEach((p) => {
+                p.source = pool;
+            });
+        } else if (!this._parametersSource.has(paramKey)) {
+            throw Error("Parameter name '" + paramKey + "' is not a parameter of the system.");
         }
-        this.parametersSource.set(paramKey, { key: paramKey, source: pool });
+        this._parametersSource.set(paramKey, { key: paramKey, source: pool });
     }
 
     /** Extract parameters key from the parameter object */
@@ -81,7 +91,7 @@ abstract class System<T> implements ISystem<T> {
         const keys = Object.keys(this._parameters);
 
         keys.forEach((k) => {
-            this.parametersSource.set(k, { key: k, source: undefined });
+            this._parametersSource.set(k, { key: k, source: undefined });
         });
     }
 }

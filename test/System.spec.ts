@@ -99,11 +99,21 @@ describe("System ", () => {
             expect(positionFactory.values[i].position.x).to.equal(0.0);
             expect(positionFactory.values[i].position.y).to.equal(0.0);
             expect(positionFactory.values[i].position.z).to.equal(0.0);
-
         }
     });
     it("setParamSource should throw an error if the key is not a parameter of the system", () => {
-
+        const s = new MoveByOneUnitSystem();
+        try {
+            expect(s.setParamSource("$", positionFactory));
+        } catch (err) {
+            expect(err).to.be.an("Error");
+        }
+    });
+    it("setParamSource with key '*' should set the source to every parameters", () => {
+        const s = new MoveByOneUnitSystem();
+        expect(s.parameterSource.get("p").source).to.equal(undefined);
+        s.setParamSource("*", positionFactory);
+        expect(s.parameterSource.get("p").source).to.not.equal(undefined);
     });
     it("should update active components", () => {
         const s = new MoveByOneUnitSystem();
