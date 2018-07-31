@@ -4,7 +4,7 @@ import { ISystem } from "./ISystem";
 export { System };
 declare abstract class System<T> implements ISystem<T> {
     active: boolean;
-    parametersSource: FastIterationMap<string, {
+    protected _parametersSource: FastIterationMap<string, {
         key: string;
         source: IComponentFactory<IComponent>;
     }>;
@@ -15,6 +15,10 @@ declare abstract class System<T> implements ISystem<T> {
     abstract execute(params: T, ...args: any[]): any;
     init(): void;
     parameters: T;
+    readonly parameterSource: FastIterationMap<string, {
+        key: string;
+        source: IComponentFactory<IComponent>;
+    }>;
     process(...args: any[]): void;
     setParamSource(paramKey: string, pool: IComponentFactory<IComponent>): void;
     /** Extract parameters key from the parameter object */

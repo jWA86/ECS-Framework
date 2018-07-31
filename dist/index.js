@@ -975,7 +975,7 @@ var System = /** @class */ (function () {
         this.initialized = false;
     }
     System.prototype.init = function () {
-        this.parametersSource = new FastIterationMap_1.FastIterationMap();
+        this._parametersSource = new FastIterationMap_1.FastIterationMap();
         this.extractingParametersKeys();
         this.initialized = true;
     };
@@ -991,6 +991,16 @@ var System = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(System.prototype, "parameterSource", {
+        get: function () {
+            if (!this.initialized) {
+                this.init();
+            }
+            return this._parametersSource;
+        },
+        enumerable: true,
+        configurable: true
+    });
     System.prototype.process = function () {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
@@ -999,7 +1009,7 @@ var System = /** @class */ (function () {
         // Holds currently process component
         var params = this._parameters;
         // const flist = this.factories;
-        var flist = this.parametersSource.values;
+        var flist = this._parametersSource.values;
         // flist.length = this.keys.length
         var nbComponent = flist[0].source.activeLength;
         var f = flist[0].source.values;
@@ -1039,17 +1049,23 @@ var System = /** @class */ (function () {
         if (!this.initialized) {
             this.init();
         }
-        if (!this.parametersSource.has(paramKey)) {
-            throw new Error("Parameter name '" + paramKey + "' is not a parameter of the system.");
+        // set the same source to every parameters if the key is *
+        if (paramKey === "*") {
+            this._parametersSource.values.forEach(function (p) {
+                p.source = pool;
+            });
         }
-        this.parametersSource.set(paramKey, { key: paramKey, source: pool });
+        else if (!this._parametersSource.has(paramKey)) {
+            throw Error("Parameter name '" + paramKey + "' is not a parameter of the system.");
+        }
+        this._parametersSource.set(paramKey, { key: paramKey, source: pool });
     };
     /** Extract parameters key from the parameter object */
     System.prototype.extractingParametersKeys = function () {
         var _this = this;
         var keys = Object.keys(this._parameters);
         keys.forEach(function (k) {
-            _this.parametersSource.set(k, { key: k, source: undefined });
+            _this._parametersSource.set(k, { key: k, source: undefined });
         });
     };
     return System;
