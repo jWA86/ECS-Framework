@@ -31,7 +31,7 @@ abstract class System<T> implements ISystem<T> {
         this._parameters = val;
         this.init();
     }
-    public get parameterSource() {
+    public get parametersSource() {
         if (!this.initialized) { this.init(); }
         return this._parametersSource;
     }

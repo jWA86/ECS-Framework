@@ -15,7 +15,7 @@ declare abstract class System<T> implements ISystem<T> {
     abstract execute(params: T, ...args: any[]): any;
     init(): void;
     parameters: T;
-    readonly parameterSource: FastIterationMap<string, {
+    readonly parametersSource: FastIterationMap<string, {
         key: string;
         source: IComponentFactory<IComponent>;
     }>;

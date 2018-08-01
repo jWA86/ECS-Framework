@@ -111,9 +111,9 @@ describe("System ", () => {
     });
     it("setParamSource with key '*' should set the source to every parameters", () => {
         const s = new MoveByOneUnitSystem();
-        expect(s.parameterSource.get("p").source).to.equal(undefined);
+        expect(s.parametersSource.get("p").source).to.equal(undefined);
         s.setParamSource("*", positionFactory);
-        expect(s.parameterSource.get("p").source).to.not.equal(undefined);
+        expect(s.parametersSource.get("p").source).to.not.equal(undefined);
     });
     it("should update active components", () => {
         const s = new MoveByOneUnitSystem();

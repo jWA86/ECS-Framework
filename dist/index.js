@@ -991,7 +991,7 @@ var System = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(System.prototype, "parameterSource", {
+    Object.defineProperty(System.prototype, "parametersSource", {
         get: function () {
             if (!this.initialized) {
                 this.init();
