@@ -1381,6 +1381,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+var FastIterationMap_1 = __webpack_require__(1);
 var Mousetrap = __webpack_require__(14);
 var ComponentFactory_1 = __webpack_require__(2);
 var EntityFactory_1 = __webpack_require__(3);
@@ -1395,6 +1396,7 @@ var Project = /** @class */ (function () {
         var sysM = new SystemManager_1.SystemManager();
         this.gameLoop = new GameLoop_1.GameLoop(sysM);
         this.poolManager = new PoolManager_1.PoolManager();
+        this.factories = new FastIterationMap_1.FastIterationMap();
         this.systemManager = sysM;
         this._dependencies = dependencies || [];
         this.keyboardShortCut = Mousetrap;

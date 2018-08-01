@@ -1,3 +1,4 @@
+import { FastIterationMap } from "FastIterationMap";
 import { GameLoop } from "./GameLoop";
 import { IGraphics, IKeyboardShortCut, IProject, IUtil } from "./interfaces";
 import { PoolManager } from "./PoolManager";
@@ -9,6 +10,9 @@ declare class Project implements IProject {
     graphics: IGraphics;
     poolManager: PoolManager;
     systemManager: SystemManager;
+    factories: FastIterationMap<string, {
+        create: (...args) => any;
+    }>;
     keyboardShortCut: IKeyboardShortCut;
     /** Centralize instances of utils here */
     utils: Map<string, IUtil>;
