@@ -1,3 +1,4 @@
+import { FastIterationMap } from "FastIterationMap";
 import * as Mousetrap from "mousetrap";
 import { ComponentFactory } from "./ComponentFactory";
 import { EntityFactory } from "./EntityFactory";
@@ -15,6 +16,7 @@ class Project implements IProject {
     public graphics: IGraphics;
     public poolManager: PoolManager;
     public systemManager: SystemManager;
+    public factories: FastIterationMap<string, { create: (...args) => any }>;
     public keyboardShortCut: IKeyboardShortCut;
     /** Centralize instances of utils here */
     public utils: Map<string, IUtil>;
@@ -25,6 +27,7 @@ class Project implements IProject {
         const sysM = new SystemManager();
         this.gameLoop = new GameLoop(sysM);
         this.poolManager = new PoolManager();
+        this.factories = new FastIterationMap<string, {create: () => any }>();
         this.systemManager = sysM;
         this._dependencies = dependencies || [];
         this.keyboardShortCut = Mousetrap;
