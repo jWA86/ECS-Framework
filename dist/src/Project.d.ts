@@ -1,14 +1,13 @@
 import { FastIterationMap } from "FastIterationMap";
 import { GameLoop } from "./GameLoop";
-import { IGraphics, IKeyboardShortCut, IProject, IUtil } from "./interfaces";
-import { PoolManager } from "./PoolManager";
+import { IGraphics, IKeyboardShortCut, IPool, IProject, IUtil } from "./interfaces";
 import { SystemManager } from "./SystemManager";
 export { Project };
 declare class Project implements IProject {
     protected _projectName: string;
     gameLoop: GameLoop;
     graphics: IGraphics;
-    poolManager: PoolManager;
+    poolManager: FastIterationMap<string, IPool>;
     systemManager: SystemManager;
     factories: FastIterationMap<string, {
         create: (...args) => any;

@@ -1038,8 +1038,6 @@ var System = /** @class */ (function () {
                     }
                 }
                 if (isFound) {
-                    // why apply is necessary ?
-                    // this.execute.apply(this, params);
                     this.execute.apply(this, [params].concat(args));
                 }
             }
@@ -1283,9 +1281,9 @@ var SystemManager_1 = __webpack_require__(6);
 exports.SystemManager = SystemManager_1.SystemManager;
 var DEFAULT_CONF = __webpack_require__(7);
 exports.DEFAULT_CONF = DEFAULT_CONF;
-var HtmlInterface_1 = __webpack_require__(16);
+var HtmlInterface_1 = __webpack_require__(15);
 exports.HtmlInterface = HtmlInterface_1.HtmlInterface;
-var TimeMeasureUtil_1 = __webpack_require__(17);
+var TimeMeasureUtil_1 = __webpack_require__(16);
 exports.TimeMeasureComponent = TimeMeasureUtil_1.TimeMeasureComponent;
 exports.TimeMeasureSystem = TimeMeasureUtil_1.TimeMeasureSystem;
 exports.TimeMeasureSystemEndMark = TimeMeasureUtil_1.TimeMeasureSystemEndMark;
@@ -1387,7 +1385,6 @@ var ComponentFactory_1 = __webpack_require__(2);
 var EntityFactory_1 = __webpack_require__(3);
 var GameLoop_1 = __webpack_require__(4);
 var pollyFill_1 = __webpack_require__(0);
-var PoolManager_1 = __webpack_require__(15);
 var System_1 = __webpack_require__(5);
 var SystemManager_1 = __webpack_require__(6);
 var Project = /** @class */ (function () {
@@ -1395,7 +1392,7 @@ var Project = /** @class */ (function () {
         this._projectName = _projectName;
         var sysM = new SystemManager_1.SystemManager();
         this.gameLoop = new GameLoop_1.GameLoop(sysM);
-        this.poolManager = new PoolManager_1.PoolManager();
+        this.poolManager = new FastIterationMap_1.FastIterationMap();
         this.factories = new FastIterationMap_1.FastIterationMap();
         this.systemManager = sysM;
         this._dependencies = dependencies || [];
@@ -2512,38 +2509,6 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/*global define:false */
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var FastIterationMap_1 = __webpack_require__(1);
-var pollyFill_1 = __webpack_require__(0);
-var PoolManager = /** @class */ (function () {
-    function PoolManager() {
-        this._pools = new FastIterationMap_1.FastIterationMap();
-    }
-    PoolManager.prototype.get = function (poolId) {
-        return this._pools.get(poolId);
-    };
-    PoolManager.prototype.pushPool = function (pool) {
-        var id = this.generateId(pool);
-        this._pools.set(id, pool);
-        return id;
-    };
-    PoolManager.prototype.remove = function (poolId) {
-        return this._pools.delete(poolId);
-    };
-    PoolManager.prototype.generateId = function (pool) {
-        return pool.type + pollyFill_1.RANDOM.integer(100000);
-    };
-    return PoolManager;
-}());
-exports.PoolManager = PoolManager;
-
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
 // TO do , propriety to place it on top of the canvas
 var HtmlInterface = /** @class */ (function () {
     function HtmlInterface(_htmlId, _url) {
@@ -2615,7 +2580,7 @@ exports.HtmlInterface = HtmlInterface;
 
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
