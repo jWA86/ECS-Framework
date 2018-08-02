@@ -1,13 +1,6 @@
 import { expect } from "chai";
 import "mocha";
-import { ComponentFactory } from "../../src/ComponentFactory";
-import { EntityFactory } from "../../src/EntityFactory";
-import { GameLoop } from "../../src/GameLoop";
 import { GLOBAL } from "../../src/pollyFill";
-import { PoolManager } from "../../src/PoolManager";
-import { Project } from "../../src/Project";
-import { System } from "../../src/System";
-import { SystemManager } from "../../src/SystemManager";
 
 describe("HtmlInterface", () => {
     const placeHolderId = "placeHolder";

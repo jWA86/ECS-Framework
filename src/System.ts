@@ -65,8 +65,6 @@ abstract class System<T> implements ISystem<T> {
                     }
                 }
                 if (isFound) {
-                    // why apply is necessary ?
-                    // this.execute.apply(this, params);
                     this.execute(params, ...args);
                 }
             }

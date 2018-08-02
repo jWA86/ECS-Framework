@@ -3,9 +3,8 @@ import * as Mousetrap from "mousetrap";
 import { ComponentFactory } from "./ComponentFactory";
 import { EntityFactory } from "./EntityFactory";
 import { GameLoop } from "./GameLoop";
-import { IGraphics, IKeyboardShortCut, IProject, IUtil } from "./interfaces";
+import { IGraphics, IKeyboardShortCut, IPool, IProject, IUtil  } from "./interfaces";
 import { GLOBAL } from "./pollyFill";
-import { PoolManager } from "./PoolManager";
 import { System } from "./System";
 import { SystemManager } from "./SystemManager";
 
@@ -14,7 +13,7 @@ export { Project };
 class Project implements IProject {
     public gameLoop: GameLoop;
     public graphics: IGraphics;
-    public poolManager: PoolManager;
+    public poolManager: FastIterationMap<string, IPool>;
     public systemManager: SystemManager;
     public factories: FastIterationMap<string, { create: (...args) => any }>;
     public keyboardShortCut: IKeyboardShortCut;
@@ -26,7 +25,7 @@ class Project implements IProject {
 
         const sysM = new SystemManager();
         this.gameLoop = new GameLoop(sysM);
-        this.poolManager = new PoolManager();
+        this.poolManager = new FastIterationMap<string, IPool>();
         this.factories = new FastIterationMap<string, {create: () => any }>();
         this.systemManager = sysM;
         this._dependencies = dependencies || [];

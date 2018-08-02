@@ -1,10 +1,10 @@
 import { expect } from "chai";
+import { FastIterationMap } from "FastIterationMap";
 import "mocha";
 import { ComponentFactory } from "../src/ComponentFactory";
 import { EntityFactory } from "../src/EntityFactory";
 import { GameLoop } from "../src/GameLoop";
 import { GLOBAL } from "../src/pollyFill";
-import { PoolManager } from "../src/PoolManager";
 import { Project } from "../src/Project";
 import { System } from "../src/System";
 import { SystemManager } from "../src/SystemManager";
@@ -29,7 +29,7 @@ describe("Project Setup", () => {
     it("should instantiate a PoolManager", () => {
         expect(GLOBAL).to.not.equal(undefined);
         const p = new Project("project3");
-        expect(p.poolManager).to.be.an.instanceof(PoolManager);
+        expect(p.poolManager).to.be.an.instanceof(FastIterationMap);
     });
     it("should instantiate a SystemManager", () => {
         expect(GLOBAL).to.not.equal(undefined);
