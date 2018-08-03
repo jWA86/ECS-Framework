@@ -80,8 +80,9 @@ abstract class System<T> implements ISystem<T> {
             });
         } else if (!this._parametersSource.has(paramKey)) {
             throw Error("Parameter name '" + paramKey + "' is not a parameter of the system.");
+        } else {
+            this._parametersSource.set(paramKey, { key: paramKey, source: pool });
         }
-        this._parametersSource.set(paramKey, { key: paramKey, source: pool });
     }
 
     /** Extract parameters key from the parameter object */
