@@ -25,7 +25,7 @@ describe("System ", () => {
     class PositionComponent implements IComponent {
         public entityId: number = 0;
         public active: boolean = false;
-        constructor(public position: IVec3) {}
+        constructor(public position: IVec3) { }
     }
 
     class VelocityComponent implements IComponent {
@@ -35,38 +35,36 @@ describe("System ", () => {
     }
 
     interface IMoveByOneUnitParams {
-        p: { position: IVec3 };
+        position: IVec3;
     }
 
     const moveByOneUnitParams: IMoveByOneUnitParams = {
-        p: {
-            position: {x: 0, y: 0, z: 0 },
-        },
+        position: { x: 0, y: 0, z: 0 },
     };
 
     class MoveByOneUnitSystem extends System<IMoveByOneUnitParams> {
-        protected _parameters: IMoveByOneUnitParams = moveByOneUnitParams;
+        protected _defaultParameter: IMoveByOneUnitParams = moveByOneUnitParams;
         constructor() {
             super();
         }
-        public get parameters() {
-            return this._parameters;
-        }
+
         public execute(params: IMoveByOneUnitParams) {
-            params.p.position.x += 1.0;
-            params.p.position.y += 1.0;
-            params.p.position.z += 1.0;
+            // params.position[this._parametersSource.get("position").keyInSource].x += 1.0;
+            // shorter version
+            params.position[this._k.position].x += 1.0;
+            params.position[this._k.position].y += 1.0;
+            params.position[this._k.position].z += 1.0;
         }
     }
 
     interface IMoveParams {
-        p: { position: IVec3 };
-        v: { velocity: IVec3 };
+        position: IVec3;
+        velocity: IVec3;
     }
 
     const moveParams: IMoveParams = {
-        p: { position: zeroVec3 },
-        v: { velocity: zeroVec3 },
+        position: zeroVec3,
+        velocity: zeroVec3,
     };
 
     let velocityFactory: ComponentFactory<VelocityComponent>;
@@ -101,23 +99,48 @@ describe("System ", () => {
             expect(positionFactory.values[i].position.z).to.equal(0.0);
         }
     });
-    it("setParamSource should throw an error if the key is not a parameter of the system", () => {
-        const s = new MoveByOneUnitSystem();
-        try {
-            expect(s.setParamSource("$", positionFactory));
-        } catch (err) {
-            expect(err).to.be.an("Error");
+    it("(javascript only) setParamSource should throw an error if the key is not a parameter of the system", () => {
+        // Uncomment in VSCode, the compiler should hightlight the parameter as wrong
+        // const s = new MoveByOneUnitSystem();
+        // try {
+        //     expect(s.setParamSource("$", positionFactory));
+        // } catch (err) {
+        //     expect(err).to.be.an("Error");
+        // }
+    });
+    it("setParamSource with param name in source should update components even if their param name are different than the one used in the execute method of the system", () => {
+        class CompDiffName implements IComponent {
+            public active = true;
+            public entityId = 0;
+            constructor(public pos = { x: 0.0, y: 0.0, z: 0.0 }) { }
         }
+
+        const positionFactory2 = new ComponentFactory<CompDiffName>(2, new CompDiffName());
+        positionFactory2.create(1, true);
+
+        expect(positionFactory2.get(1).pos.x).to.equal(0.0);
+        expect(positionFactory2.get(1).pos.y).to.equal(0.0);
+        expect(positionFactory2.get(1).pos.z).to.equal(0.0);
+
+        const s = new MoveByOneUnitSystem();
+        s.setParamSource("position", positionFactory2, "pos");
+
+        s.process();
+
+        expect(positionFactory2.get(1).pos.x, "pos.x was not modified in the execute method").to.equal(1.0);
+        expect(positionFactory2.get(1).pos.y, "pos.y was not modified in the execute method").to.equal(1.0);
+        expect(positionFactory2.get(1).pos.z, "pos.z was not modified in the execute method").to.equal(1.0);
+
     });
     it("setParamSource with key '*' should set the source to every parameters", () => {
         const s = new MoveByOneUnitSystem();
-        expect(s.parametersSource.get("p").source).to.equal(undefined);
+        expect(s.parametersSource.get("position").source).to.equal(undefined);
         s.setParamSource("*", positionFactory);
-        expect(s.parametersSource.get("p").source).to.not.equal(undefined);
+        expect(s.parametersSource.get("position").source).to.not.equal(undefined);
     });
     it("should update active components", () => {
         const s = new MoveByOneUnitSystem();
-        s.setParamSource("p", positionFactory);
+        s.setParamSource("position", positionFactory);
         s.process();
 
         for (let i = 0; i < positionFactory.nbActive; ++i) {
@@ -129,7 +152,7 @@ describe("System ", () => {
     });
     it("should not update inactive components", () => {
         const s = new MoveByOneUnitSystem();
-        s.setParamSource("p", positionFactory);
+        s.setParamSource("position", positionFactory);
         s.process();
         for (let i = positionFactory.nbActive; i < positionFactory.nbActive + positionFactory.nbInactive; ++i) {
             expect(positionFactory.values[i].active).to.equal(false);
@@ -144,7 +167,7 @@ describe("System ", () => {
             positionFactory.values[i].active = true;
         }
         const s = new MoveByOneUnitSystem();
-        s.setParamSource("p", positionFactory);
+        s.setParamSource("position", positionFactory);
         s.process();
         for (let i = positionFactory.nbActive + positionFactory.nbInactive; i < positionFactory.size; ++i) {
             expect(positionFactory.values[i].entityId).to.equal(0);
@@ -173,13 +196,13 @@ describe("System ", () => {
         describe("non parallel pool", () => {
 
             class MoveSystem extends System<IMoveParams> {
-                protected _parameters: IMoveParams = moveParams;
+                protected _defaultParameter: IMoveParams = moveParams;
                 constructor() { super(); }
 
                 public execute(params: IMoveParams) {
-                    params.p.position.x *= params.v.velocity.x;
-                    params.p.position.y *= params.v.velocity.y;
-                    params.p.position.z *= params.v.velocity.z;
+                    params.position[this._k.position].x *= params.velocity[this._k.velocity].x;
+                    params.position[this._k.position].y *= params.velocity[this._k.velocity].y;
+                    params.position[this._k.position].z *= params.velocity[this._k.velocity].z;
                 }
             }
 
@@ -212,8 +235,8 @@ describe("System ", () => {
                     expect(positionFactory.values[i].position.x).to.not.equal(2.0);
                 }
                 const s = new MoveSystem();
-                s.setParamSource("p", positionFactory);
-                s.setParamSource("v", velocityFactory);
+                s.setParamSource("position", positionFactory);
+                s.setParamSource("velocity", velocityFactory);
                 s.process();
 
                 for (let i = 0; i < positionFactory.size - 1; ++i) {
@@ -224,8 +247,8 @@ describe("System ", () => {
                 expect(positionFactory.nbActive).to.equal(velocityFactory.nbActive + 1);
 
                 const s = new MoveSystem();
-                s.setParamSource("p", positionFactory);
-                s.setParamSource("v", velocityFactory);
+                s.setParamSource("position", positionFactory);
+                s.setParamSource("velocity", velocityFactory);
                 s.process();
                 // last one should not be updated since there is no velocity component associated with.
                 expect(positionFactory.values[positionFactory.size - 1].position.x).to.equal(1.0);
@@ -234,14 +257,14 @@ describe("System ", () => {
 
         describe("parallel pool system", () => {
             class MoveSystem extends System<IMoveParams> {
-                protected _parameters: IMoveParams = moveParams;
+                protected _defaultParameter: IMoveParams = moveParams;
                 constructor() {
                     super();
                 }
                 public execute(params: IMoveParams) {
-                    params.p.position.x *= params.v.velocity.x;
-                    params.p.position.y *= params.v.velocity.y;
-                    params.p.position.z *= params.v.velocity.z;
+                    params.position[this._k.position].x *= params.velocity[this._k.velocity].x;
+                    params.position[this._k.position].y *= params.velocity[this._k.velocity].y;
+                    params.position[this._k.position].z *= params.velocity[this._k.velocity].z;
                 }
             }
             beforeEach(() => {
@@ -251,25 +274,25 @@ describe("System ", () => {
             it("should pass all the components to the execute fonction", () => {
 
                 class ArgTestSystem extends System<IMoveParams> {
-                    protected _parameters: IMoveParams = moveParams;
+                    protected _defaultParameter: IMoveParams = moveParams;
                     constructor() {
                         super();
                     }
                     public execute(params: IMoveParams) {
-                        expect(params.p).to.have.property("position");
-                        expect(params.v).to.have.property("velocity");
+                        expect(params.position).to.have.property("position");
+                        expect(params.velocity).to.have.property("velocity");
                     }
                 }
                 const ms = new ArgTestSystem();
-                ms.setParamSource("p", positionFactory);
-                ms.setParamSource("v", velocityFactory);
+                ms.setParamSource("position", positionFactory);
+                ms.setParamSource("velocity", velocityFactory);
                 ms.process();
 
             });
             it("should update the component in pools specified in the system constructor", () => {
                 const ms = new MoveSystem();
-                ms.setParamSource("p", positionFactory);
-                ms.setParamSource("v", velocityFactory);
+                ms.setParamSource("position", positionFactory);
+                ms.setParamSource("velocity", velocityFactory);
                 ms.process();
 
                 for (let i = 0; i < positionFactory.length; ++i) {
@@ -282,8 +305,8 @@ describe("System ", () => {
                 movingEntities.addFactory("position", positionFactory);
                 movingEntities.addFactory("velocity", velocityFactory);
 
-                ms.setParamSource("p", movingEntities.getFactory("position"));
-                ms.setParamSource("v", movingEntities.getFactory("velocity"));
+                ms.setParamSource("position", movingEntities.getFactory("position"));
+                ms.setParamSource("velocity", movingEntities.getFactory("velocity"));
                 ms.process();
 
                 for (let i = 0; i < positionFactory.nbCreated; ++i) {
@@ -307,16 +330,16 @@ describe("System ", () => {
             a2: { notFromComponent2: number };
         }
 
-        const defaultArgsParam: IArgsParam  = {
+        const defaultArgsParam: IArgsParam = {
             a1: { notFromComponent1: 0 },
-            a2: { notFromComponent2 : 0 },
+            a2: { notFromComponent2: 0 },
         };
 
         // set component prop value from external variables value passed to the process methode
         class ArgsSystem extends System<IArgsParam> {
-            protected _parameters: IArgsParam = defaultArgsParam;
+            protected _defaultParameter: IArgsParam = defaultArgsParam;
             constructor() { super(); }
-            public execute(params: IArgsParam, arg1: number, arg2: number ) {
+            public execute(params: IArgsParam, arg1: number, arg2: number) {
                 params.a1.notFromComponent1 = arg1;
                 params.a2.notFromComponent2 = arg2;
             }
@@ -354,13 +377,13 @@ describe("System ", () => {
         }
 
         class MoveSystem extends System<IMoveParams> {
-            protected _parameters: IMoveParams = moveParams;
+            protected _defaultParameter: IMoveParams = moveParams;
             constructor() { super(); }
 
             public execute(params: IMoveParams) {
-                params.p.position.x *= params.v.velocity.x;
-                params.p.position.y *= params.v.velocity.y;
-                params.p.position.z *= params.v.velocity.z;
+                params.position[this._k.position].x *= params.velocity[this._k.velocity].x;
+                params.position[this._k.position].y *= params.velocity[this._k.velocity].y;
+                params.position[this._k.position].z *= params.velocity[this._k.velocity].z;
             }
         }
 
@@ -402,8 +425,8 @@ describe("System ", () => {
         });
         it("should be able to get all param from one componentssource", () => {
             const s = new MoveSystem();
-            s.setParamSource("p", movingFactory);
-            s.setParamSource("v", movingFactory);
+            s.setParamSource("position", movingFactory);
+            s.setParamSource("velocity", movingFactory);
             s.process();
 
             for (let i = 0; i < movingFactory.size - 1; ++i) {
@@ -412,8 +435,8 @@ describe("System ", () => {
         });
         it("should be able to get all params from multiples components source", () => {
             const s = new MoveSystem();
-            s.setParamSource("p", positionFactory);
-            s.setParamSource("v", velocityFactory);
+            s.setParamSource("position", positionFactory);
+            s.setParamSource("velocity", velocityFactory);
             s.process();
 
             for (let i = 0; i < positionFactory.size - 1; ++i) {

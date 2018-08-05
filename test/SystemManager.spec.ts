@@ -15,32 +15,32 @@ describe("SystemManager should be able to", () => {
     }
 
     interface IIntegerParams {
-        i: { integer: number };
+        integer: number;
     }
 
     const incrementParams =  {
-        i: { integer: 0 },
+        integer: 0,
     };
 
     class IncrementSystem extends System<IIntegerParams> {
-        protected _parameters: IIntegerParams = incrementParams;
+        protected _defaultParameter: IIntegerParams = incrementParams;
         constructor() { super(); }
         public execute(params: IIntegerParams) {
-            params.i.integer += 1;
+            params.integer[this._k.integer] += 1;
         }
     }
 
     interface IFeedBackParams {
-        e: { emptyComp: IComponent };
+        emptyComp: IComponent;
     }
 
     const feedbackParams = {
-        e: { emptyComp: {entityId: 0, active: true} },
+        emptyComp: { entityId: 0, active: true },
     };
 
     class FeedBackSystem extends System<IFeedBackParams> {
         public static callBack: (timer: FrameEvent) => void;
-        protected _parameters: IFeedBackParams = feedbackParams;
+        protected _defaultParameter: IFeedBackParams = feedbackParams;
         constructor() {
             super();
         }

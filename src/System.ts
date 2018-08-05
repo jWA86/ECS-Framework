@@ -1,34 +1,52 @@
 import { FastIterationMap } from "FastIterationMap";
+import { ComponentFactory } from "./ComponentFactory";
 import { IComponent, IComponentFactory } from "./interfaces";
 import { ISystem } from "./ISystem";
-export { System };
+export { IKeyMapping, System };
 
 // Comment forcer l'implementation des noms de parametres lors de l'heritage/ implementation
-abstract class System<T> implements ISystem<T> {
+
+interface IKeyMapping<P, S extends IComponent> {
+    key: keyof P;
+    keyInSource: keyof S;
+    source: IComponentFactory<S>;
+}
+
+abstract class System<P> implements ISystem<P> {
 
     public active: boolean = true;
 
-    protected _parametersSource: FastIterationMap<string, { key: string, source: IComponentFactory<IComponent> }>;
-
-    /** Object containing the currently processed component parameters */
-    protected abstract _parameters: T;
+    protected _parametersSource: FastIterationMap<keyof P, IKeyMapping<P, IComponent>>;
+    /**
+     * Define the parameters need by the System
+     * Used the key of the object to generate _currentParameters and _parametersSource
+     */
+    protected abstract _defaultParameter: P;
+    /** Components mapped to parameters being modified in the execute method */
+    protected _currentParameters: Record<keyof P, IComponent>;
+    /** Shortcut for : this._currentParameters.get("paramName").keyInSource */
+    protected _k: Record<keyof P, string>;
     protected initialized: boolean = false;
     constructor() { }
-
-    public abstract execute(params: T, ...args: any[]);
+    /**
+     * Execute on the current parameters
+     * @param params Technically it's of type Record<keyof P, IComponent> but setting it to <P> allow to get the type of the parameters in the intellisense when using VSCode.
+     * @param args Additional args passed from process()
+     */
+    public abstract execute(params: P, ...args: any[]);
     public init() {
-        this._parametersSource = new FastIterationMap<string, { key: string, source: IComponentFactory<IComponent> }>();
+        this._parametersSource = new FastIterationMap<keyof P, IKeyMapping<P, IComponent>>();
 
         this.extractingParametersKeys();
         this.initialized = true;
     }
 
     public get parameters() {
-        return this._parameters;
+        return this._defaultParameter;
     }
-    public set parameters(val: T) {
+    public set parameters(val: P) {
         // to implement
-        this._parameters = val;
+        this._defaultParameter = val;
         this.init();
     }
     public get parametersSource() {
@@ -38,12 +56,14 @@ abstract class System<T> implements ISystem<T> {
 
     public process(...args: any[]) {
         // Holds currently process component
-        const params = this._parameters;
+        const params = this._currentParameters;
         // const flist = this.factories;
         const flist = this._parametersSource.values;
         // flist.length = this.keys.length
         const nbComponent = flist[0].source.activeLength;
-        const f = flist[0].source.values;
+
+        type T = P[keyof P] & IComponent;
+        const f = flist[0].source.values as T[];
         for (let i = 0; i < nbComponent; ++i) {
             // get the component from the first factory that serve as a reference
             // if it is active query the other components
@@ -65,13 +85,13 @@ abstract class System<T> implements ISystem<T> {
                     }
                 }
                 if (isFound) {
-                    this.execute(params, ...args);
+                    this.execute(params as any, ...args);
                 }
             }
         }
     }
 
-    public setParamSource(paramKey: string, pool: IComponentFactory<IComponent>) {
+    public setParamSource<C extends IComponent>(paramKey: keyof P | "*", pool: IComponentFactory<C>, paramNameInSource?: keyof C) {
         if (!this.initialized) { this.init(); }
         // set the same source to every parameters if the key is *
         if (paramKey === "*") {
@@ -79,18 +99,41 @@ abstract class System<T> implements ISystem<T> {
                 p.source = pool;
             });
         } else if (!this._parametersSource.has(paramKey)) {
+            // when called directly from javascript (not using typescript type check)
             throw Error("Parameter name '" + paramKey + "' is not a parameter of the system.");
         } else {
-            this._parametersSource.set(paramKey, { key: paramKey, source: pool });
+
+            const mappedKey: IKeyMapping<P, C> = {
+                key: paramKey,
+                keyInSource: paramNameInSource || paramKey as any,
+                source: pool,
+            };
+            this._parametersSource.set(paramKey, mappedKey);
+            this._k[paramKey as string] = mappedKey.keyInSource;
         }
     }
 
     /** Extract parameters key from the parameter object */
     protected extractingParametersKeys() {
-        const keys = Object.keys(this._parameters);
 
+        const keys = Object.keys(this._defaultParameter);
+        const _k = {};
+        const _currentParameters = {};
         keys.forEach((k) => {
-            this._parametersSource.set(k, { key: k, source: undefined });
+
+            const mappedKey: IKeyMapping<P, any> = {
+                key: k as keyof P,
+                keyInSource: k,
+                source: undefined,
+            };
+
+            this._parametersSource.set(k as keyof P, mappedKey);
+
+            _currentParameters[k] = undefined as IComponent;
+            // set default param name in source as the same.
+            _k[k] = k;
         });
+        this._currentParameters = _currentParameters as Record<keyof P, IComponent>;
+        this._k = Object.assign({}, _k as Record<keyof P, string>);
     }
 }

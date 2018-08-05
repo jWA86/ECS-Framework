@@ -5,10 +5,10 @@ import { Graphics } from "./Graphics";
 import * as interfaces from "./interfaces";
 import { RANDOM, TIMESTAMP } from "./pollyFill";
 import { Project } from "./Project";
-import { System } from "./System";
+import { IKeyMapping, System } from "./System";
 import { SystemManager } from "./SystemManager";
 import * as DEFAULT_CONF from "./utils/DefaultConfig";
 import { HtmlInterface } from "./utils/HtmlInterface";
 import { TimeMeasureComponent, TimeMeasureSystem, TimeMeasureSystemEndMark, TimeMeasureSystemStartMark,  TimeMeasureUtil } from "./utils/TimeMeasureUtil";
 
-export { ComponentFactory, EntityFactory, interfaces, GameLoop, Graphics, HtmlInterface, Project, System, SystemManager, TimeMeasureComponent, TimeMeasureSystem, TimeMeasureSystemEndMark, TimeMeasureSystemStartMark,  TimeMeasureUtil, TIMESTAMP, RANDOM, DEFAULT_CONF };
+export { ComponentFactory, EntityFactory, interfaces, IKeyMapping, GameLoop, Graphics, HtmlInterface, Project, System, SystemManager, TimeMeasureComponent, TimeMeasureSystem, TimeMeasureSystemEndMark, TimeMeasureSystemStartMark,  TimeMeasureUtil, TIMESTAMP, RANDOM, DEFAULT_CONF };

@@ -46,7 +46,7 @@ describe("TimeMeasureUtil", () => {
     // system that do some dummy calculation so that we have something to measure
     class DummySystem extends System<{ res: number }> {
         public hasRun = false;
-        public _parameters = { res: 0 };
+        protected _defaultParameter = { res: 0 };
         constructor() { super(); }
         public process() {
             this.execute();

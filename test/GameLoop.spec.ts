@@ -52,16 +52,16 @@ describe("GameLoop", () => {
     }
 
     interface IFeedBackParams {
-        e: { emptyComp: IComponent };
+        emptyComp: IComponent;
     }
 
     const feedbackParams = {
-        e: { emptyComp: {entityId: 0, active: true} },
+        emptyComp: {entityId: 0, active: true },
     };
 
     class FeedBackSystem extends System<IFeedBackParams> {
         public static callBack: (timer: FrameEvent, ...args: any[]) => void;
-        protected _parameters: IFeedBackParams = feedbackParams;
+        protected _defaultParameter: IFeedBackParams = feedbackParams;
         public execute(params: IFeedBackParams, timer: FrameEvent, ...args: any[]) {
             FeedBackSystem.callBack(timer, ...args);
         }
@@ -96,23 +96,23 @@ describe("GameLoop", () => {
     }
 
     interface IMoveParams {
-        p: { position: IVec3 };
-        v: { velocity: IVec3 };
+        position: IVec3;
+        velocity: IVec3;
     }
 
     const moveParams: IMoveParams = {
-        p: { position: zeroVec3 },
-        v: { velocity: zeroVec3 },
+        position: zeroVec3,
+        velocity: zeroVec3,
     };
 
     class MoveSystem extends System<IMoveParams> {
-        protected _parameters: IMoveParams = moveParams;
+        protected _defaultParameter: IMoveParams = moveParams;
         constructor() { super(); }
 
         public execute(params: IMoveParams) {
-            params.p.position.x *= params.v.velocity.x;
-            params.p.position.y *= params.v.velocity.y;
-            params.p.position.z *= params.v.velocity.z;
+            params.position[this._k.position].x *= params.velocity[this._k.velocity].x;
+            params.position[this._k.position].y *= params.velocity[this._k.velocity].y;
+            params.position[this._k.position].z *= params.velocity[this._k.velocity].z;
         }
     }
 
@@ -132,7 +132,7 @@ describe("GameLoop", () => {
     };
 
     class IncrementSystem extends System<IIntergerParams> {
-        protected _parameters: IIntergerParams = incrementParams;
+        protected _defaultParameter: IIntergerParams = incrementParams;
         constructor() { super(); }
         public execute(params: IIntergerParams) {
             params.i.integer += 1;
@@ -141,7 +141,7 @@ describe("GameLoop", () => {
 
     // Dummy system that multiply an integer by itself
     class SquareSystem extends System<IIntergerParams> {
-        protected _parameters: IIntergerParams = incrementParams;
+        protected _defaultParameter: IIntergerParams = incrementParams;
         constructor() { super(); }
         public execute(params: IIntergerParams) {
             params.i.integer = params.i.integer * params.i.integer;
@@ -210,7 +210,7 @@ describe("GameLoop", () => {
         // checking that delta does not vary much
         const sM = new SystemManager();
         const fbckSys = new FeedBackSystem();
-        fbckSys.setParamSource("e", feedBackFactory);
+        fbckSys.setParamSource("emptyComp", feedBackFactory);
         feedBackFactory.create(1, true);
         expect(feedBackFactory.nbActive).to.gt(0);
 
@@ -267,7 +267,7 @@ describe("GameLoop", () => {
         const frequency = (1000 / 60);
         feedBackFactory.create(1, true);
         const s = new FeedBackSystem();
-        s.setParamSource("e", feedBackFactory);
+        s.setParamSource("emptyComp", feedBackFactory);
         FeedBackSystem["timerArr"] = [];
         FeedBackSystem.callBack = (timer: FrameEvent) => {
             FeedBackSystem["timerArr"].push(timer.time);
@@ -392,7 +392,7 @@ describe("GameLoop", () => {
     it("pass optional parameter from start to each system", (done) => {
         feedBackFactory.create(1, true);
         const s = new FeedBackSystem();
-        s.setParamSource("e", feedBackFactory);
+        s.setParamSource("emptyComp", feedBackFactory);
         FeedBackSystem["timerArr"] = [];
         FeedBackSystem.callBack = (timer: FrameEvent, a1, a2) => {
             FeedBackSystem["arg1"] = a1;
@@ -416,7 +416,7 @@ describe("GameLoop", () => {
     it("pass the currentTimer to each System as optional parameter", (done) => {
         feedBackFactory.create(1, true);
         const s = new FeedBackSystem();
-        s.setParamSource("e", feedBackFactory);
+        s.setParamSource("emptyComp", feedBackFactory);
         FeedBackSystem["timerArr"] = [];
         FeedBackSystem.callBack = (timer: FrameEvent) => {
             FeedBackSystem["timerArr"].push(timer.time);
