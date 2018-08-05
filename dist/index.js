@@ -968,7 +968,6 @@ exports.GameLoop = GameLoop;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var FastIterationMap_1 = __webpack_require__(1);
-// Comment forcer l'implementation des noms de parametres lors de l'heritage/ implementation
 var System = /** @class */ (function () {
     function System() {
         this.active = true;
@@ -981,11 +980,11 @@ var System = /** @class */ (function () {
     };
     Object.defineProperty(System.prototype, "parameters", {
         get: function () {
-            return this._parameters;
+            return this._defaultParameter;
         },
         set: function (val) {
             // to implement
-            this._parameters = val;
+            this._defaultParameter = val;
             this.init();
         },
         enumerable: true,
@@ -1007,7 +1006,7 @@ var System = /** @class */ (function () {
             args[_i] = arguments[_i];
         }
         // Holds currently process component
-        var params = this._parameters;
+        var params = this._currentParameters;
         // const flist = this.factories;
         var flist = this._parametersSource.values;
         // flist.length = this.keys.length
@@ -1043,7 +1042,7 @@ var System = /** @class */ (function () {
             }
         }
     };
-    System.prototype.setParamSource = function (paramKey, pool) {
+    System.prototype.setParamSource = function (paramKey, pool, paramNameInSource) {
         if (!this.initialized) {
             this.init();
         }
@@ -1054,17 +1053,38 @@ var System = /** @class */ (function () {
             });
         }
         else if (!this._parametersSource.has(paramKey)) {
+            // when called directly from javascript (not using typescript type check)
             throw Error("Parameter name '" + paramKey + "' is not a parameter of the system.");
         }
-        this._parametersSource.set(paramKey, { key: paramKey, source: pool });
+        else {
+            var mappedKey = {
+                key: paramKey,
+                keyInSource: paramNameInSource || paramKey,
+                source: pool,
+            };
+            this._parametersSource.set(paramKey, mappedKey);
+            this._k[paramKey] = mappedKey.keyInSource;
+        }
     };
     /** Extract parameters key from the parameter object */
     System.prototype.extractingParametersKeys = function () {
         var _this = this;
-        var keys = Object.keys(this._parameters);
+        var keys = Object.keys(this._defaultParameter);
+        var _k = {};
+        var _currentParameters = {};
         keys.forEach(function (k) {
-            _this._parametersSource.set(k, { key: k, source: undefined });
+            var mappedKey = {
+                key: k,
+                keyInSource: k,
+                source: undefined,
+            };
+            _this._parametersSource.set(k, mappedKey);
+            _currentParameters[k] = undefined;
+            // set default param name in source as the same.
+            _k[k] = k;
         });
+        this._currentParameters = _currentParameters;
+        this._k = Object.assign({}, _k);
     };
     return System;
 }());
