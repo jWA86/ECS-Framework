@@ -1,7 +1,7 @@
 import { IComponent, IComponentFactory } from "./IComponentFactory";
 export { ISystem };
 
-interface ISystem<P> {
+interface ISystem<P extends IComponent> {
     /**
      * Wether to process the system in the gameloop or not
      */

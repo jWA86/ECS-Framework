@@ -4,6 +4,7 @@ import "mocha";
 import { ComponentFactory } from "../src/ComponentFactory";
 import { EntityFactory } from "../src/EntityFactory";
 import { GameLoop } from "../src/GameLoop";
+import { IComponent } from "../src/interfaces";
 import { GLOBAL } from "../src/pollyFill";
 import { Project } from "../src/Project";
 import { System } from "../src/System";
@@ -56,7 +57,7 @@ describe("Project Setup", () => {
         it("System", () => {
             const p = new Project("project6");
             expect(GLOBAL["System"]).to.not.equal(undefined);
-            const sys: System<{}> = new GLOBAL["System"]({});
+            const sys: System<IComponent> = new GLOBAL["System"]({});
             expect(sys).to.be.an.instanceof(System);
         });
         it("EntityFactory", () => {

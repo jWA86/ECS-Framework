@@ -44,9 +44,9 @@ const isPerformanceWorking = () => {
 
 describe("TimeMeasureUtil", () => {
     // system that do some dummy calculation so that we have something to measure
-    class DummySystem extends System<{ res: number }> {
+    class DummySystem extends System<{ active: boolean, entityId: number, res: number }> {
         public hasRun = false;
-        protected _defaultParameter = { res: 0 };
+        protected _defaultParameter = { active: true, entityId: 0, res: 0 };
         constructor() { super(); }
         public process() {
             this.execute();

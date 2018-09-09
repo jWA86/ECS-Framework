@@ -1,10 +1,7 @@
 import { FastIterationMap } from "FastIterationMap";
-import { ComponentFactory } from "./ComponentFactory";
 import { IComponent, IComponentFactory } from "./interfaces";
 import { ISystem } from "./ISystem";
 export { IKeyMapping, System };
-
-// Comment forcer l'implementation des noms de parametres lors de l'heritage/ implementation
 
 interface IKeyMapping<P, S extends IComponent> {
     key: keyof P;
@@ -12,7 +9,7 @@ interface IKeyMapping<P, S extends IComponent> {
     source: IComponentFactory<S>;
 }
 
-abstract class System<P> implements ISystem<P> {
+abstract class System<P extends IComponent> implements ISystem<P> {
 
     public active: boolean = true;
 
@@ -53,7 +50,7 @@ abstract class System<P> implements ISystem<P> {
         if (!this.initialized) { this.init(); }
         return this._parametersSource;
     }
-
+    /** Iterate on all active components from the component pool associated with the parameter 'entityId' */
     public process(...args: any[]) {
         // Holds currently process component
         const params = this._currentParameters;

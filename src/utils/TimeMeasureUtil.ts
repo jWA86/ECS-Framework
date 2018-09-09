@@ -1,6 +1,7 @@
 import { ComponentFactory } from "../ComponentFactory";
 import { IComponentFactory } from "../IComponentFactory";
 import { IFrameEvent} from "../IFrameEvent";
+import { IComponent } from "../interfaces";
 import { ISystem } from "../ISystem";
 import { ISystemManager } from "../ISystemManager";
 import { RANDOM, TIMESTAMP } from "../pollyFill";
@@ -66,12 +67,12 @@ class TimeMeasureUtil implements ITimeMeasureUtil {
     }
 }
 
-abstract class TimeMeasureSystem implements ISystem<{}> {
+abstract class TimeMeasureSystem implements ISystem<IComponent> {
     public static performance = window.performance;
     public active = true;
     protected startMark: string;
     protected endMark: string;
-    protected _parameters = {};
+    protected _parameters = {active: true, entityId: 0};
     /**
      * @param tmComponent the component used for recording time
      */

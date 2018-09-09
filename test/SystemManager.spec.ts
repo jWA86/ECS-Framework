@@ -14,11 +14,13 @@ describe("SystemManager should be able to", () => {
         constructor(public integer: number) { }
     }
 
-    interface IIntegerParams {
+    interface IIntegerParams extends IComponent {
         integer: number;
     }
 
     const incrementParams =  {
+        active: true,
+        entityId: 0,
         integer: 0,
     };
 
@@ -30,12 +32,14 @@ describe("SystemManager should be able to", () => {
         }
     }
 
-    interface IFeedBackParams {
-        emptyComp: IComponent;
+    interface IFeedBackParams extends IComponent {
+        pos: {x: number, y: number};
     }
 
     const feedbackParams = {
-        emptyComp: { entityId: 0, active: true },
+        active: true,
+        entityId: 0,
+        pos: { x: 0, y: 0 },
     };
 
     class FeedBackSystem extends System<IFeedBackParams> {

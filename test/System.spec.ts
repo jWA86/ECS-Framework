@@ -34,11 +34,13 @@ describe("System ", () => {
         constructor(public velocity: IVec3) { }
     }
 
-    interface IMoveByOneUnitParams {
+    interface IMoveByOneUnitParams extends IComponent {
         position: IVec3;
     }
 
     const moveByOneUnitParams: IMoveByOneUnitParams = {
+        active: true,
+        entityId: 0,
         position: { x: 0, y: 0, z: 0 },
     };
 
@@ -57,12 +59,14 @@ describe("System ", () => {
         }
     }
 
-    interface IMoveParams {
+    interface IMoveParams extends IComponent {
         position: IVec3;
         velocity: IVec3;
     }
 
     const moveParams: IMoveParams = {
+        active: true,
+        entityId: 0,
         position: zeroVec3,
         velocity: zeroVec3,
     };
@@ -325,7 +329,7 @@ describe("System ", () => {
             public entityId: number;
             constructor(public notFromComponent1: number, public notFromComponent2: number) { }
         }
-        interface IArgsParam {
+        interface IArgsParam extends IComponent {
             a1: { notFromComponent1: number };
             a2: { notFromComponent2: number };
         }
@@ -333,6 +337,8 @@ describe("System ", () => {
         const defaultArgsParam: IArgsParam = {
             a1: { notFromComponent1: 0 },
             a2: { notFromComponent2: 0 },
+            active: true,
+            entityId: 0,
         };
 
         // set component prop value from external variables value passed to the process methode

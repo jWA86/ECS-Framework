@@ -51,12 +51,14 @@ describe("GameLoop", () => {
         constructor() { }
     }
 
-    interface IFeedBackParams {
-        emptyComp: IComponent;
+    interface IFeedBackParams extends IComponent {
+        pos: {x: number, y: number};
     }
 
     const feedbackParams = {
-        emptyComp: {entityId: 0, active: true },
+        active: true,
+        entityId: 0,
+        pos: { x: 0, y: 0 },
     };
 
     class FeedBackSystem extends System<IFeedBackParams> {
@@ -95,12 +97,14 @@ describe("GameLoop", () => {
         constructor( public velocity: IVec3) { }
     }
 
-    interface IMoveParams {
+    interface IMoveParams extends IComponent {
         position: IVec3;
         velocity: IVec3;
     }
 
     const moveParams: IMoveParams = {
+        active: true,
+        entityId: 0,
         position: zeroVec3,
         velocity: zeroVec3,
     };
@@ -123,11 +127,13 @@ describe("GameLoop", () => {
         constructor(public integer: number) { }
     }
 
-    interface IIntergerParams {
+    interface IIntergerParams extends IComponent {
         i: { integer: number };
     }
 
     const incrementParams =  {
+        active: true,
+        entityId: 0,
         i: { integer: 0 },
     };
 
@@ -210,7 +216,7 @@ describe("GameLoop", () => {
         // checking that delta does not vary much
         const sM = new SystemManager();
         const fbckSys = new FeedBackSystem();
-        fbckSys.setParamSource("emptyComp", feedBackFactory);
+        fbckSys.setParamSource("pos", feedBackFactory);
         feedBackFactory.create(1, true);
         expect(feedBackFactory.nbActive).to.gt(0);
 
@@ -267,7 +273,7 @@ describe("GameLoop", () => {
         const frequency = (1000 / 60);
         feedBackFactory.create(1, true);
         const s = new FeedBackSystem();
-        s.setParamSource("emptyComp", feedBackFactory);
+        s.setParamSource("pos", feedBackFactory);
         FeedBackSystem["timerArr"] = [];
         FeedBackSystem.callBack = (timer: FrameEvent) => {
             FeedBackSystem["timerArr"].push(timer.time);
@@ -392,7 +398,7 @@ describe("GameLoop", () => {
     it("pass optional parameter from start to each system", (done) => {
         feedBackFactory.create(1, true);
         const s = new FeedBackSystem();
-        s.setParamSource("emptyComp", feedBackFactory);
+        s.setParamSource("pos", feedBackFactory);
         FeedBackSystem["timerArr"] = [];
         FeedBackSystem.callBack = (timer: FrameEvent, a1, a2) => {
             FeedBackSystem["arg1"] = a1;
@@ -416,7 +422,7 @@ describe("GameLoop", () => {
     it("pass the currentTimer to each System as optional parameter", (done) => {
         feedBackFactory.create(1, true);
         const s = new FeedBackSystem();
-        s.setParamSource("emptyComp", feedBackFactory);
+        s.setParamSource("pos", feedBackFactory);
         FeedBackSystem["timerArr"] = [];
         FeedBackSystem.callBack = (timer: FrameEvent) => {
             FeedBackSystem["timerArr"].push(timer.time);
