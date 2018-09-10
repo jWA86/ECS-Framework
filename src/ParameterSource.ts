@@ -2,7 +2,7 @@ import { FastIterationMap } from "FastIterationMap";
 import { IComponentFactory } from "./IComponentFactory";
 import { IComponent } from "./interfaces";
 
-export { IParameterBinding, ParameterBinding, ParametersSourceIterator };
+export { IParameterBinding, ParameterBinding, ParametersSourceIterator };
 
 interface IParameterBinding<P, S extends IComponent, ParamType> {
     key: keyof P;
@@ -38,11 +38,11 @@ class ParameterBinding<Parameter, SourceComponent extends IComponent, ParamType>
 class ParametersSourceIterator<Parameters extends IComponent> {
     public currentIteration: number = 0;
     protected _sources: FastIterationMap<keyof Parameters, IParameterBinding<Parameters, IComponent, any>>;
+    protected _defaultParameters: Parameters;
     /** component source of entityId  */
     protected _idSource: IComponentFactory<IComponent>;
-    protected _defaultParameters: Parameters;
-    constructor() {
-        this.setObjectSourceKey();
+    constructor(defaultParameters: Parameters) {
+        this.defaultParameters = defaultParameters;
     }
     public reset() {
         this.currentIteration = 0;
@@ -52,31 +52,55 @@ class ParametersSourceIterator<Parameters extends IComponent> {
      * @param values object containing values of parameters, modify it will not modify the component unless it's an object. access : values.key;
      * @param components object referencing components for each key, use : components.key[keyInSource] to modify the parameter in the referenced component.
      */
-    public next(values: Parameters, components: { [P in keyof Parameters]: IComponent }): boolean {
+
+    public set defaultParameters(val: any) {
+        this._defaultParameters = val;
+        this.setObjectSourceKey();
+    }
+
+    public get sources(): FastIterationMap<keyof Parameters, IParameterBinding<Parameters, IComponent, any>> {
+        return this._sources;
+    }
+
+    public next(outValues: Parameters, outComponents: { [P in keyof Parameters]: IComponent }, skipInactive: boolean): boolean {
+        this.currentIteration += 1;
         const nbActiveComponent = this._idSource.activeLength;
-        if (this.currentIteration >= nbActiveComponent) {
+        if (this.currentIteration - 1 >= nbActiveComponent) {
             return true;
         }
+
+        const end = () => {
+            if (this.currentIteration - 1 >= nbActiveComponent) {
+                return true;
+            } else {
+                return false;
+            }
+        };
 
         const flist = this._sources.values;
         const refPool = this._idSource.values;
         // get the component from the idsource poolFactory that serve as a reference
         // if it is active query the other components
-        const refComponent = refPool[this.currentIteration];
-        if (refComponent.active) {
-            components.entityId = refComponent;
-            values.entityId = refComponent.entityId;
+        const refComponent = refPool[this.currentIteration - 1];
+        if (!refComponent.active && skipInactive) {
+            outComponents.active = refComponent;
+            outValues.active = false;
+            end();
+        } else {
+            outComponents.entityId = refComponent;
+            outValues.entityId = refComponent.entityId;
             let isFound = true;
             // Iterate others factories to query rest of the components
-            for (let j = 1; j < flist.length; ++j) {
+            const l = flist.length;
+            for (let j = 0; j < l; ++j) {
                 // If the factory is the same as the factory that serve as a reference
                 // we push the same component to the args array,
                 // otherwise we query the component though get(entityId)
                 const key = flist[j].key;
                 const keyInSource = flist[j].keyInSource;
                 if (flist[j] === flist[0]) {
-                    components[key] = refComponent;
-                    values[key] = refComponent[keyInSource] as any;
+                    outComponents[key] = refComponent;
+                    outValues[key] = refComponent[keyInSource] as any;
                 } else {
                     const c = flist[j].source.get(refComponent.entityId);
                     if (!c) {
@@ -85,19 +109,15 @@ class ParametersSourceIterator<Parameters extends IComponent> {
                         // this.currentIteration += 1;
                         throw Error("component with parameter " + key + " was not found in " + flist[j].source + " with key name " + keyInSource.toString());
                     }
-                    components[key] = c;
-                    values[key] = c[keyInSource];
+                    outComponents[key] = c;
+                    outValues[key] = c[keyInSource];
                 }
             }
             if (isFound) {
-                this.currentIteration += 1;
-                if (this.currentIteration >= nbActiveComponent) {
-                    return true;
-                } else {
-                    return false;
-                }
+                end();
             }
         }
+
     }
     // Set value of parameters from ObjectContainingValue to the corresponding component
     public copyValToComponent(objectContainingValue: Parameters, objectReferencingComponents: { [P in keyof Parameters]: IComponent }) {
@@ -108,6 +128,10 @@ class ParametersSourceIterator<Parameters extends IComponent> {
             const keyInSource = params[i].keyInSource;
             objectReferencingComponents[key][keyInSource] = objectContainingValue[key] as any;
         }
+    }
+
+    public validateBinding(): boolean {
+        return true;
     }
 
     public setObjectSource<C extends IComponent>(paramKey: keyof Parameters | "*", pool: IComponentFactory<C>, paramNameInSource?: keyof C) {
@@ -128,6 +152,7 @@ class ParametersSourceIterator<Parameters extends IComponent> {
             this._sources.set(paramKey, mappedKey as any);
         }
     }
+
     protected setObjectSourceKey() {
         this._sources = new FastIterationMap<keyof Parameters, IParameterBinding<Parameters, IComponent, any>>();
         const ref = this._defaultParameters;
