@@ -2,7 +2,7 @@ import { expect } from "chai";
 import "mocha";
 import { ComponentFactory } from "../src/entry";
 import { IComponent } from "../src/interfaces";
-import { ParameterBinding, ParametersSourceIterator } from "../src/ParameterSource";
+import { ParameterBinding, ParametersSourceIterator, ParametersSourceIterator2 } from "../src/ParameterSource";
 
 describe("ParameterBinding", () => {
     class Comp1 implements IComponent {
@@ -186,17 +186,61 @@ describe("ParameterBinding", () => {
         it("throw an error when one component is not found", () => {
 
         });
+        it("should be able to copy back value to components", () => {
+            const p1 = new ComponentFactory<Comp1>(20, new Comp1());
+            const p2 = new ComponentFactory<Comp2>(20, new Comp2());
+            let i = 1;
+            while (i < 11) {
+                const c1 = p1.create(i, true);
+                c1.x1 = Math.random() * 10;
+                const c2 = p2.create(i, true);
+                c2.x2 = Math.random() * 10;
+                i++;
+            }
+
+            const pSIterator = new ParametersSourceIterator(new ParamComp());
+            pSIterator.setObjectSource("*", p1);
+            pSIterator.setObjectSource("x", p1, "x1");
+            pSIterator.setObjectSource("y", p2, "x2");
+
+            const objParam = new ParamComp();
+            const compParam = {} as Record<keyof ParamComp, IComponent>;
+            while (!pSIterator.next(objParam, compParam, true)) {
+                if (!objParam.active) {
+                    objParam.x = 314.0;
+                    objParam.y = 314.0;
+                    expect(compParam.x[pSIterator.sources.get("x").keyInSource]).to.not.equal(objParam.x);
+                    expect(compParam.y[pSIterator.sources.get("y").keyInSource]).to.not.equal(objParam.y);
+                    pSIterator.copyValToComponent(objParam, compParam);
+                    expect(compParam.x[pSIterator.sources.get("x").keyInSource]).to.equal(objParam.x);
+                    expect(compParam.y[pSIterator.sources.get("y").keyInSource]).to.equal(objParam.y);
+                }
+            }
+        });
+        it("should be able to sort params by source for faster assemblage", () => {
+
+            const p1 = new ComponentFactory<Comp1>(20, new Comp1());
+            const p2 = new ComponentFactory<Comp2>(20, new Comp2());
+
+            const pSIterator = new ParametersSourceIterator2(new ParamComp());
+            pSIterator.setObjectSource("*", p1);
+            pSIterator.setObjectSource("x", p1, "x1");
+            pSIterator.setObjectSource("y", p2, "x2");
+
+            const res = pSIterator.sortParamBySource(pSIterator.sources);
+            expect(res[0].length).to.equal(3);
+            expect(res[0][0].source).to.equal(res[0][1].source);
+            expect(res[1].length).to.equal(1);
+            expect(res[1][0].source).to.not.equal(res[0][1].source);
+        });
     });
 });
-
-
-
 
 // for every source:
 // get params
 
 // ex : x s1, y s2, entityId: s1, active: s1
-// currently do : 
+// currently do :
 // x = refComponent
 // y = getById
 // entityId = getById
@@ -207,12 +251,10 @@ describe("ParameterBinding", () => {
 // set x by refComponent
 // entityId = refComponent
 // active = refComponent
-// s2: 
+// s2:
 // y getById
 
-//TODO : 
+// TODO :
 // system class with this paramIterator
 // compare performance
 // Refactor test process active from different source than entityId (and different key)
-
-
