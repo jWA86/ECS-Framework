@@ -322,6 +322,92 @@ describe("PerfTest", () => {
                     // res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 4, sys: "previousSystem" });
                     // });
                 });
+                describe("2 pools", () => {
+                    let pool1: ComponentFactory<{ entityId: number, active: true }>;
+                    let pool2: ComponentFactory<{ entityId: number, active: true, x: number , y: number }>;
+                    let pools: Array<ComponentFactory<any>>;
+
+                    let system: SmallNbParamsSystem;
+                    beforeEach(() => {
+                        pool1 = new ComponentFactory<{ entityId: number, active: true }>(1000, { entityId: 0, active: true });
+                        pool2 = new ComponentFactory<{ entityId: number, active: true, x: number, y: number }>(1000, { entityId: 0, active: true, x: 0, y: 0 });
+
+                        pools = [pool1, pool2];
+
+                        system = new SmallNbParamsSystem();
+                        system.setParamSource("entityId", pool1);
+                        system.setParamSource("active", pool1);
+                        system.setParamSource("x", pool2);
+                        system.setParamSource("y", pool2);
+                    });
+                    // 0, 1, 5, 10, 25, 50, 75, 100, 250, 500, 1000, 10000, 100000
+                    it("0 component", () => {
+                        const nbComp = 0;
+                        createComponents(pools, nbComp);
+                        const r = run(system);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "previousSystem" });
+                    });
+                    it("1 components", () => {
+                        const nbComp = 1;
+                        createComponents(pools, nbComp);
+                        const r = run(system);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "previousSystem" });
+                    });
+                    it("5 components", () => {
+                        const nbComp = 5;
+                        createComponents(pools, nbComp);
+                        const r = run(system);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "previousSystem" });
+                    });
+                    it("10 components", () => {
+                        const nbComp = 10;
+                        createComponents(pools, nbComp);
+                        const r = run(system);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "previousSystem" });
+                    });
+                    it("25 components", () => {
+                        const nbComp = 25;
+                        createComponents(pools, nbComp);
+                        const r = run(system);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "previousSystem" });
+                    });
+                    it("50 components", () => {
+                        const nbComp = 50;
+                        createComponents(pools, nbComp);
+                        const r = run(system);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "previousSystem" });
+                    });
+                    it("75 components", () => {
+                        const nbComp = 75;
+                        createComponents(pools, nbComp);
+                        const r = run(system);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "previousSystem" });
+                    });
+                    it("100 components", () => {
+                        const nbComp = 100;
+                        createComponents(pools, nbComp);
+                        const r = run(system);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "previousSystem" });
+                    });
+                    it("250 components", () => {
+                        const nbComp = 250;
+                        createComponents(pools, nbComp);
+                        const r = run(system);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "previousSystem" });
+                    });
+                    it("500 components", () => {
+                        const nbComp = 500;
+                        createComponents(pools, nbComp);
+                        const r = run(system);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "previousSystem" });
+                    });
+                    it("1000 components", () => {
+                        const nbComp = 1000;
+                        createComponents(pools, nbComp);
+                        const r = run(system);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "previousSystem" });
+                    });
+                });
             });
             describe("big number of params", () => {
                 describe("1 pool", () => {
@@ -526,6 +612,99 @@ describe("PerfTest", () => {
 
                     // });
                 });
+                describe("2 pools", () => {
+
+                    let pool1: ComponentFactory<{ entityId: 0, active: true, x: 0, y: number, z: number }>;
+                    let pool2: ComponentFactory<{entityId: 0, active: true, a: number, b: number, c: number, d: number, e: number}>;
+
+                    let pools: Array<ComponentFactory<any>>;
+                    let system: TenParamsSystem;
+                    beforeEach(() => {
+                        pool1 = new ComponentFactory<{ entityId: 0, active: true, x: 0, y: number, z: number }>(1000, { entityId: 0, active: true, x: 0, y: 0, z: 0 });
+                        pool2 = new ComponentFactory<{entityId: 0, active: true, a: number, b: number, c: number, d: number, e: number}>(1000, {entityId: 0, active: true, a: 0, b: 0, c: 0, d: 0, e: 0});
+
+                        pools = [pool1, pool2];
+                        system = new TenParamsSystem();
+                        system.setParamSource("entityId", pool1);
+                        system.setParamSource("active", pool1);
+                        system.setParamSource("x", pool1);
+                        system.setParamSource("y", pool1);
+                        system.setParamSource("z", pool1);
+                        system.setParamSource("a", pool2);
+                        system.setParamSource("b", pool2);
+                        system.setParamSource("c", pool2);
+                        system.setParamSource("d", pool2);
+                        system.setParamSource("e", pool2);
+
+                    });
+                    // 0, 1, 5, 10, 25, 50, 75, 100, 250, 500, 1000, 10000, 100000
+                    it("0 component", () => {
+                        const nbComp = 0;
+                        createComponents(pools, nbComp);
+                        const r = run(system);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "previousSystem" });
+                    });
+                    it("1 components", () => {
+                        const nbComp = 1;
+                        createComponents(pools, nbComp);
+                        const r = run(system);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "previousSystem" });
+                    });
+                    it("5 components", () => {
+                        const nbComp = 5;
+                        createComponents(pools, nbComp);
+                        const r = run(system);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "previousSystem" });
+                    });
+                    it("10 components", () => {
+                        const nbComp = 10;
+                        createComponents(pools, nbComp);
+                        const r = run(system);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "previousSystem" });
+                    });
+                    it("25 components", () => {
+                        const nbComp = 25;
+                        createComponents(pools, nbComp);
+                        const r = run(system);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "previousSystem" });
+                    });
+                    it("50 components", () => {
+                        const nbComp = 50;
+                        createComponents(pools, nbComp);
+                        const r = run(system);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "previousSystem" });
+                    });
+                    it("75 components", () => {
+                        const nbComp = 75;
+                        createComponents(pools, nbComp);
+                        const r = run(system);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "previousSystem" });
+                    });
+                    it("100 components", () => {
+                        const nbComp = 100;
+                        createComponents(pools, nbComp);
+                        const r = run(system);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "previousSystem" });
+                    });
+                    it("250 components", () => {
+                        const nbComp = 250;
+                        createComponents(pools, nbComp);
+                        const r = run(system);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "previousSystem" });
+                    });
+                    it("500 components", () => {
+                        const nbComp = 500;
+                        createComponents(pools, nbComp);
+                        const r = run(system);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "previousSystem" });
+                    });
+                    it("1000 components", () => {
+                        const nbComp = 1000;
+                        createComponents(pools, nbComp);
+                        const r = run(system);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "previousSystem" });
+                    });
+                });
             });
         });
         describe("newSystem", () => {
@@ -721,6 +900,92 @@ describe("PerfTest", () => {
                     // const r = run(newSystem);
                     // res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 4, sys: "newSystem" });
                     // });
+                });
+                describe("2 pools", () => {
+                    let pool1: ComponentFactory<{ entityId: number, active: true }>;
+                    let pool2: ComponentFactory<{ entityId: number, active: true, x: number , y: number }>;
+                    let pools: Array<ComponentFactory<any>>;
+
+                    let newSystem: NewSmallNbParamsSystem;
+                    beforeEach(() => {
+                        pool1 = new ComponentFactory<{ entityId: number, active: true }>(1000, { entityId: 0, active: true});
+                        pool2 = new ComponentFactory<{ entityId: number, active: true, x: number, y: number }>(1000, { entityId: 0, active: true, x: 0, y: 0 });
+
+                        pools = [pool1, pool2];
+
+                        newSystem = new NewSmallNbParamsSystem(new SmallNbParam());
+                        newSystem.setParamSource("entityId", pool1);
+                        newSystem.setParamSource("active", pool1);
+                        newSystem.setParamSource("x", pool2);
+                        newSystem.setParamSource("y", pool2);
+                    });
+
+                    // 0, 1, 5, 10, 25, 50, 75, 100, 250, 500, 1000, 10000, 100000
+                    it("0 component", () => {
+                        const nbComp = 0;
+                        const r = run(newSystem);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "newSystem" });
+                    });
+                    it("1 components", () => {
+                        const nbComp = 1;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "newSystem" });
+                    });
+                    it("5 components", () => {
+                        const nbComp = 5;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "newSystem" });
+                    });
+                    it("10 components", () => {
+                        const nbComp = 10;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "newSystem" });
+                    });
+                    it("25 components", () => {
+                        const nbComp = 25;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "newSystem" });
+                    });
+                    it("50 components", () => {
+                        const nbComp = 50;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "newSystem" });
+                    });
+                    it("75 components", () => {
+                        const nbComp = 75;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "newSystem" });
+                    });
+                    it("100 components", () => {
+                        const nbComp = 100;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "newSystem" });
+                    });
+                    it("250 components", () => {
+                        const nbComp = 250;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "newSystem" });
+                    });
+                    it("500 components", () => {
+                        const nbComp = 500;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "newSystem" });
+                    });
+                    it("1000 components", () => {
+                        const nbComp = 1000;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "newSystem" });
+                    });
                 });
             });
             describe("big number of params", () => {
@@ -925,6 +1190,98 @@ describe("PerfTest", () => {
                     // it("100000 components", () => {
 
                     // });
+                });
+                describe("2 pools", () => {
+                    let pool1: ComponentFactory<{ entityId: 0, active: true, x: 0, y: number, z: number }>;
+                    let pool2: ComponentFactory<{entityId: 0, active: true, a: number, b: number, c: number, d: number, e: number}>;
+
+                    let pools: Array<ComponentFactory<any>>;
+                    let newSystem: NewTenParamsSystem;
+                    beforeEach(() => {
+                        pool1 = new ComponentFactory<{ entityId: 0, active: true, x: 0, y: number, z: number }>(1000, { entityId: 0, active: true, x: 0, y: 0, z: 0 });
+                        pool2 = new ComponentFactory<{entityId: 0, active: true, a: number, b: number, c: number, d: number, e: number}>(1000, {entityId: 0, active: true, a: 0, b: 0, c: 0, d: 0, e: 0});
+
+                        pools = [pool1, pool2];
+                        newSystem = new NewTenParamsSystem(new TenParams());
+                        newSystem.setParamSource("entityId", pool1);
+                        newSystem.setParamSource("active", pool1);
+                        newSystem.setParamSource("x", pool1);
+                        newSystem.setParamSource("y", pool1);
+                        newSystem.setParamSource("z", pool1);
+                        newSystem.setParamSource("a", pool2);
+                        newSystem.setParamSource("b", pool2);
+                        newSystem.setParamSource("c", pool2);
+                        newSystem.setParamSource("d", pool2);
+                        newSystem.setParamSource("e", pool2);
+                    });
+
+                    // 0, 1, 5, 10, 25, 50, 75, 100, 250, 500, 1000, 10000, 100000
+                    it("0 component", () => {
+                        const nbComp = 0;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "newSystem" });
+                    });
+                    it("1 components", () => {
+                        const nbComp = 1;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "newSystem" });
+                    });
+                    it("5 components", () => {
+                        const nbComp = 5;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "newSystem" });
+                    });
+                    it("10 components", () => {
+                        const nbComp = 10;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "newSystem" });
+                    });
+                    it("25 components", () => {
+                        const nbComp = 25;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "newSystem" });
+                    });
+                    it("50 components", () => {
+                        const nbComp = 50;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "newSystem" });
+                    });
+                    it("75 components", () => {
+                        const nbComp = 75;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "newSystem" });
+                    });
+                    it("100 components", () => {
+                        const nbComp = 100;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "newSystem" });
+                    });
+                    it("250 components", () => {
+                        const nbComp = 250;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "newSystem" });
+                    });
+                    it("500 components", () => {
+                        const nbComp = 500;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "newSystem" });
+                    });
+                    it("1000 components", () => {
+                        const nbComp = 1000;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "newSystem" });
+                    });
                 });
             });
         });
@@ -1122,6 +1479,92 @@ describe("PerfTest", () => {
                     // res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 4, sys: "newSystem2" });
                     // });
                 });
+                describe("2 pools", () => {
+                    let pool1: ComponentFactory<{ entityId: number, active: true }>;
+                    let pool2: ComponentFactory<{ entityId: number, active: true, x: number, y: number }>;
+                    let pools: Array<ComponentFactory<any>>;
+
+                    let newSystem2: NewSmallNbParamsSystem2;
+                    beforeEach(() => {
+                        pool1 = new ComponentFactory<{ entityId: number, active: true }>(1000, { entityId: 0, active: true });
+                        pool2 = new ComponentFactory<{ entityId: number, active: true, x: number, y: number }>(1000, { entityId: 0, active: true, x: 0, y: 0 });
+
+                        pools = [pool1, pool2];
+
+                        newSystem2 = new NewSmallNbParamsSystem2(new SmallNbParam());
+                        newSystem2.setParamSource("entityId", pool1);
+                        newSystem2.setParamSource("active", pool1);
+                        newSystem2.setParamSource("x", pool2);
+                        newSystem2.setParamSource("y", pool2);
+                    });
+
+                    // 0, 1, 5, 10, 25, 50, 75, 100, 250, 500, 1000, 10000, 100000
+                    it("0 component", () => {
+                        const nbComp = 0;
+                        const r = run(newSystem2);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "newSystem2" });
+                    });
+                    it("1 components", () => {
+                        const nbComp = 1;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem2);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "newSystem2" });
+                    });
+                    it("5 components", () => {
+                        const nbComp = 5;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem2);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "newSystem2" });
+                    });
+                    it("10 components", () => {
+                        const nbComp = 10;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem2);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "newSystem2" });
+                    });
+                    it("25 components", () => {
+                        const nbComp = 25;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem2);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "newSystem2" });
+                    });
+                    it("50 components", () => {
+                        const nbComp = 50;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem2);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "newSystem2" });
+                    });
+                    it("75 components", () => {
+                        const nbComp = 75;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem2);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "newSystem2" });
+                    });
+                    it("100 components", () => {
+                        const nbComp = 100;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem2);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "newSystem2" });
+                    });
+                    it("250 components", () => {
+                        const nbComp = 250;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem2);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "newSystem2" });
+                    });
+                    it("500 components", () => {
+                        const nbComp = 500;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem2);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "newSystem2" });
+                    });
+                    it("1000 components", () => {
+                        const nbComp = 1000;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem2);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 4, nbPool: 2, sys: "newSystem2" });
+                    });
+                });
             });
             describe("big number of params", () => {
                 describe("1 pool", () => {
@@ -1325,6 +1768,100 @@ describe("PerfTest", () => {
                     // it("100000 components", () => {
 
                     // });
+                });
+                describe("2 pools", () => {
+
+                    let pool1: ComponentFactory<{ entityId: 0, active: true, x: 0, y: number, z: number }>;
+                    let pool2: ComponentFactory<{entityId: 0, active: true, a: number, b: number, c: number, d: number, e: number}>;
+
+                    let pools: Array<ComponentFactory<any>>;
+                    let newSystem2: NewTenParamsSystem2;
+
+                    beforeEach(() => {
+                        pool1 = new ComponentFactory<{ entityId: 0, active: true, x: 0, y: number, z: number }>(1000, { entityId: 0, active: true, x: 0, y: 0, z: 0 });
+                        pool2 = new ComponentFactory<{entityId: 0, active: true, a: number, b: number, c: number, d: number, e: number}>(1000, { entityId: 0, active: true, a: 0, b: 0, c: 0, d: 0, e: 0 });
+
+                        pools = [pool1, pool2];
+                        newSystem2 = new NewTenParamsSystem2(new TenParams());
+                        newSystem2.setParamSource("entityId", pool1);
+                        newSystem2.setParamSource("active", pool1);
+                        newSystem2.setParamSource("x", pool1);
+                        newSystem2.setParamSource("y", pool1);
+                        newSystem2.setParamSource("z", pool1);
+                        newSystem2.setParamSource("a", pool2);
+                        newSystem2.setParamSource("b", pool2);
+                        newSystem2.setParamSource("c", pool2);
+                        newSystem2.setParamSource("d", pool2);
+                        newSystem2.setParamSource("e", pool2);
+
+                    });
+                    // 0, 1, 5, 10, 25, 50, 75, 100, 250, 500, 1000, 10000, 100000
+                    it("0 component", () => {
+                        const nbComp = 0;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem2);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "newSystem2" });
+                    });
+                    it("1 components", () => {
+                        const nbComp = 1;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem2);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "newSystem2" });
+                    });
+                    it("5 components", () => {
+                        const nbComp = 5;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem2);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "newSystem2" });
+                    });
+                    it("10 components", () => {
+                        const nbComp = 10;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem2);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "newSystem2" });
+                    });
+                    it("25 components", () => {
+                        const nbComp = 25;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem2);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "newSystem2" });
+                    });
+                    it("50 components", () => {
+                        const nbComp = 50;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem2);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "newSystem2" });
+                    });
+                    it("75 components", () => {
+                        const nbComp = 75;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem2);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "newSystem2" });
+                    });
+                    it("100 components", () => {
+                        const nbComp = 100;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem2);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "newSystem2" });
+                    });
+                    it("250 components", () => {
+                        const nbComp = 250;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem2);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "newSystem2" });
+                    });
+                    it("500 components", () => {
+                        const nbComp = 500;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem2);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "newSystem2" });
+                    });
+                    it("1000 components", () => {
+                        const nbComp = 1000;
+                        createComponents(pools, nbComp);
+                        const r = run(newSystem2);
+                        res.push({ time: r, nbComponents: nbComp, nbParam: 10, nbPool: 2, sys: "newSystem2" });
+                    });
                 });
             });
         });
