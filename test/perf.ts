@@ -7,7 +7,7 @@ interface IRes {
     "sys": string;
 }
 
-describe.only("stats", () => {
+describe("stats", () => {
     describe("1000 components", () => {
         it("mean 1000, 10, 10", () => {
             const f = filter(1000, 10, 10);
