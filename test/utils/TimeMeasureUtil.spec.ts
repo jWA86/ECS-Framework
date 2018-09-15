@@ -47,13 +47,14 @@ describe("TimeMeasureUtil", () => {
     class DummySystem extends System<{ active: boolean, entityId: number, res: number }> {
         public hasRun = false;
         protected _defaultParameter = { active: true, entityId: 0, res: 0 };
-        constructor() { super(); }
+        constructor(params: { active: boolean, entityId: number, res: number }) { super(params); }
         public process() {
             this.execute();
         }
-        public execute(params?: { res: number }) {
+        public execute(params?: { active: boolean, entityId: number, res: number }) {
             this.sleep(10);
             this.hasRun = true;
+            return params;
         }
         public sleep(ms) {
             const date = new Date();
@@ -73,10 +74,10 @@ describe("TimeMeasureUtil", () => {
         isRequestAnimationFrameWorking();
         isPerformanceWorking();
         sysManager = new SystemManager();
-        s1Id = sysManager.pushSystem(new DummySystem(), false);
-        s2Id = sysManager.pushSystem(new DummySystem());
-        s3Id = sysManager.pushSystem(new DummySystem());
-        s4Id = sysManager.pushSystem(new DummySystem());
+        s1Id = sysManager.pushSystem(new DummySystem({ active: true, entityId: 0, res: 0 }), false);
+        s2Id = sysManager.pushSystem(new DummySystem({ active: true, entityId: 0, res: 0 }));
+        s3Id = sysManager.pushSystem(new DummySystem({ active: true, entityId: 0, res: 0 }));
+        s4Id = sysManager.pushSystem(new DummySystem({ active: true, entityId: 0, res: 0 }));
     });
     describe("Constructor", () => {
         it("should instantiate a component factory if one is not passed as a parameter", () => {

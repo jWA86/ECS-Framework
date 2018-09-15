@@ -63,9 +63,9 @@ describe("GameLoop", () => {
 
     class FeedBackSystem extends System<IFeedBackParams> {
         public static callBack: (timer: FrameEvent, ...args: any[]) => void;
-        protected _defaultParameter: IFeedBackParams = feedbackParams;
         public execute(params: IFeedBackParams, timer: FrameEvent, ...args: any[]) {
             FeedBackSystem.callBack(timer, ...args);
+            return params;
         }
     }
 
@@ -110,13 +110,13 @@ describe("GameLoop", () => {
     };
 
     class MoveSystem extends System<IMoveParams> {
-        protected _defaultParameter: IMoveParams = moveParams;
-        constructor() { super(); }
+        constructor(params: IMoveParams) { super(params); }
 
         public execute(params: IMoveParams) {
-            params.position[this._k.position].x *= params.velocity[this._k.velocity].x;
-            params.position[this._k.position].y *= params.velocity[this._k.velocity].y;
-            params.position[this._k.position].z *= params.velocity[this._k.velocity].z;
+            params.position.x *= params.velocity.x;
+            params.position.y *= params.velocity.y;
+            params.position.z *= params.velocity.z;
+            return params;
         }
     }
 
@@ -128,29 +128,29 @@ describe("GameLoop", () => {
     }
 
     interface IIntergerParams extends IComponent {
-        i: { integer: number };
+        integer: number;
     }
 
     const incrementParams =  {
         active: true,
         entityId: 0,
-        i: { integer: 0 },
+        integer: 0,
     };
 
     class IncrementSystem extends System<IIntergerParams> {
-        protected _defaultParameter: IIntergerParams = incrementParams;
-        constructor() { super(); }
+        constructor(params: IIntergerParams) { super(params); }
         public execute(params: IIntergerParams) {
-            params.i.integer += 1;
+            params.integer += 1;
+            return params;
         }
     }
 
     // Dummy system that multiply an integer by itself
     class SquareSystem extends System<IIntergerParams> {
-        protected _defaultParameter: IIntergerParams = incrementParams;
-        constructor() { super(); }
+        constructor(params: IIntergerParams) { super(params); }
         public execute(params: IIntergerParams) {
-            params.i.integer = params.i.integer * params.i.integer;
+            params.integer = params.integer * params.integer;
+            return params;
         }
     }
 
@@ -181,8 +181,8 @@ describe("GameLoop", () => {
     });
     it("accept a list of System to iterate on", () => {
         const sM = new SystemManager();
-        sM.pushSystem(new IncrementSystem(), true);
-        sM.pushSystem(new SquareSystem(), true);
+        sM.pushSystem(new IncrementSystem(incrementParams), true);
+        sM.pushSystem(new SquareSystem(incrementParams), true);
         const gl = new GameLoop(sM);
         const res = gl.systemManager;
         expect(res).to.deep.equal(sM);
@@ -215,7 +215,8 @@ describe("GameLoop", () => {
     it("provide the time ellaspsed since the last frame call", (done) => {
         // checking that delta does not vary much
         const sM = new SystemManager();
-        const fbckSys = new FeedBackSystem();
+        const fbckSys = new FeedBackSystem(feedbackParams);
+        fbckSys.setParamSource("*", feedBackFactory);
         fbckSys.setParamSource("pos", feedBackFactory);
         feedBackFactory.create(1, true);
         expect(feedBackFactory.nbActive).to.gt(0);
@@ -272,7 +273,8 @@ describe("GameLoop", () => {
         // then we compare value to make sure it's executed at a fixed time step
         const frequency = (1000 / 60);
         feedBackFactory.create(1, true);
-        const s = new FeedBackSystem();
+        const s = new FeedBackSystem(feedbackParams);
+        s.setParamSource("*", feedBackFactory);
         s.setParamSource("pos", feedBackFactory);
         FeedBackSystem["timerArr"] = [];
         FeedBackSystem.callBack = (timer: FrameEvent) => {
@@ -306,10 +308,10 @@ describe("GameLoop", () => {
         const nFixedIntFactory = new ComponentFactory<IntegerComponent>(2, new IntegerComponent(0));
         fixedIntFactory.create(1, true);
         nFixedIntFactory.create(1, true);
-        const fixedTS = new IncrementSystem();
-        const nFixedTS = new IncrementSystem();
-        fixedTS.setParamSource("i", fixedIntFactory);
-        nFixedTS.setParamSource("i",  nFixedIntFactory);
+        const fixedTS = new IncrementSystem(incrementParams);
+        const nFixedTS = new IncrementSystem(incrementParams);
+        fixedTS.setParamSource("*", fixedIntFactory);
+        nFixedTS.setParamSource("*", nFixedIntFactory);
 
         const sM = new SystemManager();
         sM.pushSystem(fixedTS, true);
@@ -344,15 +346,15 @@ describe("GameLoop", () => {
         fact2.create(1, true);
         fact3.create(1, true);
         fact4.create(1, true);
-        const incS1 = new IncrementSystem();
-        const incS2 = new IncrementSystem();
-        const incS3 = new IncrementSystem();
-        const incS4 = new IncrementSystem();
+        const incS1 = new IncrementSystem(incrementParams);
+        const incS2 = new IncrementSystem(incrementParams);
+        const incS3 = new IncrementSystem(incrementParams);
+        const incS4 = new IncrementSystem(incrementParams);
 
-        incS1.setParamSource("i", fact1);
-        incS2.setParamSource("i", fact2);
-        incS3.setParamSource("i", fact3);
-        incS4.setParamSource("i", fact4);
+        incS1.setParamSource("*", fact1);
+        incS2.setParamSource("*", fact2);
+        incS3.setParamSource("*", fact3);
+        incS4.setParamSource("*", fact4);
 
         const sM = new SystemManager();
         const pausedFSysId = sM.pushSystem(incS1, true);
@@ -397,7 +399,8 @@ describe("GameLoop", () => {
 
     it("pass optional parameter from start to each system", (done) => {
         feedBackFactory.create(1, true);
-        const s = new FeedBackSystem();
+        const s = new FeedBackSystem(feedbackParams);
+        s.setParamSource("*", feedBackFactory);
         s.setParamSource("pos", feedBackFactory);
         FeedBackSystem["timerArr"] = [];
         FeedBackSystem.callBack = (timer: FrameEvent, a1, a2) => {
@@ -421,7 +424,8 @@ describe("GameLoop", () => {
     });
     it("pass the currentTimer to each System as optional parameter", (done) => {
         feedBackFactory.create(1, true);
-        const s = new FeedBackSystem();
+        const s = new FeedBackSystem(feedbackParams);
+        s.setParamSource("*", feedBackFactory);
         s.setParamSource("pos", feedBackFactory);
         FeedBackSystem["timerArr"] = [];
         FeedBackSystem.callBack = (timer: FrameEvent) => {

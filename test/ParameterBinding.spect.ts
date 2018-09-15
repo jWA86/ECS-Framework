@@ -2,7 +2,7 @@ import { expect } from "chai";
 import "mocha";
 import { ComponentFactory } from "../src/entry";
 import { IComponent } from "../src/interfaces";
-import { ParameterBinding, ParametersSourceIterator, ParametersSourceIterator2 } from "../src/ParameterSource";
+import { ParameterBinding, ParametersSourceIterator } from "../src/ParameterSource";
 
 describe("ParameterBinding", () => {
     class Comp1 implements IComponent {
@@ -222,7 +222,7 @@ describe("ParameterBinding", () => {
             const p1 = new ComponentFactory<Comp1>(20, new Comp1());
             const p2 = new ComponentFactory<Comp2>(20, new Comp2());
 
-            const pSIterator = new ParametersSourceIterator2(new ParamComp());
+            const pSIterator = new ParametersSourceIterator(new ParamComp());
             pSIterator.setObjectSource("*", p1);
             pSIterator.setObjectSource("x", p1, "x1");
             pSIterator.setObjectSource("y", p2, "x2");
