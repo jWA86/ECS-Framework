@@ -1,7 +1,7 @@
 import { FastIterationMap } from "FastIterationMap";
 import { IComponent, IComponentFactory } from "./interfaces";
 import { ISystem } from "./ISystem";
-import { ParametersSourceIterator } from "./ParameterSource";
+import { ParametersSourceIterator, IParameterBinding } from "./ParameterSource";
 export { IKeyMapping, System };
 
 interface IKeyMapping<P, S extends IComponent> {
@@ -24,7 +24,7 @@ abstract class System<P extends IComponent> implements ISystem<P> {
         this._currentParametersComponents = {} as Record<keyof P, IComponent>;
         this._parametersSource = new ParametersSourceIterator<P>(paramValuesHolder);
     }
-    public get parametersSource() {
+    public get parametersSource(): FastIterationMap<keyof P, IParameterBinding<P, IComponent, any>>  {
         return this._parametersSource.sources;
     }
     public setParamSource<C extends IComponent>(paramKey: keyof P | "*", pool: IComponentFactory<C>, paramNameInSource?: keyof C) {

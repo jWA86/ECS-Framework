@@ -45,6 +45,28 @@ describe("ParameterBinding", () => {
         x = xPB.getParameter(1);
         expect(x).to.equal(cp2.x2);
     });
+    it("should be able to validate parameterBinding, (checked that props are set and the keyInSource exist in the source)", () => {
+        const p1 = new ComponentFactory<Comp1>(20, new Comp1());
+        const p2 = new ComponentFactory<Comp2>(20, new Comp2());
+
+        const pbX = new ParameterBinding("x");
+        try {
+            pbX.validate();
+        } catch (e) {
+            expect(e).to.be.instanceof(Error);
+        }
+
+        pbX.setSource(p1, "x1");
+
+        expect(pbX.validate()).to.equal(true);
+
+        pbX.keyInSource = "zz";
+        try {
+            pbX.validate();
+        } catch (e) {
+            expect(e).to.be.instanceof(Error);
+        }
+    });
     describe("ParametersSourceIterator", () => {
 
         let defaultParams;
@@ -233,28 +255,31 @@ describe("ParameterBinding", () => {
             expect(res[1].length).to.equal(1);
             expect(res[1][0].source).to.not.equal(res[0][1].source);
         });
+        it("should be able to validate every parameter binding", () => {
+            const p1 = new ComponentFactory<Comp1>(20, new Comp1());
+            const p2 = new ComponentFactory<Comp2>(20, new Comp2());
+            const p3 = new ComponentFactory<{ entityId: number, active: true, x1: string }>(20, { entityId: 0, active: true, x1: " " });
+            const pSIterator = new ParametersSourceIterator(new ParamComp());
+            // param binding not set should trow en error
+            try {
+                pSIterator.validate();
+            } catch (e) {
+                expect(e).to.be.instanceof(Error);
+            }
+
+            pSIterator.setObjectSource("*", p1);
+            pSIterator.setObjectSource("x", p1, "x1");
+            pSIterator.setObjectSource("y", p2, "x2");
+
+            expect(pSIterator.validate()).to.be.eq(true);
+
+            pSIterator.setObjectSource("x", p3, "x1");
+            try {
+                pSIterator.validate();
+            } catch (e) {
+                // not same type error
+                expect(e).to.be.instanceof(Error);
+            }
+        });
     });
 });
-
-// for every source:
-// get params
-
-// ex : x s1, y s2, entityId: s1, active: s1
-// currently do :
-// x = refComponent
-// y = getById
-// entityId = getById
-// active = getById
-
-// by Sources :
-// s1 :
-// set x by refComponent
-// entityId = refComponent
-// active = refComponent
-// s2:
-// y getById
-
-// TODO :
-// system class with this paramIterator
-// compare performance
-// Refactor test process active from different source than entityId (and different key)

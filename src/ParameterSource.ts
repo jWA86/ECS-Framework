@@ -11,25 +11,57 @@ interface IParameterBinding<P, S extends IComponent, ParamType> {
     getParameter(id: number): ParamType;
     getComponent(out: S, id: number): S;
     setSource(source: IComponentFactory<S>, keyInSource: keyof S);
+    validate(): boolean;
 }
 
 class ParameterBinding<Parameter, SourceComponent extends IComponent, ParamType> implements
     IParameterBinding<Parameter, SourceComponent, ParamType>  {
-    public source: IComponentFactory<IComponent>;
-    public keyInSource: keyof any;
-    constructor(public key: keyof Parameter) { }
+    protected _source: IComponentFactory<IComponent>;
+    protected _keyInSource: keyof any;
+    constructor(public key: keyof Parameter) {
+        this._source = undefined;
+        this._keyInSource = undefined;
+    }
 
+    public get source(): IComponentFactory<IComponent> {
+        return this._source;
+    }
+    public set keyInSource(val: keyof any) {
+        this._keyInSource = val;
+    }
+    public get keyInSource() {
+        return this._keyInSource;
+    }
     public getParameter(entityId: number): ParamType {
-        return this.source.get(entityId)[this.keyInSource];
+        return this._source.get(entityId)[this._keyInSource];
     }
 
     public getComponent(out: SourceComponent, entityId: number): SourceComponent {
-        return out = this.source.get(entityId);
+        return out = this._source.get(entityId);
     }
 
     public setSource<S extends IComponent>(source: IComponentFactory<S>, keyInSource: keyof S) {
-        this.source = source;
-        this.keyInSource = keyInSource;
+        this._source = source;
+        this._keyInSource = keyInSource;
+    }
+
+    public validate(): boolean {
+        if (this.key === undefined) {
+            throw Error("key is not defined");
+        }
+        if (this._source === undefined) {
+            throw Error("source for parameter binding " + this.key + " is not set");
+        }
+        if (this._keyInSource === undefined) {
+            throw Error("key in source for parameter binding " + this.key + " is not set");
+        }
+
+        const z = this.source.values[0];
+        if (z[this._keyInSource] === undefined) {
+            throw Error(`key in source ${this._keyInSource.toString()} doesn't exist in source`);
+        } else {
+            return true;
+        }
     }
 }
 
@@ -117,15 +149,26 @@ class ParametersSourceIterator<Parameters extends IComponent> {
             objectReferencingComponents[key][keyInSource] = objectContainingValue[key] as any;
         }
     }
-
-    public validateBinding(): boolean {
+    /**
+     * Return true if valid or else throw en Error
+     */
+    public validate(): boolean {
+        this._paramsSortedBySources.forEach((ar) => {
+            ar.forEach((pb) => {
+                pb.validate();
+                // console.log(typeof pb.source.values[0][pb.keyInSource]);
+                if (typeof pb.source.values[0][pb.keyInSource] !== typeof this._defaultParameters[pb.key]) {
+                    throw Error(`parameter ${pb.key} and ${pb.keyInSource.toString()} don't share the same type`);
+                }
+            });
+        });
         return true;
     }
 
     public setObjectSource<C extends IComponent>(paramKey: keyof Parameters | "*", pool: IComponentFactory<C>, paramNameInSource?: keyof C) {
         if (paramKey === "*") {
             this._paramsSources.values.forEach((p) => {
-                p.source = pool;
+                p.setSource(pool, p.key as keyof IComponent);
             });
             this._idSource = pool;
             this._activeSource = pool;
