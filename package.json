@@ -33,7 +33,7 @@
     "karma-mocha": "^1.3.0",
     "karma-phantomjs-launcher": "^1.0.4",
     "karma-safari-launcher": "^1.0.0",
-    "karma-typescript": "^3.0.8",
+    "karma-typescript": "3.0.8",
     "mocha": "^5.0.1",
     "ts-loader": "3.5.0",
     "typescript": "^2.8.1",
