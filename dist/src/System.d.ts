@@ -1,37 +1,23 @@
 import { FastIterationMap } from "FastIterationMap";
 import { IComponent, IComponentFactory } from "./interfaces";
 import { ISystem } from "./ISystem";
+import { ParametersSourceIterator, IParameterBinding } from "./ParameterSource";
 export { IKeyMapping, System };
 interface IKeyMapping<P, S extends IComponent> {
     key: keyof P;
     keyInSource: keyof S;
     source: IComponentFactory<S>;
 }
-declare abstract class System<P> implements ISystem<P> {
+declare abstract class System<P extends IComponent> implements ISystem<P> {
     active: boolean;
-    protected _parametersSource: FastIterationMap<keyof P, IKeyMapping<P, IComponent>>;
-    /**
-     * Define the parameters need by the System
-     * Used the key of the object to generate _currentParameters and _parametersSource
-     */
-    protected abstract _defaultParameter: P;
+    protected _parametersSource: ParametersSourceIterator<P>;
     /** Components mapped to parameters being modified in the execute method */
-    protected _currentParameters: Record<keyof P, IComponent>;
-    /** Shortcut for : this._currentParameters.get("paramName").keyInSource */
-    protected _k: Record<keyof P, string>;
-    protected initialized: boolean;
-    constructor();
-    /**
-     * Execute on the current parameters
-     * @param params Technically it's of type Record<keyof P, IComponent> but setting it to <P> allow to get the type of the parameters in the intellisense when using VSCode.
-     * @param args Additional args passed from process()
-     */
-    abstract execute(params: P, ...args: any[]): any;
-    init(): void;
-    parameters: P;
-    readonly parametersSource: FastIterationMap<keyof P, IKeyMapping<P, IComponent>>;
-    process(...args: any[]): void;
+    protected _currentParametersComponents: Record<keyof P, IComponent>;
+    protected _currentParametersValues: P;
+    constructor(paramValuesHolder: P);
+    readonly parametersSource: FastIterationMap<keyof P, IParameterBinding<P, IComponent, any>>;
     setParamSource<C extends IComponent>(paramKey: keyof P | "*", pool: IComponentFactory<C>, paramNameInSource?: keyof C): void;
-    /** Extract parameters key from the parameter object */
-    protected extractingParametersKeys(): void;
+    abstract execute(params: P, ...args: any[]): P;
+    /** Iterate on all active components from the component pool associated with the parameter 'entityId' */
+    process(...args: any[]): void;
 }

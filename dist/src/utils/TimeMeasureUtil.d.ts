@@ -1,5 +1,6 @@
 import { IComponentFactory } from "../IComponentFactory";
 import { IFrameEvent } from "../IFrameEvent";
+import { IComponent } from "../interfaces";
 import { ISystem } from "../ISystem";
 import { ISystemManager } from "../ISystemManager";
 import { ITimeMeasureComponent, ITimeMeasureUtil } from "./ITimeMeasureUtil";
@@ -48,19 +49,25 @@ declare class TimeMeasureUtil implements ITimeMeasureUtil {
     uninstall(systemId: string): void;
     getMeasures(systemId: string): any;
 }
-declare abstract class TimeMeasureSystem implements ISystem<{}> {
+declare abstract class TimeMeasureSystem implements ISystem<IComponent> {
     tmComponent: TimeMeasureComponent;
     static performance: Performance;
     active: boolean;
     protected startMark: string;
     protected endMark: string;
-    protected _parameters: {};
+    protected _parameters: {
+        active: boolean;
+        entityId: number;
+    };
     /**
      * @param tmComponent the component used for recording time
      */
     constructor(tmComponent: TimeMeasureComponent);
     /** Not used */
-    readonly parameters: {};
+    readonly parameters: {
+        active: boolean;
+        entityId: number;
+    };
     abstract process(...args: any[]): any;
     abstract execute(...args: any[]): any;
     setParamSource(): void;
