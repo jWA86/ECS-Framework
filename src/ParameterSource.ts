@@ -83,11 +83,6 @@ class ParametersSourceIterator<Parameters extends IComponent> {
     public reset() {
         this.currentIteration = 0;
     }
-    /**
-     *
-     * @param values object containing values of parameters, modify it will not modify the component unless it's an object. access : values.key;
-     * @param components object referencing components for each key, use : components.key[keyInSource] to modify the parameter in the referenced component.
-     */
 
     public set defaultParameters(val: any) {
         this._defaultParameters = val;
@@ -97,7 +92,12 @@ class ParametersSourceIterator<Parameters extends IComponent> {
     public get sources(): FastIterationMap<keyof Parameters, IParameterBinding<Parameters, IComponent, any>> {
         return this._paramsSources;
     }
-    /** Assemble parameters from poolFactories sources, if skipInactive is true, the process of assemblage is aborded and the resulting obj is not modified */
+
+    /** Assemble parameters from poolFactories sources, if skipInactive is true, the process of assemblage is aborded and the resulting obj is not modified.
+     *
+     * @param outValues object containing values of parameters, modify it will not modify the component unless it's an object. access : values.key;
+     * @param outComponentsobject referencing components for each key, use : components.key[keyInSource] to modify the parameter in the referenced component.
+     */
     public next(outValues: Parameters, outComponents: { [P in keyof Parameters]: IComponent }, skipInactive: boolean): boolean {
         // this.currentIteration += 1;
         const nbActiveComponent = this._idSource.activeLength;
@@ -163,6 +163,14 @@ class ParametersSourceIterator<Parameters extends IComponent> {
             });
         });
         return true;
+    }
+
+    public getParameterValue(entityId: number, paramKey: keyof Parameters) {
+        return this._paramsSources.get(paramKey).getParameter(entityId);
+    }
+
+    public getParameterComponent(outComponent: IComponent, entityId: number, paramKey: keyof Parameters): IComponent {
+        return this._paramsSources.get(paramKey).getComponent(outComponent, entityId);
     }
 
     public setObjectSource<C extends IComponent>(paramKey: keyof Parameters | "*", pool: IComponentFactory<C>, paramNameInSource?: keyof C) {
