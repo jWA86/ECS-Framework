@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 8);
+/******/ 	return __webpack_require__(__webpack_require__.s = 9);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -92,7 +92,7 @@ exports.RANDOM = RANDOM;
 var GLOBAL = isBrowser() ? window : isNode() ? global : new Error("Unknow environment");
 exports.GLOBAL = GLOBAL;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
 
 /***/ }),
 /* 1 */
@@ -967,7 +967,232 @@ exports.GameLoop = GameLoop;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var ParameterSource_1 = __webpack_require__(15);
+var FastIterationMap_1 = __webpack_require__(1);
+var ParameterBinding = /** @class */ (function () {
+    function ParameterBinding(key) {
+        this.key = key;
+        this._source = undefined;
+        this._keyInSource = undefined;
+    }
+    Object.defineProperty(ParameterBinding.prototype, "source", {
+        get: function () {
+            return this._source;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(ParameterBinding.prototype, "keyInSource", {
+        get: function () {
+            return this._keyInSource;
+        },
+        set: function (val) {
+            this._keyInSource = val;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    ParameterBinding.prototype.getParameter = function (entityId) {
+        return this._source.get(entityId)[this._keyInSource];
+    };
+    ParameterBinding.prototype.getComponent = function (out, entityId) {
+        return out = this._source.get(entityId);
+    };
+    ParameterBinding.prototype.setSource = function (source, keyInSource) {
+        this._source = source;
+        this._keyInSource = keyInSource;
+    };
+    ParameterBinding.prototype.validate = function () {
+        if (this.key === undefined) {
+            throw Error("key is not defined");
+        }
+        if (this._source === undefined) {
+            throw Error("source for parameter binding " + this.key + " is not set");
+        }
+        if (this._keyInSource === undefined) {
+            throw Error("key in source for parameter binding " + this.key + " is not set");
+        }
+        var z = this.source.values[0];
+        if (z[this._keyInSource] === undefined) {
+            throw Error("key in source " + this._keyInSource.toString() + " doesn't exist in source");
+        }
+        else {
+            return true;
+        }
+    };
+    return ParameterBinding;
+}());
+exports.ParameterBinding = ParameterBinding;
+/** Iteration by sources  */
+var ParametersSourceIterator = /** @class */ (function () {
+    function ParametersSourceIterator(defaultParameters) {
+        this.currentIteration = 0;
+        this.defaultParameters = defaultParameters;
+    }
+    ParametersSourceIterator.prototype.reset = function () {
+        this.currentIteration = 0;
+    };
+    Object.defineProperty(ParametersSourceIterator.prototype, "defaultParameters", {
+        set: function (val) {
+            this._defaultParameters = val;
+            this.setObjectSourceKey();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(ParametersSourceIterator.prototype, "sources", {
+        get: function () {
+            return this._paramsSources;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    /** Assemble parameters from poolFactories sources, if skipInactive is true, the process of assemblage is aborded and the resulting obj is not modified.
+     *
+     * @param outValues object containing values of parameters, modify it will not modify the component unless it's an object. access : values.key;
+     * @param outComponentsobject referencing components for each key, use : components.key[keyInSource] to modify the parameter in the referenced component.
+     */
+    ParametersSourceIterator.prototype.next = function (outValues, outComponents, skipInactive) {
+        // this.currentIteration += 1;
+        var nbActiveComponent = this._idSource.activeLength;
+        if (this.currentIteration >= nbActiveComponent) {
+            return true;
+        }
+        var refPool = this._idSource.values;
+        var currentSource;
+        var nbSources = this._paramsSortedBySources.length;
+        currentSource = this._idSource;
+        var id = refPool[this.currentIteration].entityId;
+        var activeComp = this._activeSource.get(id);
+        if (!activeComp[this._activeKeyInSource] && skipInactive) {
+            outValues.active = false;
+            this.currentIteration += 1;
+            return false;
+        }
+        else {
+            for (var s = 0; s < nbSources; ++s) {
+                var comp = void 0;
+                var paramSource = this._paramsSortedBySources[s];
+                if (paramSource[0].source === currentSource) {
+                    comp = currentSource.values[this.currentIteration];
+                }
+                else {
+                    currentSource = paramSource[0].source;
+                    comp = currentSource.get(id);
+                }
+                if (comp === undefined) {
+                    throw Error("Component with entityId " + id + " was not found in " + currentSource);
+                }
+                var nbParam = paramSource.length;
+                for (var p = 0; p < nbParam; ++p) {
+                    var key = paramSource[p].key;
+                    outComponents[key] = comp;
+                    outValues[key] = comp[paramSource[p].keyInSource];
+                }
+            }
+        }
+        this.currentIteration += 1;
+        return false;
+    };
+    // Set value of parameters from ObjectContainingValue to the corresponding component
+    ParametersSourceIterator.prototype.copyValToComponent = function (objectContainingValue, objectReferencingComponents) {
+        var params = this._paramsSources.values;
+        var l = params.length;
+        for (var i = 0; i < l; i++) {
+            var key = params[i].key;
+            var keyInSource = params[i].keyInSource;
+            objectReferencingComponents[key][keyInSource] = objectContainingValue[key];
+        }
+    };
+    /**
+     * Return true if valid or else throw en Error
+     */
+    ParametersSourceIterator.prototype.validate = function () {
+        var _this = this;
+        this._paramsSortedBySources.forEach(function (ar) {
+            ar.forEach(function (pb) {
+                pb.validate();
+                // console.log(typeof pb.source.values[0][pb.keyInSource]);
+                if (typeof pb.source.values[0][pb.keyInSource] !== typeof _this._defaultParameters[pb.key]) {
+                    throw Error("parameter " + pb.key + " and " + pb.keyInSource.toString() + " don't share the same type");
+                }
+            });
+        });
+        return true;
+    };
+    ParametersSourceIterator.prototype.getParameterValue = function (entityId, paramKey) {
+        return this._paramsSources.get(paramKey).getParameter(entityId);
+    };
+    ParametersSourceIterator.prototype.getParameterComponent = function (outComponent, entityId, paramKey) {
+        return this._paramsSources.get(paramKey).getComponent(outComponent, entityId);
+    };
+    ParametersSourceIterator.prototype.setObjectSource = function (paramKey, pool, paramNameInSource) {
+        if (paramKey === "*") {
+            this._paramsSources.values.forEach(function (p) {
+                p.setSource(pool, p.key);
+            });
+            this._idSource = pool;
+            this._activeSource = pool;
+            this._activeKeyInSource = "active";
+        }
+        else if (!this._paramsSources.has(paramKey)) {
+            // when called directly from javascript (not using typescript type check)
+            throw Error("Parameter name '" + paramKey + "' is not a parameter of the system.");
+        }
+        else {
+            var mappedKey = new ParameterBinding(paramKey);
+            mappedKey.setSource(pool, paramNameInSource || paramKey);
+            if (paramKey === "entityId") {
+                this._idSource = mappedKey.source;
+            }
+            if (paramKey === "active") {
+                this._activeSource = mappedKey.source;
+                this._activeKeyInSource = paramNameInSource || "active";
+            }
+            this._paramsSources.set(paramKey, mappedKey);
+        }
+        this._paramsSortedBySources = this.sortParamBySource(this._paramsSources);
+    };
+    ParametersSourceIterator.prototype.sortParamBySource = function (parameterBindings) {
+        var ar = [];
+        parameterBindings.values.forEach(function (a) {
+            // let inserted = false;
+            var res = ar.find(function (pArray) {
+                return pArray[0].source === a.source;
+            });
+            if (res !== undefined) {
+                res.push(a);
+            }
+            else {
+                ar.push([a]);
+            }
+        });
+        return ar;
+    };
+    ParametersSourceIterator.prototype.setObjectSourceKey = function () {
+        var _this = this;
+        this._paramsSources = new FastIterationMap_1.FastIterationMap();
+        var ref = this._defaultParameters;
+        var keys = Object.keys(this._defaultParameters);
+        keys.forEach(function (k) {
+            var o = ref[k];
+            var mappedKey = new ParameterBinding(k);
+            mappedKey.setSource(undefined, k);
+            _this._paramsSources.set(k, mappedKey);
+        });
+    };
+    return ParametersSourceIterator;
+}());
+exports.ParametersSourceIterator = ParametersSourceIterator;
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var ParameterSource_1 = __webpack_require__(5);
 var System = /** @class */ (function () {
     function System(paramValuesHolder) {
         this.active = true;
@@ -1005,7 +1230,7 @@ exports.System = System;
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1169,7 +1394,7 @@ exports.SystemManager = SystemManager;
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1180,14 +1405,14 @@ exports.TM_POOL_SIZE = TM_POOL_SIZE;
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(9);
+module.exports = __webpack_require__(10);
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1199,20 +1424,23 @@ var EntityFactory_1 = __webpack_require__(3);
 exports.EntityFactory = EntityFactory_1.EntityFactory;
 var GameLoop_1 = __webpack_require__(4);
 exports.GameLoop = GameLoop_1.GameLoop;
-var Graphics_1 = __webpack_require__(11);
+var Graphics_1 = __webpack_require__(12);
 exports.Graphics = Graphics_1.Graphics;
-var interfaces = __webpack_require__(12);
+var interfaces = __webpack_require__(13);
 exports.interfaces = interfaces;
+var ParameterSource_1 = __webpack_require__(5);
+exports.ParameterBinding = ParameterSource_1.ParameterBinding;
+exports.ParametersSourceIterator = ParameterSource_1.ParametersSourceIterator;
 var pollyFill_1 = __webpack_require__(0);
 exports.RANDOM = pollyFill_1.RANDOM;
 exports.TIMESTAMP = pollyFill_1.TIMESTAMP;
-var Project_1 = __webpack_require__(13);
+var Project_1 = __webpack_require__(14);
 exports.Project = Project_1.Project;
-var System_1 = __webpack_require__(5);
+var System_1 = __webpack_require__(6);
 exports.System = System_1.System;
-var SystemManager_1 = __webpack_require__(6);
+var SystemManager_1 = __webpack_require__(7);
 exports.SystemManager = SystemManager_1.SystemManager;
-var DEFAULT_CONF = __webpack_require__(7);
+var DEFAULT_CONF = __webpack_require__(8);
 exports.DEFAULT_CONF = DEFAULT_CONF;
 var HtmlInterface_1 = __webpack_require__(16);
 exports.HtmlInterface = HtmlInterface_1.HtmlInterface;
@@ -1225,7 +1453,7 @@ exports.TimeMeasureUtil = TimeMeasureUtil_1.TimeMeasureUtil;
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 var g;
@@ -1252,7 +1480,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1297,7 +1525,7 @@ exports.Graphics = Graphics;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1306,20 +1534,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var FastIterationMap_1 = __webpack_require__(1);
-var Mousetrap = __webpack_require__(14);
+var Mousetrap = __webpack_require__(15);
 var ComponentFactory_1 = __webpack_require__(2);
 var EntityFactory_1 = __webpack_require__(3);
 var GameLoop_1 = __webpack_require__(4);
 var pollyFill_1 = __webpack_require__(0);
-var System_1 = __webpack_require__(5);
-var SystemManager_1 = __webpack_require__(6);
+var System_1 = __webpack_require__(6);
+var SystemManager_1 = __webpack_require__(7);
 var Project = /** @class */ (function () {
     function Project(_projectName, dependencies) {
         this._projectName = _projectName;
@@ -1385,7 +1613,7 @@ exports.Project = Project;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;/*global define:false */
@@ -2436,231 +2664,6 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/*global define:false */
 
 
 /***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var FastIterationMap_1 = __webpack_require__(1);
-var ParameterBinding = /** @class */ (function () {
-    function ParameterBinding(key) {
-        this.key = key;
-        this._source = undefined;
-        this._keyInSource = undefined;
-    }
-    Object.defineProperty(ParameterBinding.prototype, "source", {
-        get: function () {
-            return this._source;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ParameterBinding.prototype, "keyInSource", {
-        get: function () {
-            return this._keyInSource;
-        },
-        set: function (val) {
-            this._keyInSource = val;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    ParameterBinding.prototype.getParameter = function (entityId) {
-        return this._source.get(entityId)[this._keyInSource];
-    };
-    ParameterBinding.prototype.getComponent = function (out, entityId) {
-        return out = this._source.get(entityId);
-    };
-    ParameterBinding.prototype.setSource = function (source, keyInSource) {
-        this._source = source;
-        this._keyInSource = keyInSource;
-    };
-    ParameterBinding.prototype.validate = function () {
-        if (this.key === undefined) {
-            throw Error("key is not defined");
-        }
-        if (this._source === undefined) {
-            throw Error("source for parameter binding " + this.key + " is not set");
-        }
-        if (this._keyInSource === undefined) {
-            throw Error("key in source for parameter binding " + this.key + " is not set");
-        }
-        var z = this.source.values[0];
-        if (z[this._keyInSource] === undefined) {
-            throw Error("key in source " + this._keyInSource.toString() + " doesn't exist in source");
-        }
-        else {
-            return true;
-        }
-    };
-    return ParameterBinding;
-}());
-exports.ParameterBinding = ParameterBinding;
-/** Iteration by sources  */
-var ParametersSourceIterator = /** @class */ (function () {
-    function ParametersSourceIterator(defaultParameters) {
-        this.currentIteration = 0;
-        this.defaultParameters = defaultParameters;
-    }
-    ParametersSourceIterator.prototype.reset = function () {
-        this.currentIteration = 0;
-    };
-    Object.defineProperty(ParametersSourceIterator.prototype, "defaultParameters", {
-        set: function (val) {
-            this._defaultParameters = val;
-            this.setObjectSourceKey();
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ParametersSourceIterator.prototype, "sources", {
-        get: function () {
-            return this._paramsSources;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    /** Assemble parameters from poolFactories sources, if skipInactive is true, the process of assemblage is aborded and the resulting obj is not modified.
-     *
-     * @param outValues object containing values of parameters, modify it will not modify the component unless it's an object. access : values.key;
-     * @param outComponentsobject referencing components for each key, use : components.key[keyInSource] to modify the parameter in the referenced component.
-     */
-    ParametersSourceIterator.prototype.next = function (outValues, outComponents, skipInactive) {
-        // this.currentIteration += 1;
-        var nbActiveComponent = this._idSource.activeLength;
-        if (this.currentIteration >= nbActiveComponent) {
-            return true;
-        }
-        var refPool = this._idSource.values;
-        var currentSource;
-        var nbSources = this._paramsSortedBySources.length;
-        currentSource = this._idSource;
-        var id = refPool[this.currentIteration].entityId;
-        var activeComp = this._activeSource.get(id);
-        if (!activeComp[this._activeKeyInSource] && skipInactive) {
-            outValues.active = false;
-            this.currentIteration += 1;
-            return false;
-        }
-        else {
-            for (var s = 0; s < nbSources; ++s) {
-                var comp = void 0;
-                var paramSource = this._paramsSortedBySources[s];
-                if (paramSource[0].source === currentSource) {
-                    comp = currentSource.values[this.currentIteration];
-                }
-                else {
-                    currentSource = paramSource[0].source;
-                    comp = currentSource.get(id);
-                }
-                if (comp === undefined) {
-                    throw Error("Component with entityId " + id + " was not found in " + currentSource);
-                }
-                var nbParam = paramSource.length;
-                for (var p = 0; p < nbParam; ++p) {
-                    var key = paramSource[p].key;
-                    outComponents[key] = comp;
-                    outValues[key] = comp[paramSource[p].keyInSource];
-                }
-            }
-        }
-        this.currentIteration += 1;
-        return false;
-    };
-    // Set value of parameters from ObjectContainingValue to the corresponding component
-    ParametersSourceIterator.prototype.copyValToComponent = function (objectContainingValue, objectReferencingComponents) {
-        var params = this._paramsSources.values;
-        var l = params.length;
-        for (var i = 0; i < l; i++) {
-            var key = params[i].key;
-            var keyInSource = params[i].keyInSource;
-            objectReferencingComponents[key][keyInSource] = objectContainingValue[key];
-        }
-    };
-    /**
-     * Return true if valid or else throw en Error
-     */
-    ParametersSourceIterator.prototype.validate = function () {
-        var _this = this;
-        this._paramsSortedBySources.forEach(function (ar) {
-            ar.forEach(function (pb) {
-                pb.validate();
-                // console.log(typeof pb.source.values[0][pb.keyInSource]);
-                if (typeof pb.source.values[0][pb.keyInSource] !== typeof _this._defaultParameters[pb.key]) {
-                    throw Error("parameter " + pb.key + " and " + pb.keyInSource.toString() + " don't share the same type");
-                }
-            });
-        });
-        return true;
-    };
-    ParametersSourceIterator.prototype.getParameterValue = function (entityId, paramKey) {
-        return this._paramsSources.get(paramKey).getParameter(entityId);
-    };
-    ParametersSourceIterator.prototype.getParameterComponent = function (outComponent, entityId, paramKey) {
-        return this._paramsSources.get(paramKey).getComponent(outComponent, entityId);
-    };
-    ParametersSourceIterator.prototype.setObjectSource = function (paramKey, pool, paramNameInSource) {
-        if (paramKey === "*") {
-            this._paramsSources.values.forEach(function (p) {
-                p.setSource(pool, p.key);
-            });
-            this._idSource = pool;
-            this._activeSource = pool;
-            this._activeKeyInSource = "active";
-        }
-        else if (!this._paramsSources.has(paramKey)) {
-            // when called directly from javascript (not using typescript type check)
-            throw Error("Parameter name '" + paramKey + "' is not a parameter of the system.");
-        }
-        else {
-            var mappedKey = new ParameterBinding(paramKey);
-            mappedKey.setSource(pool, paramNameInSource || paramKey);
-            if (paramKey === "entityId") {
-                this._idSource = mappedKey.source;
-            }
-            if (paramKey === "active") {
-                this._activeSource = mappedKey.source;
-                this._activeKeyInSource = paramNameInSource || "active";
-            }
-            this._paramsSources.set(paramKey, mappedKey);
-        }
-        this._paramsSortedBySources = this.sortParamBySource(this._paramsSources);
-    };
-    ParametersSourceIterator.prototype.sortParamBySource = function (parameterBindings) {
-        var ar = [];
-        parameterBindings.values.forEach(function (a) {
-            // let inserted = false;
-            var res = ar.find(function (pArray) {
-                return pArray[0].source === a.source;
-            });
-            if (res !== undefined) {
-                res.push(a);
-            }
-            else {
-                ar.push([a]);
-            }
-        });
-        return ar;
-    };
-    ParametersSourceIterator.prototype.setObjectSourceKey = function () {
-        var _this = this;
-        this._paramsSources = new FastIterationMap_1.FastIterationMap();
-        var ref = this._defaultParameters;
-        var keys = Object.keys(this._defaultParameters);
-        keys.forEach(function (k) {
-            var o = ref[k];
-            var mappedKey = new ParameterBinding(k);
-            mappedKey.setSource(undefined, k);
-            _this._paramsSources.set(k, mappedKey);
-        });
-    };
-    return ParametersSourceIterator;
-}());
-exports.ParametersSourceIterator = ParametersSourceIterator;
-
-
-/***/ }),
 /* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -2756,7 +2759,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var ComponentFactory_1 = __webpack_require__(2);
 var pollyFill_1 = __webpack_require__(0);
-var DefaultConfig_1 = __webpack_require__(7);
+var DefaultConfig_1 = __webpack_require__(8);
 /**
  * Component that holds time measure
  */

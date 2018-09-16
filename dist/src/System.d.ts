@@ -1,7 +1,7 @@
 import { FastIterationMap } from "FastIterationMap";
 import { IComponent, IComponentFactory } from "./interfaces";
 import { ISystem } from "./ISystem";
-import { ParametersSourceIterator, IParameterBinding } from "./ParameterSource";
+import { IParameterBinding, ParametersSourceIterator } from "./ParameterSource";
 export { IKeyMapping, System };
 interface IKeyMapping<P, S extends IComponent> {
     key: keyof P;
