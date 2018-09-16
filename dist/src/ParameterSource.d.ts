@@ -35,14 +35,13 @@ declare class ParametersSourceIterator<Parameters extends IComponent> {
     protected _activeKeyInSource: keyof any;
     constructor(defaultParameters: Parameters);
     reset(): void;
-    /**
-     *
-     * @param values object containing values of parameters, modify it will not modify the component unless it's an object. access : values.key;
-     * @param components object referencing components for each key, use : components.key[keyInSource] to modify the parameter in the referenced component.
-     */
     defaultParameters: any;
     readonly sources: FastIterationMap<keyof Parameters, IParameterBinding<Parameters, IComponent, any>>;
-    /** Assemble parameters from poolFactories sources, if skipInactive is true, the process of assemblage is aborded and the resulting obj is not modified */
+    /** Assemble parameters from poolFactories sources, if skipInactive is true, the process of assemblage is aborded and the resulting obj is not modified.
+     *
+     * @param outValues object containing values of parameters, modify it will not modify the component unless it's an object. access : values.key;
+     * @param outComponentsobject referencing components for each key, use : components.key[keyInSource] to modify the parameter in the referenced component.
+     */
     next(outValues: Parameters, outComponents: {
         [P in keyof Parameters]: IComponent;
     }, skipInactive: boolean): boolean;
@@ -53,6 +52,8 @@ declare class ParametersSourceIterator<Parameters extends IComponent> {
      * Return true if valid or else throw en Error
      */
     validate(): boolean;
+    getParameterValue(entityId: number, paramKey: keyof Parameters): any;
+    getParameterComponent(outComponent: IComponent, entityId: number, paramKey: keyof Parameters): IComponent;
     setObjectSource<C extends IComponent>(paramKey: keyof Parameters | "*", pool: IComponentFactory<C>, paramNameInSource?: keyof C): void;
     sortParamBySource(parameterBindings: FastIterationMap<keyof Parameters, IParameterBinding<Parameters, IComponent, any>>): Array<Array<IParameterBinding<Parameters, IComponent, any>>>;
     protected setObjectSourceKey(): void;

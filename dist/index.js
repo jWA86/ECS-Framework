@@ -2507,11 +2507,6 @@ var ParametersSourceIterator = /** @class */ (function () {
         this.currentIteration = 0;
     };
     Object.defineProperty(ParametersSourceIterator.prototype, "defaultParameters", {
-        /**
-         *
-         * @param values object containing values of parameters, modify it will not modify the component unless it's an object. access : values.key;
-         * @param components object referencing components for each key, use : components.key[keyInSource] to modify the parameter in the referenced component.
-         */
         set: function (val) {
             this._defaultParameters = val;
             this.setObjectSourceKey();
@@ -2526,7 +2521,11 @@ var ParametersSourceIterator = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    /** Assemble parameters from poolFactories sources, if skipInactive is true, the process of assemblage is aborded and the resulting obj is not modified */
+    /** Assemble parameters from poolFactories sources, if skipInactive is true, the process of assemblage is aborded and the resulting obj is not modified.
+     *
+     * @param outValues object containing values of parameters, modify it will not modify the component unless it's an object. access : values.key;
+     * @param outComponentsobject referencing components for each key, use : components.key[keyInSource] to modify the parameter in the referenced component.
+     */
     ParametersSourceIterator.prototype.next = function (outValues, outComponents, skipInactive) {
         // this.currentIteration += 1;
         var nbActiveComponent = this._idSource.activeLength;
@@ -2594,6 +2593,12 @@ var ParametersSourceIterator = /** @class */ (function () {
             });
         });
         return true;
+    };
+    ParametersSourceIterator.prototype.getParameterValue = function (entityId, paramKey) {
+        return this._paramsSources.get(paramKey).getParameter(entityId);
+    };
+    ParametersSourceIterator.prototype.getParameterComponent = function (outComponent, entityId, paramKey) {
+        return this._paramsSources.get(paramKey).getComponent(outComponent, entityId);
     };
     ParametersSourceIterator.prototype.setObjectSource = function (paramKey, pool, paramNameInSource) {
         if (paramKey === "*") {
