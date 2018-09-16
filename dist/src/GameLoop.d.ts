@@ -9,6 +9,7 @@ declare class FrameEvent implements IFrameEvent {
     lastFrame: number;
     lag: number;
     time: number;
+    state: "running" | "paused" | "idle";
     constructor(MS_PER_UPDATE: number);
     reset(): void;
 }

@@ -5,4 +5,5 @@ interface IFrameEvent {
     MS_PER_UPDATE: number;
     lastFrame: number;
     time: number;
+    state: "running" | "paused" | "idle";
 }
