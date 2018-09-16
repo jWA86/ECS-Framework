@@ -11,6 +11,7 @@ class FrameEvent implements IFrameEvent {
     public lastFrame: number;
     public lag: number;
     public time: number;
+    public state: "running" | "paused" | "idle";
     constructor(public MS_PER_UPDATE: number) {
         this.lag = 0;
         this.lastFrame = 0;

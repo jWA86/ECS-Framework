@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import "mocha";
 import { ComponentFactory } from "../src/ComponentFactory";
-import { IComponent, IComponentFactory } from "../src/interfaces";
+import { IComponent } from "../src/interfaces";
 
 describe("Component Factory", () => {
     class ConcreteComponent implements IComponent {

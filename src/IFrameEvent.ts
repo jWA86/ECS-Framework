@@ -11,4 +11,5 @@ interface IFrameEvent {
     lastFrame: number;
     /* time passed since the start of the game loop */
     time: number;
+    state: "running" | "paused" | "idle";
 }
