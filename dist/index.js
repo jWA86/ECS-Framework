@@ -1198,17 +1198,20 @@ var System = /** @class */ (function () {
         this.active = true;
         this._currentParametersValues = paramValuesHolder;
         this._currentParametersComponents = {};
-        this._parametersSource = new ParameterSource_1.ParametersSourceIterator(paramValuesHolder);
+        this._parametersIterator = new ParameterSource_1.ParametersSourceIterator(paramValuesHolder);
     }
     Object.defineProperty(System.prototype, "parametersSource", {
         get: function () {
-            return this._parametersSource.sources;
+            return this._parametersIterator.sources;
         },
         enumerable: true,
         configurable: true
     });
     System.prototype.setParamSource = function (paramKey, pool, paramNameInSource) {
-        this._parametersSource.setObjectSource(paramKey, pool, paramNameInSource);
+        this._parametersIterator.setObjectSource(paramKey, pool, paramNameInSource);
+    };
+    System.prototype.validateParametersSources = function () {
+        return this._parametersIterator.validate();
     };
     /** Iterate on all active components from the component pool associated with the parameter 'entityId' */
     System.prototype.process = function () {
@@ -1216,13 +1219,13 @@ var System = /** @class */ (function () {
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
-        while (!this._parametersSource.next(this._currentParametersValues, this._currentParametersComponents, true)) {
+        while (!this._parametersIterator.next(this._currentParametersValues, this._currentParametersComponents, true)) {
             if (this._currentParametersValues.active) {
                 var res = this.execute.apply(this, [this._currentParametersValues].concat(args));
-                this._parametersSource.copyValToComponent(res, this._currentParametersComponents);
+                this._parametersIterator.copyValToComponent(res, this._currentParametersComponents);
             }
         }
-        this._parametersSource.reset();
+        this._parametersIterator.reset();
     };
     return System;
 }());

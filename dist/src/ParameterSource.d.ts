@@ -9,7 +9,7 @@ interface IParameterBinding<P, S extends IComponent, ParamType> {
     getParameter(id: number): ParamType;
     getComponent(out: S, id: number): S;
     setSource(source: IComponentFactory<S>, keyInSource: keyof S): any;
-    validate(): boolean;
+    validate(): true | Error;
 }
 declare class ParameterBinding<Parameter, SourceComponent extends IComponent, ParamType> implements IParameterBinding<Parameter, SourceComponent, ParamType> {
     key: keyof Parameter;
@@ -21,7 +21,7 @@ declare class ParameterBinding<Parameter, SourceComponent extends IComponent, Pa
     getParameter(entityId: number): ParamType;
     getComponent(out: SourceComponent, entityId: number): SourceComponent;
     setSource<S extends IComponent>(source: IComponentFactory<S>, keyInSource: keyof S): void;
-    validate(): boolean;
+    validate(): true | Error;
 }
 /** Iteration by sources  */
 declare class ParametersSourceIterator<Parameters extends IComponent> {
@@ -51,7 +51,7 @@ declare class ParametersSourceIterator<Parameters extends IComponent> {
     /**
      * Return true if valid or else throw en Error
      */
-    validate(): boolean;
+    validate(): true | Error;
     getParameterValue(entityId: number, paramKey: keyof Parameters): any;
     getParameterComponent(outComponent: IComponent, entityId: number, paramKey: keyof Parameters): IComponent;
     setObjectSource<C extends IComponent>(paramKey: keyof Parameters | "*", pool: IComponentFactory<C>, paramNameInSource?: keyof C): void;
