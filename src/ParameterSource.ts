@@ -142,6 +142,58 @@ class ParametersSourceIterator<Parameters extends IComponent> {
         this.currentIteration += 1;
         return false;
     }
+
+    public assembleParamters(entityId: number, out?: Parameters): Parameters {
+        const res: Parameters = out || Object.assign({}, this._defaultParameters);
+        const nbSources = this._paramsSortedBySources.length;
+        let currentSource: IComponentFactory<IComponent>;
+
+        for (let s = 0; s < nbSources; ++s) {
+            let comp: IComponent;
+            const paramSource = this._paramsSortedBySources[s];
+            if (paramSource[0].source === currentSource) {
+                comp = currentSource.values[this.currentIteration];
+            } else {
+                currentSource = paramSource[0].source;
+                comp = currentSource.get(entityId);
+            }
+            if (comp === undefined) {
+                throw Error("Component with entityId " + entityId + " was not found in " + currentSource);
+            }
+            const nbParam = paramSource.length;
+            for (let p = 0; p < nbParam; ++p) {
+                const key = paramSource[p].key;
+                // outComponents[key] = comp;
+                res[key] = comp[paramSource[p].keyInSource];
+            }
+        }
+        return res;
+    }
+
+    public assembleParamtersAsComponents(entityId: number, outComponent: { [P in keyof Parameters]: IComponent }): { [P in keyof Parameters]: IComponent } {
+        const nbSources = this._paramsSortedBySources.length;
+        let currentSource: IComponentFactory<IComponent>;
+
+        for (let s = 0; s < nbSources; ++s) {
+            let comp: IComponent;
+            const paramSource = this._paramsSortedBySources[s];
+            if (paramSource[0].source === currentSource) {
+                comp = currentSource.values[this.currentIteration];
+            } else {
+                currentSource = paramSource[0].source;
+                comp = currentSource.get(entityId);
+            }
+            if (comp === undefined) {
+                throw Error("Component with entityId " + entityId + " was not found in " + currentSource);
+            }
+            const nbParam = paramSource.length;
+            for (let p = 0; p < nbParam; ++p) {
+                const key = paramSource[p].key;
+                outComponent[key] = comp;
+            }
+        }
+        return outComponent;
+    }
     // Set value of parameters from ObjectContainingValue to the corresponding component
     public copyValToComponent(objectContainingValue: Parameters, objectReferencingComponents: { [P in keyof Parameters]: IComponent }) {
         const params = this._paramsSources.values;
@@ -155,7 +207,7 @@ class ParametersSourceIterator<Parameters extends IComponent> {
     /**
      * Return true if valid or else throw en Error
      */
-    public validate(): true | Error {
+    public validate(): true | Error {
         this._paramsSortedBySources.forEach((ar) => {
             ar.forEach((pb) => {
                 pb.validate();
