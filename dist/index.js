@@ -1093,6 +1093,56 @@ var ParametersSourceIterator = /** @class */ (function () {
         this.currentIteration += 1;
         return false;
     };
+    ParametersSourceIterator.prototype.assembleParamters = function (entityId, out) {
+        var res = out || Object.assign({}, this._defaultParameters);
+        var nbSources = this._paramsSortedBySources.length;
+        var currentSource;
+        for (var s = 0; s < nbSources; ++s) {
+            var comp = void 0;
+            var paramSource = this._paramsSortedBySources[s];
+            if (paramSource[0].source === currentSource) {
+                comp = currentSource.values[this.currentIteration];
+            }
+            else {
+                currentSource = paramSource[0].source;
+                comp = currentSource.get(entityId);
+            }
+            if (comp === undefined) {
+                throw Error("Component with entityId " + entityId + " was not found in " + currentSource);
+            }
+            var nbParam = paramSource.length;
+            for (var p = 0; p < nbParam; ++p) {
+                var key = paramSource[p].key;
+                // outComponents[key] = comp;
+                res[key] = comp[paramSource[p].keyInSource];
+            }
+        }
+        return res;
+    };
+    ParametersSourceIterator.prototype.assembleParamtersAsComponents = function (entityId, outComponent) {
+        var nbSources = this._paramsSortedBySources.length;
+        var currentSource;
+        for (var s = 0; s < nbSources; ++s) {
+            var comp = void 0;
+            var paramSource = this._paramsSortedBySources[s];
+            if (paramSource[0].source === currentSource) {
+                comp = currentSource.values[this.currentIteration];
+            }
+            else {
+                currentSource = paramSource[0].source;
+                comp = currentSource.get(entityId);
+            }
+            if (comp === undefined) {
+                throw Error("Component with entityId " + entityId + " was not found in " + currentSource);
+            }
+            var nbParam = paramSource.length;
+            for (var p = 0; p < nbParam; ++p) {
+                var key = paramSource[p].key;
+                outComponent[key] = comp;
+            }
+        }
+        return outComponent;
+    };
     // Set value of parameters from ObjectContainingValue to the corresponding component
     ParametersSourceIterator.prototype.copyValToComponent = function (objectContainingValue, objectReferencingComponents) {
         var params = this._paramsSources.values;

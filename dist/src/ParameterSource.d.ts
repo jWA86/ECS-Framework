@@ -45,6 +45,12 @@ declare class ParametersSourceIterator<Parameters extends IComponent> {
     next(outValues: Parameters, outComponents: {
         [P in keyof Parameters]: IComponent;
     }, skipInactive: boolean): boolean;
+    assembleParamters(entityId: number, out?: Parameters): Parameters;
+    assembleParamtersAsComponents(entityId: number, outComponent: {
+        [P in keyof Parameters]: IComponent;
+    }): {
+        [P in keyof Parameters]: IComponent;
+    };
     copyValToComponent(objectContainingValue: Parameters, objectReferencingComponents: {
         [P in keyof Parameters]: IComponent;
     }): void;
