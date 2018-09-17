@@ -1093,7 +1093,7 @@ var ParametersSourceIterator = /** @class */ (function () {
         this.currentIteration += 1;
         return false;
     };
-    ParametersSourceIterator.prototype.assembleParamters = function (entityId, out) {
+    ParametersSourceIterator.prototype.assembleParameters = function (entityId, out) {
         var res = out || Object.assign({}, this._defaultParameters);
         var nbSources = this._paramsSortedBySources.length;
         var currentSource;
@@ -1119,7 +1119,7 @@ var ParametersSourceIterator = /** @class */ (function () {
         }
         return res;
     };
-    ParametersSourceIterator.prototype.assembleParamtersAsComponents = function (entityId, outComponent) {
+    ParametersSourceIterator.prototype.assembleParametersAsComponents = function (entityId, outComponent) {
         var nbSources = this._paramsSortedBySources.length;
         var currentSource;
         for (var s = 0; s < nbSources; ++s) {
