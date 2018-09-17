@@ -11,7 +11,7 @@ interface IParameterBinding<P, S extends IComponent, ParamType> {
     getParameter(id: number): ParamType;
     getComponent(out: S, id: number): S;
     setSource(source: IComponentFactory<S>, keyInSource: keyof S);
-    validate(): boolean;
+    validate(): true | Error;
 }
 
 class ParameterBinding<Parameter, SourceComponent extends IComponent, ParamType> implements
@@ -26,12 +26,15 @@ class ParameterBinding<Parameter, SourceComponent extends IComponent, ParamType>
     public get source(): IComponentFactory<IComponent> {
         return this._source;
     }
+
     public set keyInSource(val: keyof any) {
         this._keyInSource = val;
     }
+
     public get keyInSource() {
         return this._keyInSource;
     }
+
     public getParameter(entityId: number): ParamType {
         return this._source.get(entityId)[this._keyInSource];
     }
@@ -45,7 +48,7 @@ class ParameterBinding<Parameter, SourceComponent extends IComponent, ParamType>
         this._keyInSource = keyInSource;
     }
 
-    public validate(): boolean {
+    public validate(): true | Error {
         if (this.key === undefined) {
             throw Error("key is not defined");
         }
@@ -152,7 +155,7 @@ class ParametersSourceIterator<Parameters extends IComponent> {
     /**
      * Return true if valid or else throw en Error
      */
-    public validate(): boolean {
+    public validate(): true | Error {
         this._paramsSortedBySources.forEach((ar) => {
             ar.forEach((pb) => {
                 pb.validate();
