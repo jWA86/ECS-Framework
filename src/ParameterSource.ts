@@ -143,7 +143,7 @@ class ParametersSourceIterator<Parameters extends IComponent> {
         return false;
     }
 
-    public assembleParamters(entityId: number, out?: Parameters): Parameters {
+    public assembleParameters(entityId: number, out?: Parameters): Parameters {
         const res: Parameters = out || Object.assign({}, this._defaultParameters);
         const nbSources = this._paramsSortedBySources.length;
         let currentSource: IComponentFactory<IComponent>;
@@ -170,7 +170,7 @@ class ParametersSourceIterator<Parameters extends IComponent> {
         return res;
     }
 
-    public assembleParamtersAsComponents(entityId: number, outComponent: { [P in keyof Parameters]: IComponent }): { [P in keyof Parameters]: IComponent } {
+    public assembleParametersAsComponents(entityId: number, outComponent: { [P in keyof Parameters]: IComponent }): { [P in keyof Parameters]: IComponent } {
         const nbSources = this._paramsSortedBySources.length;
         let currentSource: IComponentFactory<IComponent>;
 
