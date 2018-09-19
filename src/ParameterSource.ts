@@ -61,7 +61,7 @@ class ParameterBinding<Parameter, SourceComponent extends IComponent, ParamType>
 
         const z = this.source.values[0];
         if (z[this._keyInSource] === undefined) {
-            throw Error(`key in source ${this._keyInSource.toString()} doesn't exist in source`);
+            throw Error(`key : ${this._keyInSource.toString()} doesn't exist in source`);
         } else {
             return true;
         }
