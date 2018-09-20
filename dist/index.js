@@ -1246,7 +1246,7 @@ var ParameterSource_1 = __webpack_require__(5);
 var System = /** @class */ (function () {
     function System(paramValuesHolder) {
         this.active = true;
-        this._currentParametersValues = paramValuesHolder;
+        this._currentParametersValues = Object.assign({}, paramValuesHolder);
         this._currentParametersComponents = {};
         this._parametersIterator = new ParameterSource_1.ParametersSourceIterator(paramValuesHolder);
     }
