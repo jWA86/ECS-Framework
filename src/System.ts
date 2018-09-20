@@ -20,7 +20,7 @@ abstract class System<P extends IComponent> implements ISystem<P> {
     protected _currentParametersComponents: Record<keyof P, IComponent>;
     protected _currentParametersValues: P;
     constructor(paramValuesHolder: P) {
-        this._currentParametersValues = paramValuesHolder;
+        this._currentParametersValues = Object.assign({}, paramValuesHolder);
         this._currentParametersComponents = {} as Record<keyof P, IComponent>;
         this._parametersIterator = new ParametersSourceIterator<P>(paramValuesHolder);
     }

@@ -6,7 +6,7 @@ import { System } from "../src/System";
 import { SystemManager } from "../src/SystemManager";
 
 describe("SystemManager should be able to", () => {
-    // dummy system that increment a interger
+    // Dummy system that increment a interger
     class IntegerComponent implements IComponent {
         public entityId: number;
         public active: boolean;
