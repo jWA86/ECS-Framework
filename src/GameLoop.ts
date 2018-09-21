@@ -16,6 +16,7 @@ class FrameEvent implements IFrameEvent {
         this.lag = 0;
         this.lastFrame = 0;
         this.time = 0;
+        this.state = "idle";
     }
     public reset() {
         this.lag = 0;
@@ -56,15 +57,19 @@ class GameLoop implements IGameLoop {
     }
     public start(...args: any[]) {
         this._running = true;
+        this._currentTimer.state = "running";
         this._currentTimer.lastFrame = TIMESTAMP.now();
         this.loop(...args);
     }
     public pause() {
         this._running = false;
+        this._currentTimer.state = "paused";
+
         cancelAnimationFrame(this._frameId);
     }
     public stop() {
         this.pause();
+        this._currentTimer.state = "idle";
         this._currentTimer.reset();
     }
     /* Set the process frequency in mms */
