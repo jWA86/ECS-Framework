@@ -839,6 +839,7 @@ var FrameEvent = /** @class */ (function () {
         this.lag = 0;
         this.lastFrame = 0;
         this.time = 0;
+        this.state = "idle";
     }
     FrameEvent.prototype.reset = function () {
         this.lag = 0;
@@ -886,15 +887,18 @@ var GameLoop = /** @class */ (function () {
             args[_i] = arguments[_i];
         }
         this._running = true;
+        this._currentTimer.state = "running";
         this._currentTimer.lastFrame = pollyFill_1.TIMESTAMP.now();
         this.loop.apply(this, args);
     };
     GameLoop.prototype.pause = function () {
         this._running = false;
+        this._currentTimer.state = "paused";
         cancelAnimationFrame(this._frameId);
     };
     GameLoop.prototype.stop = function () {
         this.pause();
+        this._currentTimer.state = "idle";
         this._currentTimer.reset();
     };
     /* Set the process frequency in mms */
