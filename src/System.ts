@@ -24,7 +24,7 @@ abstract class System<P extends IComponent> implements ISystem<P> {
         this._currentParametersComponents = {} as Record<keyof P, IComponent>;
         this._parametersIterator = new ParametersSourceIterator<P>(paramValuesHolder);
     }
-    public get parametersSource(): FastIterationMap<keyof P, IParameterBinding<P, IComponent, any>>  {
+    public get parametersSource(): FastIterationMap<keyof P, IParameterBinding<P, IComponent, any>> {
         return this._parametersIterator.sources;
     }
 
@@ -32,17 +32,20 @@ abstract class System<P extends IComponent> implements ISystem<P> {
         this._parametersIterator.setObjectSource(paramKey, pool, paramNameInSource);
     }
 
-    public validateParametersSources(): true | Error {
+    public validateParametersSources(): true |  Error {
         return this._parametersIterator.validate();
     }
-    public abstract execute(params: P, ...args: any[]): P;
+    public abstract execute(params: P, ...args: any[]): P | void;
 
     /** Iterate on all active components from the component pool associated with the parameter 'entityId' */
     public process(...args: any[]) {
         while (!this._parametersIterator.next(this._currentParametersValues, this._currentParametersComponents, true)) {
             if (this._currentParametersValues.active) {
                 const res = this.execute(this._currentParametersValues, ...args);
-                this._parametersIterator.copyValToComponent(res, this._currentParametersComponents);
+                // res === this._currentParametersValues or undefined if the execute method didn't return anything (ie: a rendering system)
+                if (res !== undefined) {
+                    this._parametersIterator.copyValToComponent(res as P, this._currentParametersComponents);
+                }
             }
         }
         this._parametersIterator.reset();
