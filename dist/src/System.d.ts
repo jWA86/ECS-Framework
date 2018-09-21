@@ -18,7 +18,7 @@ declare abstract class System<P extends IComponent> implements ISystem<P> {
     readonly parametersSource: FastIterationMap<keyof P, IParameterBinding<P, IComponent, any>>;
     setParamSource<C extends IComponent>(paramKey: keyof P | "*", pool: IComponentFactory<C>, paramNameInSource?: keyof C): void;
     validateParametersSources(): true | Error;
-    abstract execute(params: P, ...args: any[]): P;
+    abstract execute(params: P, ...args: any[]): P | void;
     /** Iterate on all active components from the component pool associated with the parameter 'entityId' */
     process(...args: any[]): void;
 }

@@ -1272,7 +1272,10 @@ var System = /** @class */ (function () {
         while (!this._parametersIterator.next(this._currentParametersValues, this._currentParametersComponents, true)) {
             if (this._currentParametersValues.active) {
                 var res = this.execute.apply(this, [this._currentParametersValues].concat(args));
-                this._parametersIterator.copyValToComponent(res, this._currentParametersComponents);
+                // res === this._currentParametersValues or undefined if the execute method didn't return anything (ie: a rendering system)
+                if (res !== undefined) {
+                    this._parametersIterator.copyValToComponent(res, this._currentParametersComponents);
+                }
             }
         }
         this._parametersIterator.reset();

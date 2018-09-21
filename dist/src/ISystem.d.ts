@@ -8,7 +8,7 @@ interface ISystem<P extends IComponent> {
     /** Assemble every components from paramsSource with the same entityId and pass it to the execute methode  */
     process(...args: any[]): any;
     /** Execution on the provided component and additionnals arguments provided in the process methode */
-    execute(P: any, ...args: any[]): any;
+    execute(P: any, ...args: any[]): P | void;
     /**
      *
      * @param paramKey
